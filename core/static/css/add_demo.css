@@ -1,0 +1,16 @@
+.main-section {
+  /* nếu muốn khác mặc định */
+  margin-top: 80px;
+}
+.brutalist-panel {
+  /* hoặc dùng .brutalist-panel--narrow thay cho width tay */
+  width: 520px;
+}
+.add-form h2 {
+  text-align: center;
+  margin-bottom: 18px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: 900;
+}

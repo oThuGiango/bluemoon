@@ -1,0 +1,11 @@
+.brutalist-panel {
+  width: 520px;
+}
+.add-form h2 {
+  text-align: center;
+  margin-bottom: 18px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}

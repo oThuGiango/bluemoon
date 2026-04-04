@@ -1,0 +1,63 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/Accountant.css' %}" />
+
+<div class="header-right" id="admShell">
+    <button
+        class="user-avatar"
+        id="admProfileBtn"
+        type="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        style="border: none; outline: none;"
+    >
+        {{ user.username|slice:":1"|upper }}
+    </button>
+
+    <div class="user-menu" id="admProfilePop" aria-hidden="true">
+        <div class="user-menu-header">
+            <div class="user-avatar-lg">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+
+            <div class="user-info">
+                <div class="user-name">{{ user.username }}</div>
+                <div class="user-id">Vai trò: {{ user.vaitro.ten_vaitro }}</div>
+            </div>
+        </div>
+
+        <div class="user-menu-list">
+            <a class="user-menu-item" href="{% url 'profile' %}">
+                <div class="user-menu-icon menu-account">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div class="menu-txt">
+                    <div class="item-title">Hồ sơ cá nhân</div>
+                    <div class="item-desc">Xem và chỉnh sửa thông tin của bạn.</div>
+                </div>
+            </a>
+
+            <a class="user-menu-item" href="javascript:void(0);" id="admLogoutBtn">
+                <div class="user-menu-icon menu-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+                <div class="menu-txt">
+                    <div class="item-title" style="color: #d93025;">Đăng xuất</div>
+                    <div class="item-desc">Thoát khỏi phiên làm việc an toàn.</div>
+                </div>
+            </a>
+        </div>
+
+        <form
+            id="admLogoutForm"
+            action="{% url 'user_logout' %}"
+            method="POST"
+            style="display: none"
+        >
+            {% csrf_token %}
+        </form>
+    </div>
+</div>
+
+<div class="user-menu-overlay" id="admPopOverlay"></div>
+
+<script src="{% static 'js/admin_profile_menu.js' %}"></script>

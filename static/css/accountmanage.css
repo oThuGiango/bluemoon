@@ -1,0 +1,123 @@
+/* Đặt style tổng thể */
+.hr * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+.layout {
+  display: flex;
+  flex-direction: column; /* sắp theo chiều dọc */
+
+  flex-direction: column; /* header nằm trên cùng */
+  height: 100vh;
+}
+
+/* Nền tổng thể */
+body {
+  background-color: #9bd4c6; /* màu xanh nhạt */
+  height: 100vh;
+  display: flex;
+  flex-direction: column; /* sắp theo chiều dọc */
+
+  justify-content: center;
+  align-items: center;
+}
+
+/* Khung chính */
+.hrcontainer {
+  background-color: #aee1d3;
+  width: 90%;
+  max-width: 900px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* Thanh tìm kiếm */
+.hrsearch-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  background-color: #fff4b2;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.hrsearch-bar input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+.hrsearch-bar button {
+  margin-left: 10px;
+  padding: 8px 15px;
+  background-color: #d9ead3;
+  border: 1px solid #666;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.hrsearch-bar button:hover {
+  background-color: #c4dfb5;
+}
+
+/* Danh sách thành viên */
+.hrmember-list {
+  background-color: #fff4b2;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  min-height: 250px;
+}
+
+.hrmember-list h2 {
+  margin-bottom: 10px;
+}
+
+.hrmember-list ul {
+  list-style: none;
+  font-size: 18px;
+}
+
+.hrmember-list li {
+  margin: 8px 0;
+}
+
+/* Dãy nút dưới cùng */
+.hrbutton-bar {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.hrbtn {
+  background-color: #fff4b2;
+  border: 1px solid #666;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.hrbtn:hover {
+  background-color: #fffaaf;
+}
+
+/* Nút màu đỏ cho Xóa hộ */
+.hrdanger {
+  background-color: #f8b6b6;
+}
+
+.hrdanger:hover {
+  background-color: #ff9999;
+}
+.search-bar {
+  position: sticky; /* hoặc fixed */
+  top: 60px; /* ngay dưới topbar */
+  background-color: #fff4b2;
+  z-index: 999;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    {% load static %}
+    {% load humanize %}
+    <meta charset="UTF-8" />
+    <title>Quản Lý Đợt Thu Phí - Chung cư BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}"> 
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+    
+         {% include 'core/accountant_header.html' %}
+
+        <section class="main-content fee-collection-page">
+            <div class="main-panel data-table-panel" id="income-container">
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="message-container {{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="income-controls-top">
+                    <form method="GET" action="{% url 'fee_collection_period' %}" id="periodSearchForm" style="display: flex; gap: 10px; flex-grow: 1;">
+                        <div class="search-box-container" style="flex-grow: 1;">
+                            <input type="text" 
+                            name="search_dotthu" 
+                            placeholder="Tìm kiếm đợt thu phí..." 
+                            value="{{ query|default:'' }}" />
+                            <i class="fa-solid fa-search" onclick="document.getElementById('periodSearchForm').submit();" style="cursor: pointer;"></i>
+                        </div>
+                        <div class="control-buttons">
+                            <button type="submit" class="btn btn-primary" style="min-width: 120px; height: 100%;">
+                                <i class="fa-solid fa-filter"></i> Tìm kiếm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="fee-collection-summary-box">
+                    <h3 class="box-title">Tổng quan các đợt thu</h3>
+                    <div class="summary-details">
+                        <p>Số đợt thu đang mở: {{ active_count|default:"0" }}</p>
+                        <p>Tổng số đợt thu hệ thống: {{ dot_thu_phi_list.count }}</p>
+                    </div>
+                </div>
+
+                <h2 class="table-title">DANH SÁCH ĐỢT THU PHÍ</h2>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Đợt</th>
+                                <th>Tên Đợt Thu</th>
+                                <th>Khoản thu áp dụng</th>
+                                <th>Thời gian</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dot in dot_thu_phi_list %}
+                            <tr>
+                                <td data-label="Mã Đợt">{{ dot.id_dotthu }}</td>
+                                <td data-label="Tên Đợt Thu">{{ dot.ten_dotthu }}</td>
+                                <td data-label="Khoản thu">
+                                    {{ dot.id_khoanthu.ten_khoanthu }}
+                                </td>
+                                <td data-label="Thời gian">
+                                    {{ dot.ngay_batdau|date:"d/m/Y" }} - {{ dot.ngay_ketthuc|date:"d/m/Y" }}
+                                </td>
+                                <td data-label="Trạng thái">
+                                    {% if dot.trang_thai == 'open' %}
+                                        <span class="status status-active">Mở</span>
+                                    {% elif dot.trang_thai == 'closed' %}
+                                        <span class="status status-inactive">Đóng</span>
+                                    {% else %}
+                                        <span class="status status-draft">Nháp</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Thao tác">
+                                    <button class="action-btn view-detail modal-trigger" 
+                                            title="Xem chi tiết" 
+                                            data-url="{% url 'view_dotthu_detail_modal' dot.pk %}">
+                                        <i class="fa-solid fa-list-check"></i>
+                                    </button>
+                                    
+                                    <button class="action-btn edit-fee modal-trigger" 
+                                            style="background: #fff3e0; color: #ff9800"
+                                            title="Chỉnh sửa"
+                                            data-url="{% url 'edit_dotthu' dot.pk %}">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+
+                                    <button class="action-btn delete-fee btn-confirm-delete"
+                                            title="Xóa" 
+                                            data-url="{% url 'delete_dotthu' dot.pk %}">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center;">Chưa có đợt thu phí nào được tạo.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="income-actions-bottom">
+                    <button id="createNewFeeBtn" class="btn btn-create-new" style="min-width: 200px;" data-url="{% url 'add_dotthu' %}">
+                        <i class="fa-solid fa-plus"></i> Tạo đợt thu mới
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            &copy; BlueMoon Apartment 2025. Created by the ChatGPT's son-in-law team.
+        </footer>
+    </main>
+
+    <div id="mainModal" class="modal">
+        <div class="modal-content"></div>
+    </div>
+
+    <script src="{% static 'js/FeeManagement_modal_logic.js' %}"></script>
+</body>
+</html>

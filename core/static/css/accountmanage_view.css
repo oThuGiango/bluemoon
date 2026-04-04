@@ -1,0 +1,84 @@
+/* Page-specific only */
+.profile-card {
+  width: 420px;
+}
+.profile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.profile-list li {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+/* ====== Profile container ====== */
+.profile-list {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 20px 24px;
+  list-style: none;
+  background: #ffffff;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0 #000;
+  font-size: 15px;
+}
+
+/* ====== Mỗi dòng thông tin ====== */
+.profile-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1.5px dashed #000;
+}
+
+/* Bỏ border dòng cuối */
+.profile-list li:last-child {
+  border-bottom: none;
+}
+
+/* ====== Label ====== */
+.profile-list strong {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ====== Giá trị ====== */
+.profile-list li span {
+  font-weight: 500;
+}
+
+/* ====== Hover nhẹ ====== */
+.profile-list li:hover {
+  background: #f5f5f5;
+}
+
+/* Né header sticky */
+.page-wrap {
+  margin-top: 80px; /* đúng bằng main-section */
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Panel profile vừa tay */
+.nk-profile {
+  width: 520px; /* hoặc 420px tuỳ mày */
+  max-width: 90vw;
+}
+
+/* List info cho đẹp */
+.nk-meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nk-meta li {
+  padding: 10px 0;
+  border-bottom: 1.5px dashed #000;
+  font-weight: 600;
+}
+.nk-meta li:last-child {
+  border-bottom: none;
+}

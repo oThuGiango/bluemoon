@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    {% load static %}
+    {% load humanize %}
+    <meta charset="UTF-8">
+    <title>Lịch sử hóa đơn - Chung cư BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}"> 
+</head>
+
+<body class="income-management-page">
+    {% include 'core/Sidebar.html' %}
+
+    <main>
+        {% include 'core/accountant_header.html' %}
+
+        <div class="main-content">
+            <div class="main-panel history-panel">
+                
+                <div class="income-controls-top">
+                    <div>
+                        <h2 style="margin-bottom: 5px;"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử thu phí</h2>
+                        <p style="color: #666; font-size: 0.95em;">Tra cứu hóa đơn cư dân theo thời gian và trạng thái</p>
+                    </div>
+                    
+                    <form method="GET" action="{% url 'invoice_history' %}" class="filter-group">
+                        <div class="search-box-container">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" name="search_invoice" placeholder="Số căn hộ hoặc mã HĐ..." value="{{ query }}">
+                        </div>
+
+                        <select name="month" class="filter-select" onchange="this.form.submit()">
+                            <option value="">-- Tháng --</option>
+                            {% for m in months %}
+                                <option value="{{ m }}" {% if selected_month == m|stringformat:"s" %}selected{% endif %}>Tháng {{ m }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <select name="year" class="filter-select" onchange="this.form.submit()">
+                            <option value="">-- Năm --</option>
+                            {% for y in years %}
+                                <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>Năm {{ y }}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        {% if query or selected_month or selected_year %}
+                            <a href="{% url 'invoice_history' %}" class="action-btn" title="Xóa lọc" style="background:#f5f5f5; color:#333;">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </a>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã HĐ</th>
+                                <th>Căn hộ</th>
+                                <th>Đợt thu phí</th>
+                                <th>Tổng tiền</th>
+                                <th>Ngày nộp</th>
+                                <th>Trạng thái</th>
+                                <th style="text-align: center;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hoadon in invoice_list %}
+                            <tr>
+                                <td class="invoice-id">#{{ hoadon.id_hoadon }}</td>
+                                <td><strong>{{ hoadon.id_hokhau.so_can_ho }}</strong></td>
+                                <td>{{ hoadon.id_dotthu.ten_dotthu }}</td>
+                                <td class="amount-positive">{{ hoadon.tong_tien|floatformat:0|intcomma }}đ</td>
+                                <td>
+                                    <span>
+                                        <i class="fa-regular fa-calendar-check" style="margin-right: 5px; color: #888;"></i>
+                                        {% if hoadon.ngay_nop %}
+                                            {{ hoadon.ngay_nop|date:"d/m/Y" }}
+                                        {% else %}
+                                            <span style="color: #ccc;">Chưa nộp</span>
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if hoadon.ngay_nop %}
+                                        <span class="badge-paid"><i class="fa-solid fa-check-circle"></i> Đã nộp</span>
+                                    {% else %}
+                                        <span class="badge-unpaid"><i class="fa-solid fa-circle-xmark"></i> Chưa đóng</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    <button class="action-btn modal-trigger" 
+                                            title="Xem chi tiết" 
+                                            data-url="{% url 'view_invoice_detail_modal' hoadon.id_hoadon %}">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+
+                                    {% if not hoadon.ngay_nop %}
+                                    <button class="action-btn btn-confirm-delete" 
+                                            title="Xóa hóa đơn"
+                                            data-url="{% url 'delete_invoice_modal' hoadon.id_hoadon %}"
+                                            data-type="invoice"
+                                            style="background-color: #fff1f0; color: #f5222d; border: 1px solid #ffa39e;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 60px; color: #999;">Không tìm thấy dữ liệu hóa đơn phù hợp.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; BlueMoon Apartment 2025. Created by the ChatGPT's son-in-law team.
+        </footer>
+    </main>
+    <div id="mainModal" class="modal">
+        <div class="modal-content">
+        </div>
+    <script src="{% static 'js/FeeManagement_modal_logic.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+/* Reset cơ bản */
+.hr * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Nền tổng thể */
+body {
+  background-color: #9bd4c6; /* màu xanh nhạt */
+  margin: 0;
+  padding: 0;
+  display: block; /* KHÔNG dùng flex ở body */
+  min-height: 100vh;
+}
+html, body {
+  height: auto;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto; /* bật cuộn dọc */
+}
+
+/* Khung chính */
+.hrcontainer {
+  background-color: #aee1d3;
+  width: 90%;
+  max-width: 900px; /* tăng giới hạn chiều rộng hợp lý */
+  padding: 20px;
+  border-radius: 10px;
+  margin: 80px auto 30px auto; /* căn giữa, cách header một khoảng */
+}
+
+
+.hrbtn {
+  background-color: #fff4b2;     /* màu vàng nhạt */
+  color: #333;                   /* chữ đen nhẹ cho dễ đọc */
+  border: 1px solid #c2a700;     /* viền vàng đậm */
+  border-radius: 6px;            /* bo góc mềm mại */
+  padding: 8px 16px;             /* kích thước nút */
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out; /* hiệu ứng hover mượt */
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.1);
+}
+
+.hrbtn:hover {
+  background-color: #ffe36e;     /* vàng đậm hơn khi hover */
+  border-color: #b59700;
+  transform: translateY(-2px);   /* nổi lên nhẹ khi hover */
+  box-shadow: 2px 4px 6px rgba(0,0,0,0.15);
+}
+
+.hrbtn:active {
+  background-color: #ffd84f;     /* nhấn xuống đậm hơn */
+  transform: translateY(0);
+  box-shadow: inset 1px 2px 3px rgba(0,0,0,0.2);
+}
+
+.hrbtn:disabled {
+  background-color: #f4e3a2;
+  color: #999;
+  border-color: #ddd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.search-bar {
+  position: sticky; /* hoặc fixed */
+  top: 60px; /* ngay dưới topbar */
+  background-color: #fff4b2;
+  z-index: 999;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}

@@ -1,0 +1,127 @@
+.hrcontainer {
+  background: #fff;
+  width: 90%;
+  max-width: 900px;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 80px auto 30px;
+}
+
+/* Wrapper card chung: dùng class chung .brutalist-panel--wide là đủ,
+   nếu vẫn muốn riêng: */
+.brutalist-panel {
+  width: 80%;
+  margin: 25px auto;
+}
+
+/* Search block của riêng page (form đã dùng chung) */
+.search-panel {
+  text-align: center;
+}
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Bảng dữ liệu của trang (dùng brutalist-table chung) */
+.data-panel h2 {
+  text-align: center;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+.hrbutton-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+/* H1 ôm phần giữa, không đẩy avatar chạy lung tung */
+.topbar h1 {
+  margin: 0;
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* Cụm profile luôn dính góc phải, nhưng vẫn nằm trong padding header */
+#admShell {
+  margin-left: auto;
+}
+
+/* =========================
+   HEADER: WHITE + SHADOW
+   (override toàn bộ style cũ)
+========================= */
+
+/* Header kiểu mới (ưu tiên .topbar vì bạn đang dùng) */
+.topbar {
+  background: #ffffff !important;
+  color: #111 !important;
+  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08) !important;
+  border: none !important;
+
+  position: sticky;
+  top: 0;
+  z-index: 3000;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+/* Tiêu đề */
+.topbar h1 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1976d2 !important; /* chữ xanh – giống ảnh */
+}
+
+/* Nếu có span trong h1 */
+.topbar h1 span {
+  color: #111 !important;
+}
+
+/* Nút hamburger */
+.topbar .icon-btn,
+.topbar button {
+  background: transparent !important;
+  border: none !important;
+  color: #1976d2 !important;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+/* Icon trong nút (font-icon) */
+.topbar .icon-btn i {
+  color: #1976d2 !important;
+}
+
+/* Icon SVG */
+.topbar svg,
+.topbar svg path {
+  fill: #1976d2 !important;
+  stroke: #1976d2 !important;
+}
+
+/* Đảm bảo dropdown user bung ra không bị cắt */
+.topbar {
+  overflow: visible !important;
+}

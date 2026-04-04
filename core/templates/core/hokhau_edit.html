@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa hộ khẩu - BlueMoon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 600px; margin: 0 auto;">
+                <h2 class="form-title" style="text-align: center; color: var(--primary);"><i class="fa-solid fa-pen-to-square"></i> CẬP NHẬT HỘ KHẨU</h2>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">ID Hộ khẩu</label>
+                        <input type="text" value="{{ hokhau.id_hokhau }}" disabled style="background-color: #f5f5f5; cursor: not-allowed;">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Số căn hộ <span class="required-star">*</span></label>
+                        <input type="text" name="so_can_ho" value="{{ hokhau.so_can_ho }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Diện tích (m²)</label>
+                        <input type="number" step="0.01" name="dien_tich" value="{{ hokhau.dien_tich }}">
+                    </div>
+
+                    <div class="form-actions" style="justify-content: space-between; margin-top: 40px;">
+                        <a href="{% url 'hrmanage_delete' hokhau.id_hokhau %}" class="btn" style="background: #fff1f0; color: #ff4d4f; border: 1px solid #ffccc7; min-width: auto;">
+                            <i class="fa-solid fa-trash-can"></i> Xóa hộ
+                        </a>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="{% url 'hrmanage' %}" class="btn btn-secondary-outline" style="min-width: auto;"><i class="fa-solid fa-xmark"></i> Hủy</a>
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

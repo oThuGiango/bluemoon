@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý hộ khẩu - BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+
+        <section class="main-content income-management-page">
+            <div class="main-panel data-table-panel">
+                
+                <div class="income-controls-top">
+                    <form method="GET" action="{% url 'hrmanage' %}" style="display: flex; gap: 10px; flex-grow: 1;">
+                        <div class="search-box-container" style="flex-grow: 1;">
+                            <input type="text" name="search_id" placeholder="Nhập ID hộ khẩu hoặc số căn hộ..." value="{{ query|default:'' }}">
+                            <i class="fa-solid fa-search"></i>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="min-width: 120px;">
+                            <i class="fa-solid fa-filter"></i> Tìm kiếm
+                        </button>
+                    </form>
+                </div>
+
+                <h2 class="table-title">DANH SÁCH HỘ KHẨU</h2>
+                
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID Hộ</th>
+                                <th>Số căn hộ</th>
+                                <th>Diện tích</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hk in ho_khau_list %}
+                            <tr>
+                                <td data-label="ID Hộ"><strong>#{{ hk.id_hokhau }}</strong></td>
+                                <td data-label="Số căn">Căn hộ {{ hk.so_can_ho }}</td>
+                                <td data-label="Diện tích">{{ hk.dien_tich }} m²</td>
+                                <td data-label="Trạng thái">
+                                    <span class="status status-active">Đang sử dụng</span>
+                                </td>
+                                <td data-label="Thao tác">
+                                    <a href="{% url 'hokhau_detail' hk.id_hokhau %}" class="action-btn" title="Chi tiết" style="background: #e3f2fd; color: #1976d2;">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </a>
+                                    <a href="{% url 'hokhau_edit' hk.id_hokhau %}" class="action-btn" title="Chỉnh sửa" style="background: #fff3e0; color: #ff9800;">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align: center;">Không tìm thấy dữ liệu hộ khẩu.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="income-actions-bottom">
+                    <a href="{% url 'add_hokhau' %}" class="btn btn-create-new" style="text-decoration: none;">
+                        <i class="fa-solid fa-house-medical"></i> Thêm hộ khẩu mới
+                    </a>
+                </div>
+                <div class="income-actions-bottom">
+                    
+                    <a href="{% url 'export_hokhau_excel' %}" class="btn btn-secondary-outline" style="text-decoration: none;">
+                                                <i ></i> 📥 Xuất Excel
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

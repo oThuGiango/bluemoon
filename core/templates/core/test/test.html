@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>accountmanage'</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="sidebar.css" />
+    <link rel="stylesheet" href="accountmanage.css" />
+  </head>
+  <body>
+
+
+    <header class="topbar">
+      <button id="btnOpen" class="icon-btn" aria-controls="sidebar" aria-expanded="false" aria-label="Mở menu">
+        ☰ Menu
+      </button>
+      <h1>BLUEMOON - Dashboard</h1>
+    </header>
+
+
+    <main class="main-section">
+      <div class="container-wide" style="width: 80%; max-width: 980px">
+        <!-- Search -->
+        <section
+          class="brutalist-panel brutalist-panel--wide search-panel"
+          style="margin-bottom: 18px"
+        >
+          <form
+            method="get"
+            action="{% url 'accountmanage' %}"
+            class="search-form"
+          >
+            <input
+              class="brutalist-input"
+              type="text"
+              name="search_id"
+              placeholder="Nhập ID tài khoản..."
+              value="{{ query }}"
+            />
+            <button class="btn btn--yellow btn--compact" type="submit">
+              Tìm kiếm
+            </button>
+            {% if query %}
+            <a
+              class="btn btn--yellow btn--compact"
+              href="{% url 'accountmanage' %}"
+              >Hiện tất cả</a
+            >
+            {% endif %}
+          </form>
+        </section>
+
+        <!-- Data -->
+        <section class="brutalist-panel brutalist-panel--wide data-panel">
+          <h1
+            class="text-uc"
+            style="
+              text-align: center;
+              border-bottom: 2px solid #000;
+              padding-bottom: 10px;
+              margin-bottom: 16px;
+            "
+          >
+            Danh sách Tài Khoản
+          </h1>
+
+          <table class="brutalist-table">
+            <thead>
+              <tr>
+                <th>ID tài khoản</th>
+                <th>Username</th>
+                <th>Pass</th>
+                <th>Vai trò</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for hk in tai_khoan_list %}
+              <tr>
+                <td>
+                  <a href="{% url 'view_taikhoan' hk.id_taikhoan %}"
+                    >{{ hk.id_taikhoan }}</a
+                  >
+                </td>
+                <td>{{ hk.username }}</td>
+                <td>{{ hk.password }}</td>
+                <td>{{ hk.vaitro }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4">Không có dữ liệu</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div
+            class="hrbutton-bar"
+            style="display: flex; justify-content: center; margin-top: 12px"
+          >
+            <a
+              class="btn btn--yellow btn--compact"
+              href="{% url 'addaccount' %}"
+              >+ Thêm tài khoản</a
+            >
+          </div>
+        </section>
+      </div>
+    </main>
+
+
+
+
+<div id="overlay" class="overlay" tabindex="-1" hidden></div>
+
+<aside id="sidebar" class="sidebar" role="navigation" aria-hidden="true">
+  <div class="sidebar-header">
+    <h2>Menu</h2>
+    <button id="btnClose" class="close-btn" aria-label="Đóng menu">✕</button>
+  </div>
+
+  <nav class="nav">
+    <a href="/">Home</a>
+    <a href="/hrmanage">Quản lý hộ khẩu</a>
+    <a href="/demomanage">Quản lý nhân khẩu</a>
+    <a href="/accountmanage">Quản lý tài khoản</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <small>© 2025 BLUEMOON</small>
+  </div>
+</aside>
+<script src="sidebar.js"></script>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý tài khoản - BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}"> </head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+
+        <section class="main-content income-management-page">
+            <div class="main-panel data-table-panel">
+                
+                <div class="income-controls-top">
+                    <form method="GET" action="{% url 'accountmanage' %}" style="display: flex; gap: 10px; flex-grow: 1;">
+                        <div class="search-box-container" style="flex-grow: 1;">
+                            <input type="text" name="search_id" placeholder="Nhập ID hoặc Username..." value="{{ query|default:'' }}">
+                            <i class="fa-solid fa-search"></i>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="min-width: 120px;">
+                            <i class="fa-solid fa-filter"></i> Tìm kiếm
+                        </button>
+                    </form>
+                </div>
+
+                <h2 class="table-title">DANH SÁCH TÀI KHOẢN HỆ THỐNG</h2>
+                
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Vai trò</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tk in tai_khoan_list %}
+                            <tr>
+                                <td data-label="ID"><strong>#{{ tk.id_taikhoan }}</strong></td>
+                                <td data-label="Username">{{ tk.username }}</td>
+                                <td data-label="Vai trò">
+                                    <span class="status {% if tk.vaitro.id_vaitro == 1 %}status-active{% else %}status-inactive{% endif %}">
+                                        {{ tk.vaitro }}
+                                    </span>
+                                </td>
+                                <td data-label="Thao tác">
+                                    <a href="{% url 'view_taikhoan' tk.id_taikhoan %}" class="action-btn" title="Xem chi tiết" style="background: #e3f2fd; color: #1976d2;">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'edit_taikhoan' tk.id_taikhoan %}" class="action-btn" title="Chỉnh sửa" style="background: #fff3e0; color: #ff9800;">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <a href="{% url 'accountmanage_delete' tk.id_taikhoan %}" class="action-btn" title="Xóa" style="background: #fff1f0; color: #ff4d4f;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align: center;">Không có tài khoản nào.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="income-actions-bottom">
+                    <a href="{% url 'addaccount' %}" class="btn btn-create-new" style="text-decoration: none;">
+                        <i class="fa-solid fa-user-plus"></i> Thêm tài khoản mới
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

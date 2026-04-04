@@ -1,0 +1,158 @@
+/* ===== Admin Profile Menu (NEW) ===== */
+
+.adm-profile-btn {
+  border: 0;
+  background: transparent;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adm-profile-btn:focus {
+  outline: 2px solid rgba(64, 150, 255, 0.35);
+  outline-offset: 2px;
+}
+
+.adm-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #7c3aed; /* tím giống vibe ảnh */
+  color: #fff;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.adm-profile-pop {
+  position: absolute;
+  top: 64px; /* chỉnh theo chiều cao header của bạn */
+  right: 18px;
+  width: 320px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+  border: 1px solid #eef2f7;
+  overflow: hidden;
+  display: none;
+  z-index: 2000;
+}
+
+.adm-profile-pop.is-open {
+  display: block;
+}
+
+.adm-pop-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.adm-avatar-xl {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adm-meta {
+  min-width: 0;
+}
+
+.adm-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-role {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: #64748b;
+}
+
+.adm-pop-body {
+  padding: 10px 0;
+}
+
+.adm-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.18s ease;
+}
+
+.adm-item:hover {
+  background: #f6f8fb;
+}
+
+.adm-ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 16px;
+}
+
+.adm-ico--user {
+  background: #f1f5ff;
+  color: #2563eb;
+}
+
+.adm-ico--logout {
+  background: #fff1f2;
+  color: #ef4444;
+}
+
+.adm-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.adm-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.adm-title--danger {
+  color: #ef4444;
+}
+
+.adm-desc {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* overlay */
+.adm-pop-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent; /* chỉ để bắt click */
+  z-index: 1999;
+}

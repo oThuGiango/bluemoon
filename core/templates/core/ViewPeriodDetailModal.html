@@ -1,0 +1,141 @@
+{% load static %}
+{% load humanize %}
+
+<div class="form-container" style="max-width: 950px; width: 95%;">
+    {% csrf_token %}
+    <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 25px;">
+        CHI TIẾT ĐỢT THU PHÍ <span class="title-icon">🔍</span>
+    </h2>
+
+    <div class="detail-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 25px;">
+        <div class="detail-item">
+            <label style="font-weight: bold; color: #666; display: block; margin-bottom: 5px;">Mã Đợt Thu:</label>
+            <p id="display-dot-thu-id" style="font-size: 1.1rem; color: #333; margin: 0;">#{{ dot_thu.id_dotthu }}</p>
+        </div>
+        <div class="detail-item">
+            <label style="font-weight: bold; color: #666; display: block; margin-bottom: 5px;">Trạng Thái:</label>
+            {% if dot_thu.trang_thai == 'open' %}
+                <span class="status status-active" style="background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">Đang mở</span>
+            {% elif dot_thu.trang_thai == 'closed' %}
+                <span class="status status-inactive" style="background: #ffebee; color: #c62828; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">Đã đóng</span>
+            {% else %}
+                <span class="status status-draft" style="background: #eceff1; color: #455a64; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;">Bản nháp</span>
+            {% endif %}
+        </div>
+        <div class="detail-item" style="grid-column: span 2;">
+            <label style="font-weight: bold; color: #666; display: block; margin-bottom: 5px;">Tên Đợt Thu:</label>
+            <p style="font-size: 1.2rem; font-weight: 600; color: var(--primary); margin: 0;">{{ dot_thu.ten_dotthu }}</p>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 style="font-size: 1.1rem; border-left: 4px solid var(--primary); padding-left: 10px; margin: 0;">
+            Danh sách hóa đơn & Thanh toán
+        </h3>
+        <button type="button" id="btnToggleAddResident" class="btn" style="background: #e3f2fd; color: #1976d2; border: 1px solid #1976d2; padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+            <i class="fa-solid fa-user-plus"></i> Thêm hộ vào đợt này
+        </button>
+    </div>
+
+    <div id="addResidentSection" style="display: none; background: #fff; border: 2px dashed #bbdefb; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+        <h4 style="margin: 0 0 15px 0; color: #1976d2;"><i class="fa-solid fa-calculator"></i> Tính toán khoản thu cho hộ mới:</h4>
+        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead style="background: #f8f9fa; position: sticky; top: 0; z-index: 5;">
+                    <tr>
+                        <th style="padding: 10px; text-align: center; width: 40px;">Chọn</th>
+                        <th style="padding: 10px; text-align: left;">Căn hộ</th>
+                        <th style="padding: 10px; text-align: right;">Đơn giá</th>
+                        <th style="padding: 10px; text-align: center; width: 100px;">Hệ số</th>
+                        <th style="padding: 10px; text-align: right;">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hokhau in tat_ca_ho_khau %}
+                    <tr style="border-bottom: 1px solid #f1f1f1;" class="new-resident-row">
+                        <td style="padding: 10px; text-align: center;">
+                            <input type="checkbox" name="new_hokhau_ids" value="{{ hokhau.id_hokhau }}">
+                        </td>
+                        <td style="padding: 10px;"><strong>{{ hokhau.so_can_ho }}</strong></td>
+                        <td style="padding: 10px; text-align: right;">
+                            <span class="unit-price" data-price="{{ dot_thu.id_khoanthu.don_gia }}">
+                                {{ dot_thu.id_khoanthu.don_gia|floatformat:0|intcomma }}đ
+                            </span>
+                        </td>
+                        <td style="padding: 10px; text-align: center;">
+                            <input type="number" 
+                                   class="multiplier-input" 
+                                   value="1" step="0.1" min="0"
+                                   style="width: 70px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 4px;">
+                        </td>
+                        <td style="padding: 10px; text-align: right; font-weight: bold; color: #d32f2f;">
+                            <span class="row-total">{{ dot_thu.id_khoanthu.don_gia|floatformat:0|intcomma }}đ</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="padding: 20px; text-align: center; color: #999;">Tất cả các hộ đã có hóa đơn.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align: right;">
+            <button type="button" id="btnConfirmAddResidents" class="btn btn-primary" style="background: #1976d2; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <i class="fa-solid fa-plus-circle"></i> Xác nhận thêm & Tạo hóa đơn
+            </button>
+        </div>
+    </div>
+
+    <form id="updatePaymentForm">
+        {% csrf_token %}
+        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 12px; background: #fff;">
+            <table id="invoiceTable" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead style="background: #f8f9fa; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid #dee2e6;">
+                    <tr>
+                        <th style="padding: 12px; text-align: center; width: 50px;">
+                            <input type="checkbox" id="selectAllInvoices">
+                        </th>
+                        <th style="padding: 12px; text-align: left;">Căn hộ</th>
+                        <th style="padding: 12px; text-align: left;">Ngày nộp</th>
+                        <th style="padding: 12px; text-align: right;">Tổng tiền</th>
+                        <th style="padding: 12px; text-align: center;">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hoadon in danh_sach_hoa_don %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 12px; text-align: center;">
+                            <input type="checkbox" name="invoice_ids" value="{{ hoadon.id_hoadon }}" 
+                                   {% if hoadon.ngay_nop %} disabled checked {% endif %}>
+                        </td>
+                        <td style="padding: 12px;"><strong>{{ hoadon.id_hokhau.so_can_ho }}</strong></td>
+                        <td style="padding: 12px; color: #666;">{{ hoadon.ngay_nop|date:"d/m/Y"|default:"Chưa nộp" }}</td>
+                        <td style="padding: 12px; text-align: right; font-weight: 600;">{{ hoadon.tong_tien|floatformat:0|intcomma }}đ</td>
+                        <td style="padding: 12px; text-align: center;">
+                            {% if hoadon.ngay_nop %}
+                                <span style="color: #2e7d32; font-weight: 600;"><i class="fa-solid fa-check-circle"></i> Đã đóng</span>
+                            {% else %}
+                                <span style="color: #d32f2f;"><i class="fa-solid fa-clock"></i> Chờ thu</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="padding: 30px; text-align: center; color: #888;">Chưa có hộ dân nào trong đợt thu này.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.85rem; color: #666;">* Tích chọn các hộ đã nộp tiền mặt để xác nhận thanh toán.</span>
+            <button type="button" id="btnConfirmPayment" class="btn btn-primary" style="background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <i class="fa-solid fa-money-bill-check"></i> Xác nhận đã đóng tiền
+            </button>
+        </div>
+    </form>
+
+    <div class="form-actions" style="margin-top: 25px; text-align: right; border-top: 1px solid #eee; padding-top: 20px;">
+        <button type="button" class="btn btn-secondary-outline modal-close-btn" style="padding: 8px 25px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 6px;">
+            Thoát
+        </button>
+    </div>
+</div>

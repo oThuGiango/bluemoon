@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết tài khoản - BlueMoon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 700px; margin: 0 auto;">
+                <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 30px;">
+                    THÔNG TIN TÀI KHOẢN <span class="title-icon">🔍</span>
+                </h2>
+
+                <div class="summary-details" style="background: var(--gray-bg); padding: 25px; border-radius: 12px;">
+                    <div class="detail-item" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                        <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-hashtag" style="width: 25px;"></i> ID Tài khoản:</span>
+                        <span class="invoice-id">#{{ taikhoan.id_taikhoan }}</span>
+                    </div>
+                    <div class="detail-item" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                        <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-user" style="width: 25px;"></i> Tên đăng nhập:</span>
+                        <span>{{ taikhoan.username }}</span>
+                    </div>
+                    <div class="detail-item" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #dee2e6;">
+                        <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-shield-halved" style="width: 25px;"></i> Vai trò:</span>
+                        <span class="badge-paid" style="background: #e3f2fd !important; color: #1976d2 !important; border: 1px solid #bbdefb;">
+                            {{ taikhoan.vaitro.ten_vaitro }}
+                        </span>
+                    </div>
+                    <div class="detail-item" style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-key" style="width: 25px;"></i> Mật khẩu:</span>
+                        <span style="color: #999;">******** (Đã mã hóa)</span>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 30px; display: flex; justify-content: center; gap: 15px;">
+                    <a href="{% url 'accountmanage' %}" class="btn btn-secondary-outline" style="text-decoration: none;">
+                        <i class="fa-solid fa-arrow-left"></i> Quay lại
+                    </a>
+                    <a href="{% url 'edit_taikhoan' taikhoan.id_taikhoan %}" class="btn btn-primary" style="text-decoration: none; background-color: #ff9800; border-color: #ff9800;">
+                        <i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

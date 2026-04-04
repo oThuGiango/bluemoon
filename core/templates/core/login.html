@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Đăng nhập vào hệ thống</title>
+ 
+    <!-- CSS -->
+<link rel="stylesheet" href="{% static 'css/login.css' %}" />
+ 
+    <!-- Boxicons -->
+<link
+
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+
+      rel="stylesheet"
+
+    />
+</head>
+ 
+  <body>
+<div class="wrapper" id="loginCard">
+<div class="flip">
+ 
+        <!-- ===== FORM ĐĂNG NHẬP NGƯỜI DÙNG (KẾ TOÁN) ===== -->
+<form class="panel panel--user" action="{% url 'login' %}" method="POST">
+
+          {% csrf_token %}
+ 
+          <h1>Đăng nhập</h1>
+ 
+          <div class="input-box">
+<input
+
+              type="text"
+
+              name="username"
+
+              placeholder="Tên đăng nhập"
+
+              required
+
+            />
+<i class="bx bxs-user"></i>
+</div>
+ 
+          <div class="input-box">
+<input
+
+              type="password"
+
+              name="password"
+
+              placeholder="Mật khẩu"
+
+              required
+
+            />
+<i class="bx bxs-lock-alt"></i>
+</div>
+ 
+          <div class="remember-forgot">
+<label class="container">
+<input type="checkbox" />
+<svg viewBox="0 0 64 64" height="1.2em" width="1.2em">
+<path
+
+                  d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8
+
+                     A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16
+
+                     L 32 48 L 64 16 V 8"
+
+                  class="path"
+></path>
+</svg>
+<span>Ghi nhớ tài khoản</span>
+</label>
+ 
+            <a href="#">Quên mật khẩu</a>
+</div>
+ 
+          {% if error %}
+<p class="error">{{ error }}</p>
+
+          {% endif %}
+ 
+          <button type="submit" class="btn">Đăng nhập</button>
+ 
+          <!-- Link chuyển admin (HIỆN CHỈ LÀ UI) -->
+
+</form>
+ 
+        <!-- ===== FORM ADMIN (CHƯA KÍCH HOẠT BACKEND) ===== -->
+<!-- Giữ lại giao diện, nhưng không submit -->
+<form class="panel panel--admin" onsubmit="return false;">
+<h1>Admin</h1>
+ 
+          <div class="input-box">
+<input
+
+              type="text"
+
+              placeholder="Tên đăng nhập Admin"
+
+              disabled
+
+            />
+<i class="bx bxs-id-card"></i>
+</div>
+ 
+          <div class="input-box">
+<input
+
+              type="password"
+
+              placeholder="Mật khẩu"
+
+              disabled
+
+            />
+<i class="bx bxs-lock"></i>
+</div>
+ 
+          <button type="button" class="btn" disabled>
+
+            Đăng nhập
+</button>
+ 
+          <div class="switch-admin">
+<p><a href="#" id="toUser">Tôi là người dùng</a></p>
+</div>
+</form>
+ 
+      </div>
+</div>
+ 
+    <!-- ===== JS CHUYỂN PANEL ===== -->
+<script>
+
+      const card = document.getElementById("loginCard");
+
+      document.getElementById("toAdmin").addEventListener("click", (e) => {
+
+        e.preventDefault();
+
+        card.classList.add("show-admin");
+
+      });
+
+      document.getElementById("toUser").addEventListener("click", (e) => {
+
+        e.preventDefault();
+
+        card.classList.remove("show-admin");
+
+      });
+</script>
+</body>
+</html>
+
+ 

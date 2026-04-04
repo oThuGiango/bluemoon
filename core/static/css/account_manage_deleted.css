@@ -1,0 +1,24 @@
+/* Page-specific: Deleted screen */
+
+.deleted-panel {
+  text-align: center;
+}
+
+.deleted-title {
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #000;
+}
+
+.deleted-desc {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* nút cách ra một tí cho "thoáng" */
+.deleted-panel .form-actions {
+  margin-top: 18px;
+  justify-content: center;
+}

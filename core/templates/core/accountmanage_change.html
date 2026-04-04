@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa tài khoản - BlueMoon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 600px; margin: 0 auto;">
+                <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 25px">
+                    CẬP NHẬT TÀI KHOẢN <span class="title-icon">📝</span>
+                </h2>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">Tên đăng nhập</label>
+                        <input type="text" name="username" value="{{ taikhoan.username }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">ID Vai trò (Hiện tại: {{ taikhoan.vaitro.id_vaitro }})</label>
+                        <input type="number" name="vaitro_id" value="{{ taikhoan.vaitro.id_vaitro }}" placeholder="Nhập mã vai trò mới...">
+                        <small style="color: #666; font-style: italic;">* 1: Admin, 3: Kế toán, 2: Cư dân</small>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 30px;">
+                        <a href="{% url 'accountmanage' %}" class="btn btn-secondary-outline" style="text-decoration: none;">
+                            <i class="fa-solid fa-xmark"></i> Hủy bỏ
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

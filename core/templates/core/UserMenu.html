@@ -1,0 +1,47 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/Menu.css' %}" />
+
+<div class="user-menu" id="userMenu">
+  <div class="user-menu-header">
+    <div class="user-avatar-lg">
+      {% if user.vaitro.id_vaitro == 1 %}AD
+      {% elif user.vaitro.id_vaitro == 3 %}KT
+      {% else %}U
+      {% endif %}
+    </div>
+    <div class="user-info">
+      <div class="user-name">{{ user.username}}</div>
+      <div class="user-id">Vai trò: {{ user.vaitro.ten_vaitro }}</div>
+  </div>
+</div>
+
+<div class="user-menu-list">
+    <a href="/profile" class="user-menu-item">
+      <span class="user-menu-icon menu-account" style="background-color: #f7f7f7; color: #4096ff">
+        <i class="fa-solid fa-user"></i>
+      </span>
+      <div>
+        <div class="item-title">Tài khoản</div>
+        <div class="item-desc">Quản lý tài khoản của bạn.</div>
+      </div>
+    </a>
+
+    <a href="/logout" class="user-menu-item" id="logout-trigger" data-action="logout">
+      <span class="user-menu-icon menu-logout" style="background-color: #fff1f0; color: #ff4d4f">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </span>
+      <div>
+        <div class="item-title" style="color: #ff4d4f">Đăng xuất</div>
+        <div class="item-desc">Thoát khỏi phiên làm việc.</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<form id="logout-form" action="/logout/" method="POST" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<div id="userMenuOverlay" class="user-menu-overlay"></div>
+
+<script src="{% static 'js/UserMenu.js' %}"></script>

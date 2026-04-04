@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm nhân khẩu - BlueMoon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 700px; margin: 0 auto;">
+                <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 25px">
+                    THÊM NHÂN KHẨU MỚI <span class="title-icon">📝</span>
+                </h2>
+
+                <form method="POST" action="{% url 'demomanage/adddemo' %}">
+                    {% csrf_token %}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Họ và tên <span class="required-star">*</span></label>
+                            <input type="text" name="ho_ten" required placeholder="Nguyễn Văn A">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Loại cư trú <span class="required-star">*</span></label>
+                            <select name="loai_dang_ky_cu_tru" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                                <option value="" disabled selected>-- Chọn loại --</option>
+                                <option value="tam tru">Tạm trú</option>
+                                <option value="thuong tru">Thường trú</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ngày sinh</label>
+                            <input type="date" name="ngay_sinh">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số CCCD</label>
+                            <input type="text" name="cccd" maxlength="12">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Quan hệ với chủ hộ</label>
+                            <input type="text" name="quan_he_chu_ho" placeholder="Ví dụ: Con, Vợ...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mã Hộ khẩu (ID) <span class="required-star">*</span></label>
+                            <input type="number" name="ho_khau_id" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 30px;">
+                        <a href="{% url 'demomanage' %}" class="btn btn-secondary-outline" style="text-decoration: none;">
+                            <i class="fa-solid fa-xmark"></i> Hủy
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-check"></i> Xác nhận thêm
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xóa tài khoản - BlueMoon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 550px; margin: 50px auto; text-align: center; padding: 40px;">
+                <div style="font-size: 60px; color: #ff4d4f; margin-bottom: 20px;">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2 style="color: #222; margin-bottom: 15px;">THÀNH CÔNG!</h2>
+                <p style="color: #666; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
+                    Tài khoản đã được xóa khỏi hệ thống.<br>
+                    Mọi dữ liệu liên quan đã được cập nhật trạng thái.
+                </p>
+
+                <div class="form-actions" style="justify-content: center;">
+                    <a href="{% url 'accountmanage' %}" class="btn btn-primary" style="text-decoration: none; min-width: 200px;">
+                        <i class="fa-solid fa-list-ul"></i> Về danh sách
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

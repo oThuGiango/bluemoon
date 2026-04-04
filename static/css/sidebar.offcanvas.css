@@ -1,0 +1,69 @@
+:root {
+  --header-h: 64px;
+  --sidebar-w: 230px;
+}
+
+/* bố cục baseline */
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+}
+
+/* sidebar trượt MỌI KÍCH THƯỚC */
+.sidebar {
+  position: fixed !important;
+  top: var(--header-h) !important;
+  left: 0 !important;
+  height: calc(100vh - var(--header-h)) !important;
+  width: var(--sidebar-w) !important;
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+.sidebar.is-open {
+  transform: translateX(0);
+}
+
+/* nội dung: không chừa chỗ khi đóng, chừa chỗ khi mở (desktop) */
+.content,
+main {
+  margin-left: 0 !important;
+  transition: margin-left 0.25s ease;
+}
+@media (min-width: 993px) {
+  body.sidebar-open .content,
+  body.sidebar-open main {
+    margin-left: var(--sidebar-w) !important;
+  }
+}
+
+/* overlay: desktop cũng bật */
+.sidebar-overlay {
+  position: fixed;
+  inset: var(--header-h) 0 0 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 900;
+  display: none;
+}
+.sidebar-overlay.show {
+  display: block;
+}
+
+/* header nằm trên sidebar */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  height: var(--header-h);
+}
+header .navbar {
+  min-height: var(--header-h);
+  display: flex;
+  align-items: center;
+}
+.icon-btn {
+  position: relative;
+  z-index: 1201;
+  display: inline-flex;
+}

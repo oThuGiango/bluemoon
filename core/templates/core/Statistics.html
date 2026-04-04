@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    {% load static %}
+    {% load humanize %}
+    <meta charset="UTF-8">
+    <title>Thống Kê Tài Chính - Chung cư BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1976d2;
+            --success: #2e7d32;
+            --warning: #f57c00;
+            --bg-light: #f4f7fa;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        body { background-color: var(--bg-light); font-family: 'Roboto', sans-serif; }
+
+        .stats-container { padding: 25px; }
+
+        /* Header Styles */
+        .stats-header-card {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #fff; 
+            padding: 20px 30px; 
+            border-radius: 15px; 
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Top Cards Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+
+        .card-header {
+            font-weight: 700;
+            color: #444;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* Progress Circle */
+        .progress-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .circle-wrap {
+            width: 130px;
+            height: 130px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            /* Conic gradient for progress */
+            background: conic-gradient(var(--primary) {{ phan_tram }}%, #edf2f7 0);
+        }
+
+        .circle-wrap::after {
+            content: "";
+            position: absolute;
+            width: 105px;
+            height: 105px;
+            background: #fff;
+            border-radius: 50%;
+            top: 12.5px;
+            left: 12.5px;
+        }
+
+        .circle-percent {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        /* Controls */
+        .form-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn-excel {
+            background: var(--success);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-excel:hover {
+            background: #1b5e20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+        }
+
+        .chart-container {
+            height: 350px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+
+    <main>
+          {% include 'core/accountant_header.html' %}
+        <div class="stats-container">
+            <div class="stats-header-card">
+                <div>
+                    <h2 style="margin: 0; color: var(--primary);">Năm quyết toán {{ selected_year }}</h2>
+                </div>
+                
+                <div style="display: flex; gap: 20px;">
+                    <form action="{% url 'statistics_view' %}" method="GET" id="yearForm">
+                        <select name="year" class="form-select" onchange="this.form.submit()">
+                            <option value="2024" {% if selected_year == 2024 %}selected{% endif %}>Năm 2024</option>
+                            <option value="2025" {% if selected_year == 2025 %}selected{% endif %}>Năm 2025</option>
+                            <option value="2026" {% if selected_year == 2026 %}selected{% endif %}>Năm 2026</option>
+                        </select>
+                    </form>
+
+                    <a href="{% url 'export_finance_excel' %}?year={{ selected_year }}" class="btn-excel">
+                        <i class="fa-solid fa-file-excel"></i> Xuất Báo Cáo {{ selected_year }}
+                    </a>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-chart-pie" style="color: var(--primary);"></i>
+                        Tiến độ thu ngân sách năm {{ selected_year }}
+                    </div>
+                    <div class="progress-box">
+                        <div class="circle-wrap">
+                            <span class="circle-percent">{{ phan_tram }}%</span>
+                        </div>
+                        <div class="info-list">
+                            <div style="margin-bottom: 15px;">
+                                <small style="color: #888; display: block;">Đã thu thực tế</small>
+                                <strong style="font-size: 1.3rem; color: var(--success);">{{ tong_da_thu|floatformat:0|intcomma }}đ</strong>
+                            </div>
+                            <div>
+                                <small style="color: #888; display: block;">Mục tiêu dự kiến</small>
+                                <strong style="font-size: 1.1rem; color: #333;">{{ tong_can_thu|floatformat:0|intcomma }}đ</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-layer-group" style="color: var(--warning);"></i>
+                        Cơ cấu nguồn thu (Top 5 phí)
+                    </div>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="feeTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="margin-bottom: 50px;">
+                <div class="card-header">
+                    <i class="fa-solid fa-chart-line" style="color: var(--primary);"></i>
+                    Biến động doanh thu thực tế theo 12 tháng
+                </div>
+                <div class="chart-container">
+                    <canvas id="monthlyTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; BlueMoon Apartment 2025. Created by the ChatGPT's son-in-law team.
+        </footer>
+    </main>
+
+    <script>
+        const DB_DATA = {
+            pieLabels: {{ pie_labels|safe }},
+            pieData: {{ pie_data|safe }},
+            lineLabels: {{ line_labels|safe }},
+            lineData: {{ line_data|safe }}
+        };
+    </script>
+    
+    <script src="{% static 'js/Charts.js' %}"></script>
+</body>
+</html>

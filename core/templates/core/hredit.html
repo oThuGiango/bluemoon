@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>hredit</title>
+
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/hredit.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/sidebar_and_footer.css' %}" />
+  </head>
+  <body>
+    <header class="topbar">
+      <button
+        id="btnOpen"
+        class="icon-btn"
+        aria-controls="sidebar"
+        aria-expanded="false"
+        aria-label="Mở menu"
+      >
+        ☰
+      </button>
+      <h1>BLUEMOON - Dashboard</h1>
+    </header>
+
+    <div id="overlay" class="overlay" tabindex="-1" hidden></div>
+
+    <div class="hrcontainer">
+      <div class="hrsearch-bar">
+        <input type="text" placeholder="Thanh tìm kiếm..." />
+        <button>Tìm kiếm</button>
+      </div>
+
+      <div class="hrmember-list">
+        <h1 style="width: 80%; margin: 0 auto">Danh sách Nhân khẩu</h1>
+        <table border="1" cellpadding="5" style="width: 80%; margin: 0 auto">
+          <tr>
+            <th>ID nhân khẩu</th>
+            <th>ID hộ khẩu</th>
+            <th>DOB</th>
+            <th>CCCD</th>
+            <th>Quan hệ với chủ hộ</th>
+          </tr>
+          {% for hk in nhan_khau_list %}
+          <tr>
+            <td>{{ hk.id_nhan_khau }}</td>
+            <td>{{ hk.id_ho_khau }}</td>
+            <td>{{ hk.ngay_sinh }}</td>
+            <td>{{ hk.can_cuoc_cong_dan }}</td>
+            <td>{{ hk.quan_he_chu_ho }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">Không có dữ liệu</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="hrbutton-bar">
+        <button class="hrbtn">Thay đổi chủ hộ</button>
+        <button class="hrbtn">Thêm thành viên</button>
+        <button class="hrbtn">Xóa thành viên</button>
+        <button class="hrbtn">Tách hộ</button>
+        <button class="hrbtn danger">Xóa hộ</button>
+      </div>
+    </div>
+    {% include 'core/sidebar_and_footer.html' %}
+  </body>
+</html>

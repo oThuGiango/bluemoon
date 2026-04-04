@@ -1,0 +1,46 @@
+{% load static %}
+<form method="post" action="{% url 'delete_dotthu' pk=dot_thu.pk %}" id="deleteForm">
+    {% csrf_token %}
+    <div class="form-container">
+        <h2 class="form-title" style="color: #d93025; border-bottom: 2px solid #fce8e6; padding-bottom: 15px;">
+            <i class="fa-solid fa-triangle-exclamation title-icon" style="margin-right: 10px;"></i> 
+            Xác nhận xóa đợt thu phí
+        </h2>
+
+        <div style="text-align: center; padding: 30px 10px;">
+            <p style="font-size: 1.15rem; color: #3c4043; margin-bottom: 10px; line-height: 1.5;">
+                Bạn có chắc chắn muốn xóa đợt thu phí: <br>
+                <strong style="color: #202124; font-size: 1.3rem;">"{{ dot_thu.ten_dotthu }}"</strong>?
+            </p>
+            <div style="background-color: #fef7f7; border-radius: 8px; padding: 12px; display: inline-block;">
+                <p style="color: #d93025; font-weight: 600; font-size: 0.9rem; margin: 0;">
+                    <i class="fa-solid fa-circle-info"></i> Lưu ý: Hành động này không thể hoàn tác và có thể ảnh hưởng đến các dữ liệu liên quan.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 10px;">
+            <button type="button" class="btn btn-secondary-outline" id="cancelDeleteBtn" style="padding: 10px 20px;">
+                <i class="fa-solid fa-xmark"></i> Hủy bỏ
+            </button>
+            <button type="button" class="btn btn-danger-filled" id="confirmDeleteBtn" 
+                    style="background-color: #d93025; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.3s;">
+                <i class="fa-solid fa-trash-can"></i> Xác nhận xóa
+            </button>
+        </div>
+    </div>
+</form>
+
+<style>
+    #confirmDeleteBtn:hover {
+        background-color: #b22a1f !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .form-container {
+        animation: slideDown 0.3s ease-out;
+    }
+    @keyframes slideDown {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+</style>

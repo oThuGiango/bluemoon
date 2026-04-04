@@ -1,0 +1,77 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #9bd4c6;
+  flex-direction: column; /* header nằm trên cùng */
+
+}
+
+/* Header
+.topbar {
+  background-color: #1e3a8a;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 20px;
+  font-weight: bold;
+} */
+
+/* Main content */
+.main-section {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Form container */
+.add-form {
+  background-color: #aee1d3;
+  padding: 25px 40px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.add-form h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* Form rows */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-row label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-row input {
+  padding: 8px;
+  border: 1px solid #888;
+  border-radius: 6px;
+}
+
+/* Nút vàng */
+.hrbtn {
+  background-color: #fff4b2;
+  color: #333;
+  border: 1px solid #c2a700;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+  display: block;
+  margin: 0 auto;
+}
+
+.hrbtn:hover {
+  background-color: #ffe36e;
+}

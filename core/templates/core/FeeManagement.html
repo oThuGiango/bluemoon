@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    {% load static %}
+    {% load humanize %} 
+    <meta charset="UTF-8">
+    <title>Quản Lý Khoản Thu - Chung cư BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}"> 
+</head>
+<body>
+    
+    {% include 'core/Sidebar.html' %} 
+    <main>
+         {% include 'core/accountant_header.html' %}
+        <section class="main-content income-management-page">
+            <div class="main-panel data-table-panel" id="income-container">
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                            <div class="message-container success" style="background-color: #e6f7d9; color: #52c41a; border: 1px solid #b7eb8f;">
+                                {{ message }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                <div class="income-controls-top">
+                    <form method="GET" action="{% url 'fee_management' %}" id="feeSearchForm"
+                        style="display: flex; gap: 10px; flex-grow: 1;">
+
+                        <div class="search-box-container" style="flex-grow: 1;">
+                            <input type="text" 
+                            placeholder="Nhập vào đây để tìm kiếm..." 
+                            name="search_khoanthu" 
+                            value="{{ query|default:'' }}">
+                            <i class="fa-solid fa-search" onclick="document.getElementById('feeSearchForm').submit();" style="cursor: pointer;"></i>
+                        </div>
+                        
+                    <div class="control-buttons">
+                        <button type="submit" class="btn btn-primary" style="min-width: 120px; height: 100%;">
+                            <i class="fa-solid fa-filter"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </form>
+                </div>
+
+                <div class="income-summary-box">
+                    <h3 class="box-title">Tổng quan Khoản thu</h3>
+                    <div class="summary-details">
+                        <p>Tổng số Khoản Thu đã định nghĩa: {{ total_count|default:"0" }}</p>
+                    </div>
+                </div>
+
+                <h2 class="table-title">DANH SÁCH KHOẢN THU HIỆN TẠI</h2>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã KT</th>
+                                <th>Tên Khoản Thu</th>
+                                <th>Đơn Vị Tính</th>
+                                <th>Đơn Giá</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in khoan_thu_list %}
+                            <tr>
+                                <td data-label="Mã KT">{{ item.id_khoanthu }}</td>
+                                <td data-label="Tên khoản thu">{{ item.ten_khoanthu }}</td>
+                                <td data-label="Đơn Vị Tính">
+                                    {{ item.get_don_vi_tinh_display }}
+                                </td>
+                                <td data-label="Đơn Giá">{{ item.don_gia|floatformat:0|intcomma }} VND</td>
+                                
+                                <td data-label="Thao tác">
+                                    <button class="action-btn view-detail modal-trigger" 
+                                            title="Chi tiết" 
+                                            data-url="{% url 'view_khoanthu_detail_modal' pk=item.id_khoanthu %}">
+                                        <i class="fa-solid fa-file-invoice"></i>
+                                    </button>
+                                    
+                                    <button class="action-btn edit-fee modal-trigger" 
+                                            title="Chỉnh sửa" 
+                                            data-url="{% url 'edit_khoanthu' pk=item.id_khoanthu %}"> 
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <button class="action-btn delete-fee modal-trigger"
+                                            title="Xóa" 
+                                            data-url="{% url 'delete_khoanthu' pk=item.id_khoanthu %}"
+                                            data-name="{{item.ten_khoanthu}}">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align: center;">Không có khoản thu nào được tìm thấy.</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="income-actions-bottom">
+                    <button id="createNewFeeBtn" class="btn btn-create-new" style="min-width: 180px;" data-url="{% url 'add_khoanthu' %}">
+                        <i class="fa-solid fa-plus"></i> Tạo khoản thu mới
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <footer>
+            &copy; BlueMoon Apartment 2025. Created by the ChatGPT's son-in-law team.
+        </footer>
+    </main>
+    
+  <div id="mainModal" class="modal">
+    <div class="modal-content">
+        </div>
+</div>
+    <script src="{% static 'js/FeeManagement_modal_logic.js' %}"></script>
+</body>
+</html>

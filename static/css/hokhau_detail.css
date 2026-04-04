@@ -1,0 +1,55 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #9bd4c6;
+}
+
+
+.container {
+  width: 80%;
+  margin: 30px auto;
+}
+
+.house-info, .member-list {
+  background-color: #aee1d3;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+hrbtn, .hrbtn.small {
+  background-color: #fff4b2;
+  border: 1px solid #c2a700;
+  padding: 6px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.hrbtn.small:hover {
+  background-color: #ffe36e;
+}
+
+table a {
+  font-weight: bold;
+  color: #1e3a8a;
+  text-decoration: none;
+}

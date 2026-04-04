@@ -1,0 +1,43 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'styles/Accountant.css' %}" />
+<aside class="sidebar" id="sidebar"> 
+  <div class="sidebar-logo">
+    <i class="fa-solid fa-building-columns"></i>
+    <span>BlueMoon</span>
+  </div>
+  <nav>
+    {# 1. Chưa đăng nhập #}
+    {% if not user.is_authenticated %}
+    <ul id="menu-not-logged-in">
+      <li class="Login_btn">
+        <a href="/login">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>Đăng nhập</span>
+        </a>
+      </li>
+    </ul>
+    
+    {# 2. Nếu là Admin (id_vaitro = 1) #}
+    {% elif user.vaitro.id_vaitro == 1 %}
+    <ul id="menu-accountmanage">
+      <li><a href="/admin_home"><i class="fa-solid fa-house"></i><span>Trang chủ</span></a></li> 
+      <li><a href="/hrmanage"><i class="fa-solid fa-people-roof"></i><span>Quản lý hộ khẩu</span></a></li>
+      <li><a href="/demomanage"><i class="fa-solid fa-user-group"></i><span>Quản lý nhân khẩu</span></a></li>
+      <li><a href="/accountmanage"><i class="fa-solid fa-user-gear"></i><span>Quản lý tài khoản</span></a></li>
+      <li><a href="/demomanage/biendongnhankhau"><i class="fa-solid fa-arrows-retweet"></i><span>Biến động nhân khẩu</span></a></li>
+    </ul>
+
+    {# 3. Nếu là Kế toán (id_vaitro = 3) #}
+    {% elif user.vaitro.id_vaitro == 3 %}
+    <ul id="menu-account">
+      <li><a href="/accountant_home"><i class="fa-solid fa-house"></i><span>Trang chủ</span></a></li> 
+      <li><a href="/fee_management"><i class="fa-solid fa-file-invoice"></i><span>Quản lý khoản thu</span></a></li>
+      <li><a href="/fee_collection_period"><i class="fa-solid fa-calendar-days"></i><span>Quản lý đợt thu</span></a></li>
+      <li><a href="/statistics_view"><i class="fa-solid fa-magnifying-glass"></i><span>Tra cứu và Thống kê</span></a></li>
+      <li><a href="/invoice_history"><i class="fa-solid fa-clock-rotate-left"></i><span>Lịch sử hóa đơn</span></a></li>
+    </ul>
+    {% endif %}
+  </nav>
+  <input type="hidden" id="user-role-id" value="{{ user.vaitro.id_vaitro|default:0 }}">
+</aside>
+<script src="{% static 'js/Sidebar1.js' %}"></script>

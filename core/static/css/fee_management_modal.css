@@ -1,0 +1,248 @@
+/* --- BIẾN VÀ THIẾT LẬP CHUNG (NÊN DÙNG) --- */
+/* Giả định: var(--primary) đã được định nghĩa là màu chủ đạo của bạn */
+:root {
+    --primary: #007bff; /* Ví dụ màu xanh dương */
+    --secondary: #6c757d;
+    --success: #28a745;
+    --danger: #dc3545; /* Màu đỏ cho lỗi */
+    --warning: #ffc107;
+    --border-color: #ced4da;
+    --light-bg: #f8f9fa;
+}
+
+/* --- QUY TẮC CSS CHO MODAL (BỔ SUNG) --- */
+
+.modal {
+    display: none; /* RẤT QUAN TRỌNG: Mặc định ẩn Modal */
+    position: fixed;
+    z-index: 2000; /* Đảm bảo nó nằm trên tất cả các nội dung khác */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Cho phép cuộn nếu nội dung dài */
+    background-color: rgba(0,0,0,0.5); /* Lớp phủ nền mờ */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Class JS thêm vào để hiển thị Modal */
+.modal.show {
+    display: block;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 80px auto; /* Đặt ở giữa, dịch xuống 80px */
+    padding: 30px;
+    border: 1px solid #ddd;
+    width: 90%;
+    max-width: 600px; /* Độ rộng tối đa hợp lý cho form */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    /* Hiệu ứng chuyển động (tùy chọn) */
+    transform: translateY(-50px);
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+}
+
+
+/* --- TẠO PHONG CÁCH CHO FORM (FORM STYLING) --- */
+
+.form-container {
+    padding: 0; /* Không cần padding vì .modal-content đã có */
+}
+
+/* Tiêu đề Form */
+.form-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    border-bottom: 2px solid var(--light-bg);
+    padding-bottom: 15px;
+    margin-bottom: 25px !important;
+}
+.form-title .title-icon {
+    font-size: 1.5rem;
+    vertical-align: middle;
+}
+
+
+/* --- CÁC TRƯỜNG INPUT VÀ GROUP --- */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600; /* Nhãn nên đậm hơn */
+    color: #343a40;
+}
+
+/* Dấu sao bắt buộc */
+.required-star {
+    color: var(--danger);
+    margin-left: 4px;
+    font-weight: bold;
+}
+
+/* Định dạng Input mặc định (Áp dụng cho <input>, <select>, <textarea>) */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều rộng */
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Hiệu ứng focus nhẹ */
+}
+
+/* Trường chỉ xem (Mã Khoản Thu) */
+.form-control-disabled {
+    /* Đảm bảo style không bị lặp */
+}
+
+/* Văn bản trợ giúp (Help text) */
+.form-text.text-muted {
+    font-size: 0.875rem;
+    color: var(--secondary) !important;
+    margin-top: 5px;
+    display: block;
+}
+
+
+/* --- HIỂN THỊ THÔNG BÁO VÀ LỖI --- */
+
+/* Thông báo Lỗi chung (.error-alert) */
+.message-container.error-alert {
+    padding: 12px 15px;
+    border: 1px solid var(--danger);
+    background-color: #f8d7da; /* Màu nền đỏ nhạt */
+    color: var(--danger);
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    line-height: 1.4;
+}
+.message-container.error-alert i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* Thông báo Lỗi riêng lẻ cho từng trường (.field-error-message) */
+.field-error-message {
+    color: var(--danger);
+    font-size: 0.875rem;
+    margin-top: 5px;
+    font-style: italic;
+    display: block;
+}
+.field-error-message i {
+    margin-right: 5px;
+}
+/* Đánh dấu input bị lỗi (ví dụ: viền đỏ) */
+.form-group:has(.field-error-message) input,
+.form-group:has(.field-error-message) select,
+.form-group:has(.field-error-message) textarea {
+    border-color: var(--danger);
+}
+
+
+/* --- NÚT HÀNH ĐỘNG (BUTTONS) --- */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* Đẩy các nút sang phải */
+    gap: 15px; /* Khoảng cách giữa các nút */
+    padding-top: 20px;
+    border-top: 1px solid var(--light-bg); /* Thêm đường kẻ phân cách */
+    margin-top: 30px;
+}
+
+/* Định dạng Button chung */
+.btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 150px; /* Đảm bảo kích thước đồng nhất */
+    text-align: center;
+    white-space: nowrap;
+}
+.btn i {
+    margin-right: 8px;
+}
+
+/* Button chính (Tạo/Cập Nhật) */
+.btn-primary {
+    background-color: var(--primary);
+    color: #fff;
+    border: 1px solid var(--primary);
+}
+.btn-primary:hover {
+    background-color: #0056b3; /* Màu tối hơn khi hover */
+    border-color: #0056b3;
+}
+
+/* Button phụ (Hủy) */
+.btn-secondary-outline {
+    background-color: transparent;
+    color: var(--secondary);
+    border: 1px solid var(--secondary);
+}
+.btn-secondary-outline:hover {
+    background-color: var(--secondary);
+    color: #fff;
+}
+
+/* --- CHI TIẾT KHOẢN THU (DETAIL VIEW) --- */
+
+.detail-container {
+    padding: 0; 
+}
+
+.detail-group label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.detail-group p {
+    font-size: 1rem;
+    margin-top: 3px !important;
+    margin-bottom: 0 !important;
+}
+
+/* Nút xác nhận xóa (Màu đỏ đặc) */
+.btn-danger-filled {
+    background-color: #dc3545;
+    color: #fff;
+    border: 1px solid #dc3545;
+}
+.btn-danger-filled:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
+
+/* Modal xóa thu gọn hơn */
+.delete-modal-width {
+    max-width: 450px;
+}

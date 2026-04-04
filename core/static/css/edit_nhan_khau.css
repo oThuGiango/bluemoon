@@ -1,0 +1,17 @@
+.nk-edit__title {
+  margin: 0 0 16px;
+  text-transform: uppercase;
+  font-weight: 900;
+  border-bottom: 2px solid #000;
+  padding-bottom: 8px;
+}
+.nk-edit__title span {
+  text-transform: none;
+  font-weight: 700;
+}
+
+/* nút nhỏ: đã có .brutalist-card__button--xs */
+.form-actions {
+  gap: 10px;
+  justify-content: center;
+}

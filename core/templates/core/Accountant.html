@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <title>Chung cư BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}" />
+  </head>
+  <body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+          {% include 'core/accountant_header.html' %}
+      <section class="dashboard">
+        <div class="dash-card">
+          <div class="dash-icon bg-blue">
+            <i class="fa-solid fa-money-bill-trend-up"></i>
+          </div>
+          <div class="dash-info">
+            <div class="dash-number">358</div>
+            <div class="dash-label">Khoản thu</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon bg-green">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div class="dash-info">
+            <div class="dash-number">1,210</div>
+            <div class="dash-label">Nhân khẩu</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon bg-orange">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </div>
+          <div class="dash-info">
+            <div class="dash-number">6,120</div>
+            <div class="dash-label">Phiếu thu dịch vụ</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon bg-purple">
+            <i class="fa-solid fa-chart-simple"></i>
+          </div>
+          <div class="dash-info">
+            <div class="dash-number">40+</div>
+            <div class="dash-label">Báo cáo thống kê</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="main-content">
+        <div class="main-panel">
+          <h2>Tổng quan & Thống kê Tài chính</h2>
+          <p>
+            Chào mừng đến với Hệ thống Quản lý Chung cư BlueMoon.<br />
+            Bảng điều khiển này cung cấp cái nhìn tổng quan nhanh về các chỉ số
+            tài chính và hoạt động chính.<br />
+            Hãy sử dụng các liên kết nhanh để truy cập các chức năng thường dùng
+            hoặc xem báo cáo chi tiết.
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        &copy; BlueMoon Apartment 2025. Created by the ChatGPT's son-in-law
+        team.
+      </footer>
+    </main>
+    <script></script>
+  </body>
+</html>

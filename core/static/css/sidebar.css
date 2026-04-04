@@ -1,0 +1,132 @@
+:root {
+  --blue: #1e3a8a;
+  --bg: #f4f8ff;
+  --card: #fff;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Topbar */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px; /* chiều cao header */
+  background-color: #1e3a8a;
+  color: white;
+  /* display: flex; */
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 1000; /* luôn nằm trên các phần khác */
+}
+
+.topbar h1 {
+  font-size: 18px;
+  margin: 0;
+}
+.icon-btn {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.icon-btn:focus {
+  outline: 3px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 50;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 320px;
+  max-width: 85%;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transform: translateX(-110%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sidebar-header h2 {
+  margin: 0;
+  color: var(--blue);
+}
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Nav links */
+.nav {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nav a {
+  padding: 10px 12px;
+  text-decoration: none;
+  color: #222;
+  border-radius: 8px;
+}
+.nav a:hover {
+  background: #f1f5ff;
+}
+
+/* Footer of sidebar */
+.sidebar-footer {
+  margin-top: auto;
+  color: #555;
+  font-size: 13px;
+}
+
+/* Content push (optional) */
+.content {
+  margin-top: 60px; /* chừa chỗ cho topbar cố định */
+  padding: 20px;
+  min-height: calc(100vh - 60px); /* cao ít nhất bằng phần còn lại */
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* Open states (JS sẽ thêm/remove class .open) */
+.sidebar.open {
+  transform: translateX(0);
+}
+.overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Nếu muốn đẩy nội dung khi mở sidebar (desktop) */
+@media (min-width: 900px) {
+  .content.shift {
+    margin-left: 320px;
+  }
+}

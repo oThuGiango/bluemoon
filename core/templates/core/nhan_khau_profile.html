@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hồ sơ nhân khẩu - {{ nhan_khau.ho_ten }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 900px; margin: 0 auto;">
+                <h2 class="form-title" style="color: var(--primary);">
+                    <i class="fa-solid fa-address-card"></i> CHI TIẾT HỒ SƠ NHÂN KHẨU
+                </h2>
+
+                <div style="display: flex; gap: 40px; margin-top: 30px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px; text-align: center;">
+                        <div class="user-avatar-lg" style="width: 180px; height: 180px; font-size: 5rem; margin: 0 auto 20px; border: 5px solid #fff; box-shadow: var(--shadow);">
+                            {{ nhan_khau.ho_ten|slice:":1"|upper }}
+                        </div>
+                        <h2 style="font-family: 'Montserrat', sans-serif; color: #222; margin-bottom: 10px;">{{ nhan_khau.ho_ten }}</h2>
+                        <span class="status status-active" style="padding: 8px 20px; font-size: 1rem;">
+                            ID: #{{ nhan_khau.id_nhankhau }}
+                        </span>
+                    </div>
+
+                    <div style="flex: 2; min-width: 350px;">
+                        <div class="summary-details" style="background: var(--gray-bg); padding: 25px; border-radius: 16px;">
+                            <h3 style="margin-bottom: 20px; font-size: 1.1rem; border-bottom: 2px solid #ddd; padding-bottom: 10px;">
+                                <i class="fa-solid fa-circle-info"></i> Thông tin cơ bản
+                            </h3>
+                            
+                            <div class="detail-list">
+                                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee;">
+                                    <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-cake-candles" style="width: 25px;"></i> Ngày sinh:</span>
+                                    <span>{{ nhan_khau.ngay_sinh|date:"d/m/Y" }}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee;">
+                                    <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-id-card" style="width: 25px;"></i> Số CCCD:</span>
+                                    <span style="font-family: 'Montserrat', sans-serif; font-weight: 700;">{{ nhan_khau.cccd|default:"Chưa cập nhật" }}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee;">
+                                    <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-users-rectangle" style="width: 25px;"></i> Quan hệ chủ hộ:</span>
+                                    <span class="status status-active" style="background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff;">{{ nhan_khau.quan_he_chu_ho }}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                                    <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-house-lock" style="width: 25px;"></i> Thuộc hộ khẩu:</span>
+                                    <a href="{% url 'hokhau_detail' nhan_khau.id_hokhau_id %}" style="font-weight: 700; color: var(--primary); text-decoration: none;">
+                                        Mã hộ #{{ nhan_khau.id_hokhau_id }} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px;">
+                            <a href="{% url 'edit_nhan_khau' nhan_khau.id_nhankhau %}" class="btn btn-primary" style="background: var(--orange); border-color: var(--orange); flex: 1;">
+                                <i class="fa-solid fa-user-pen"></i> Chỉnh sửa
+                            </a>
+                            <a href="{% url 'dang_ky_bdnk' nhan_khau.id_nhankhau %}" class="btn btn-primary" style="flex: 1;">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Đăng ký biến động
+                            </a>
+                            <a href="{% url 'nhan_khau_delete' nhan_khau.id_nhankhau %}" class="btn btn-secondary-outline" style="color: #ff4d4f; border-color: #ff4d4f; flex: 1;">
+                                <i class="fa-solid fa-user-slash"></i> Xóa nhân khẩu
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="border-top: 1px solid #eee; margin-top: 40px; padding-top: 20px;">
+                    <a href="{% url 'demomanage' %}" class="btn btn-secondary-outline" style="min-width: 200px;">
+                        <i class="fa-solid fa-chevron-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

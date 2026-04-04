@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - Chung cư BlueMoon</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %} 
+    <main>
+        {% include 'core/accountant_header.html' %}
+
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 800px; margin: 0 auto; padding: 40px;">
+                <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 35px;">
+                    HỒ SƠ CÁ NHÂN <span class="title-icon">👤</span>
+                </h2>
+
+                <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px; text-align: center;">
+                        <div class="user-avatar-lg" style="width: 150px; height: 150px; font-size: 4rem; margin: 0 auto 20px;">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                        <h3 style="font-family: 'Montserrat', sans-serif; color: var(--primary);">{{ user.username }}</h3>
+                        <span class="status status-active" style="display: inline-block; margin-top: 10px;">
+                            {{ user.vaitro.ten_vaitro }}
+                        </span>
+                    </div>
+
+                    <div style="flex: 2; min-width: 300px; background: var(--gray-bg); padding: 30px; border-radius: 16px;">
+                        <div class="detail-list">
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #ddd;">
+                                <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-id-badge" style="width: 30px;"></i> Mã nhân viên:</span>
+                                <span class="invoice-id">#{{ user.id_taikhoan }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #ddd;">
+                                <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-user-tag" style="width: 30px;"></i> Tên đăng nhập:</span>
+                                <span>{{ user.username }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #ddd;">
+                                <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-shield-halved" style="width: 30px;"></i> Chức vụ:</span>
+                                <span style="font-weight: 500;">{{ user.vaitro.ten_vaitro }} (Mã: {{ user.vaitro_id }})</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 15px 0;">
+                                <span style="font-weight: 600; color: #555;"><i class="fa-solid fa-calendar-check" style="width: 30px;"></i> Ngày tham gia:</span>
+                                <span>{{ user.date_joined|date:"d/m/Y"|default:"---" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 40px; display: flex; justify-content: center; gap: 20px;">
+                    <a href="javascript:history.back()" class="btn btn-secondary-outline" style="text-decoration: none;">
+                        <i class="fa-solid fa-arrow-left"></i> Quay lại
+                    </a>
+                    <button class="btn btn-primary" onclick="alert('Tính năng đổi mật khẩu đang được phát triển!')">
+                        <i class="fa-solid fa-key"></i> Đổi mật khẩu
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer style="margin-top: 50px;">
+            &copy; BlueMoon Apartment 2026. Hỗ trợ kỹ thuật: 1900 1234.
+        </footer>
+    </main>
+</body>
+</html>

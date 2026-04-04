@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xóa thành công - BlueMoon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 500px; margin: 80px auto; text-align: center; padding: 40px;">
+                <div style="font-size: 70px; color: #52c41a; margin-bottom: 20px;">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2 style="color: #222;">ĐÃ XÓA NHÂN KHẨU</h2>
+                <p style="color: #666; margin-bottom: 30px;">Dữ liệu nhân khẩu đã được gỡ bỏ thành công khỏi hệ thống quản lý cư dân.</p>
+                <a href="{% url 'demomanage' %}" class="btn btn-primary" style="text-decoration: none; display: inline-flex;">
+                    <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

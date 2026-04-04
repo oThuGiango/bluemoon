@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chung cư BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../styles/Accountant.css">
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <main>
+        <header class="main-header">
+            <div class="header-left">
+                <h1>Chung cư <span>BlueMoon</span></h1>
+                <p>Hệ thống quản lý hiện đại và thông minh cho tòa nhà của bạn</p>
+            </div>
+            <div class="header-right">
+                <!-- Nút ngôn ngữ VI - có thể thêm ngôn ngữ khác -->
+                <button class="lang-btn" style="margin-right: 12px;">
+                    <img src="https://flagcdn.com/vn.svg" alt="VI" width="22" style="border-radius:50%;border:1px solid #d9d9d9; background:#fff; margin-right:7px;">
+                    <span>VI</span>
+                </button>
+                <!-- user-menu -->
+                <div class="user-avatar" id="userMenuBtn">N2</div>
+                <div class="user-menu" id="userMenu">
+                    <div class="user-menu-header">
+                        <div class="user-avatar-lg">KT</div>
+                        <div class="user-info">
+                            <div class="user-name">Kế toán</div>
+                            <div class="user-id">123456</div>
+                        </div>
+                    </div>
+    
+                    <div class="user-menu-list">
+                        <div class="user-menu-item">
+                            <span class="user-menu-icon menu-account"><i class="fa-regular fa-user"></i></span>
+                            <div>
+                                <div class="item-title">Tài khoản</div>
+                                <div class="item-desc">Quản lý tài khoản của bạn.</div>
+                            </div>
+                        </div>
+
+                        <div class="user-menu-item">
+                            <span class="user-menu-icon menu-idea"><i class="fa-regular fa-message"></i></span>
+                            <div>
+                                <div class="item-title">Tin nhắn</div>
+                                <div class="item-desc">Góp phần cải thiện cuộc sống cư dân.</div>
+                            </div>
+                        </div>
+                    
+                        <div class="user-menu-item">
+                            <span class="user-menu-icon menu-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+                            <div>
+                                <div class="item-title">Đăng xuất</div>
+                                <div class="item-desc">Quay về màn hình đăng nhập.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-menu-overlay" id="userMenuOverlay"></div>
+            </div>
+        </header>
+        <section class="dashboard">
+            <div class="dash-card">
+                <div class="dash-icon bg-blue"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                <div class="dash-info">
+                    <div class="dash-number">358</div>
+                    <div class="dash-label">Khoản thu</div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-icon bg-green"><i class="fa-solid fa-users"></i></div>
+                <div class="dash-info">
+                    <div class="dash-number">1,210</div>
+                    <div class="dash-label">Nhân khẩu</div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-icon bg-orange"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                <div class="dash-info">
+                    <div class="dash-number">6,120</div>
+                    <div class="dash-label">Phiếu thu dịch vụ</div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-icon bg-purple"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="dash-info">
+                    <div class="dash-number">40+</div>
+                    <div class="dash-label">Báo cáo thống kê</div>
+                </div>
+            </div>
+        </section>
+        <section class="main-content">
+            <div class="main-panel">
+                <h2>Hệ thống quản lý chung cư BlueMoon</h2>
+                <p>
+                    Nâng cao hiệu quả quản lý, tiết kiệm thời gian, minh bạch mọi thông tin.<br>
+                    Hệ thống hỗ trợ quản lý tài chính, nhân khẩu, thu phí, thống kê...<br>
+                    Mọi dữ liệu được bảo mật và cập nhật liên tục.
+                </p>
+            </div>
+            <aside class="quick-links">
+                <h3>Chức năng nhanh</h3>
+                <ul>
+                    <li><a href="#"><i class="fa-solid fa-money-bill-trend-up"></i> Quản lý khoản thu</a></li>
+                    <li><a href="#"><i class="fa-solid fa-users"></i> Quản lý đợt thu phí</a></li>
+                    <li><a href="#"><i class="fa-solid fa-chart-simple"></i> Tra cứu & Thống kê</a></li>
+                </ul>
+            </aside>
+        </section>
+        <footer>
+            &copy; BlueMoon Apartment 2025. Created by the ChatGPT's son-in-law team.
+        </footer>
+    </main>
+    <script>
+        // Import sidebar 
+        fetch('sidebar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('sidebar-container').innerHTML = html;
+            });
+
+        // User menu toggle
+        const menuBtn = document.getElementById('userMenuBtn');
+        const userMenu = document.getElementById('userMenu');
+        const overlay = document.getElementById('userMenuOverlay');
+        menuBtn.onclick = (e) => {
+            userMenu.classList.toggle('show');
+            overlay.classList.toggle('show');
+        };
+        overlay.onclick = () => {
+            userMenu.classList.remove('show');
+            overlay.classList.remove('show');
+        };
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "Escape") {
+                userMenu.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

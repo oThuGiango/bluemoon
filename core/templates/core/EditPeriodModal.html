@@ -1,0 +1,50 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+<div class="form-container" id="editPeriodFormContainer">
+    <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 25px;">
+        CHỈNH SỬA ĐỢT THU <span class="title-icon">📝</span>
+    </h2>
+    
+    {% if form.errors %}
+        <div class="message-container error-alert" style="margin-bottom: 20px;">
+            <i class="fa-solid fa-triangle-exclamation"></i> 
+            **Lỗi:** Vui lòng kiểm tra lại dữ liệu nhập vào.
+        </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'edit_dotthu' pk=dot_thu.pk %}" id="editPeriodForm">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label class="form-label" style="font-weight: bold; color: #555;">Mã Đợt Thu</label>
+            <input type="text" value="{{ dot_thu.id_dotthu }}" disabled class="form-control-disabled"
+                style="background-color: #e9ecef; border: 1px solid #ced4da; cursor: not-allowed;">
+        </div>
+
+        {% for field in form.visible_fields %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="form-label">
+                    {{ field.label }} {% if field.field.required %}<span class="required-star">*</span>{% endif %}
+                </label>
+                {{ field }} 
+
+                {% if field.errors %}
+                    <div class="field-error-message">
+                        {% for error in field.errors %}
+                            <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions" style="margin-top: 40px; text-align: right;">
+            <button type="button" class="btn btn-secondary-outline modal-close-btn" style="min-width: 150px;">
+                <i class="fa-solid fa-xmark"></i> Hủy
+            </button>
+            <button type="submit" class="btn btn-primary" style="min-width: 150px; margin-left: 15px;">
+                <i class="fa-solid fa-floppy-disk"></i> Lưu Thay Đổi
+            </button>
+        </div>
+    </form>
+</div>

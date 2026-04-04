@@ -1,0 +1,27 @@
+{% load static %}
+<form method="post" action="{% url 'delete_invoice_modal' pk=hoadon.id_hoadon %}" id="deleteForm">
+    {% csrf_token %}
+    <div class="form-container">
+        <h2 class="form-title" style="color: #d93025; border-bottom: 2px solid #fce8e6; padding-bottom: 15px;">
+            <i class="fa-solid fa-triangle-exclamation title-icon"></i> 
+            XÁC NHẬN XÓA HÓA ĐƠN
+        </h2>
+
+        <div style="text-align: center; padding: 30px 10px;">
+            <p style="font-size: 1.15rem; color: #3c4043; line-height: 1.5;">
+                Bạn có chắc chắn muốn xóa hóa đơn: <br>
+                <strong style="color: #202124; font-size: 1.3rem;">"#{{ hoadon.id_hoadon }}"</strong> 
+                của hộ <strong>{{ hoadon.id_hokhau.so_can_ho }}</strong>?
+            </p>
+        </div>
+
+        <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 15px;">
+            <button type="button" class="btn btn-secondary-outline modal-close-btn" id="cancelDeleteBtn">
+                <i class="fa-solid fa-xmark"></i> Hủy bỏ
+            </button>
+            <button type="button" class="btn btn-danger-filled" id="confirmDeleteBtn" style="background-color: #d93025; color: white;">
+                <i class="fa-solid fa-trash-can"></i> Xác nhận xóa
+            </button>
+        </div>
+    </div>
+</form>

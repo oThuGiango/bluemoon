@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết hộ khẩu - BlueMoon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+        <section class="main-content">
+            <div class="main-panel">
+                <h2 class="form-title" style="color: var(--primary);"><i class="fa-solid fa-house-user"></i> THÔNG TIN HỘ KHẨU #{{ hokhau.id_hokhau }}</h2>
+                
+                <div class="income-summary-box" style="margin-bottom: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div>
+                        <p style="color: #666; font-size: 0.9rem;">Số căn hộ</p>
+                        <p style="font-size: 1.2rem; font-weight: 700;">{{ hokhau.so_can_ho }}</p>
+                    </div>
+                    <div>
+                        <p style="color: #666; font-size: 0.9rem;">Diện tích</p>
+                        <p style="font-size: 1.2rem; font-weight: 700;">{{ hokhau.dien_tich }} m²</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <a href="{% url 'hokhau_edit' hokhau.id_hokhau %}" class="btn btn-primary" style="display: inline-flex; min-width: auto;">
+                            <i class="fa-solid fa-edit"></i> Sửa thông tin
+                        </a>
+                    </div>
+                </div>
+
+                <h3 class="table-title" style="text-align: left; border-bottom: 2px solid var(--primary); padding-bottom: 5px;">DANH SÁCH THÀNH VIÊN</h3>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ tên</th>
+                                <th>Ngày sinh</th>
+                                <th>Quan hệ</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for nk in thanh_vien %}
+                            <tr>
+                                <td><strong>#{{ nk.id_nhankhau }}</strong></td>
+                                <td>{{ nk.ho_ten }}</td>
+                                <td>{{ nk.ngay_sinh|date:"d/m/Y" }}</td>
+                                <td><span class="status status-active" style="background: #f0f5ff; color: #2f54eb; border-color: #adc6ff;">{{ nk.quan_he_chu_ho }}</span></td>
+                                <td>
+                                    <a href="{% url 'nhan_khau_profile' nk.id_nhankhau %}" class="action-btn" title="Xem profile"><i class="fa-solid fa-user-tie"></i></a>
+                                    <a href="{% url 'edit_nhan_khau' nk.id_nhankhau %}" class="action-btn" style="background: #fff3e0; color: #ff9800;"><i class="fa-solid fa-user-pen"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" style="text-align: center;">Chưa có thành viên nào.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="form-actions" style="margin-top: 20px;">
+                    <a href="{% url 'hrmanage' %}" class="btn btn-secondary-outline" style="text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

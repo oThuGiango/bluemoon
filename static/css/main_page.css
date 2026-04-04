@@ -1,0 +1,99 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Màu sắc của header */
+header {
+  background: rgb(134, 194, 250);
+}
+
+.navbar .nav-menu .nav-link {
+  color: #fff;
+}
+
+header .navbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  min-height: var(--header-h);
+  padding: 0 16px;
+}
+
+.navbar .nav-menu {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+}
+
+.navbar .nav-item a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+}
+
+.navbar .nav-item a:hover {
+  text-decoration: underline;
+}
+
+.nav-center {
+  justify-self: center;
+}
+.nav-center .logo-text {
+  margin: 0; /* bỏ margin default của h2 để không lệch dọc */
+  line-height: 1;
+}
+
+/* Bên phải giữ như cũ */
+.nav-right {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Nút hamburger không làm xô lệch layout */
+.icon-btn {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 20px;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+/* Tuỳ chọn: chỉ hiện nút ở mobile */
+@media (min-width: 993px) {
+  .icon-btn {
+    display: none;
+  }
+}
+
+.Login_btn a {
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+.Login_btn a:visited {
+  color: #fff;
+}
+
+.Login_btn a:hover {
+  color: #fff;
+  opacity: 0.9;
+}
+
+.Login_btn a:active {
+  color: #fff;
+}

@@ -1,0 +1,53 @@
+{% load static %} {% load humanize %}
+<div class="form-container detail-container">
+  <h2 style="text-align: center; color: var(--primary); margin-bottom: 25px">
+    CHI TIẾT KHOẢN THU 📄
+  </h2>
+
+  <div class="detail-group" style="margin-bottom: 15px">
+    <label style="font-weight: 700; color: #555">Mã Khoản Thu:</label>
+    <p style="margin-top: 5px; font-weight: 600">{{ khoan_thu.id_khoanthu }}</p>
+  </div>
+  <div class="detail-group" style="margin-bottom: 15px">
+    <label style="font-weight: 700; color: #555">Tên Khoản Thu:</label>
+    <p style="margin-top: 5px">{{ khoan_thu.ten_khoanthu }}</p>
+  </div>
+  <div class="detail-group" style="margin-bottom: 15px">
+    <label style="font-weight: 700; color: #555">Đơn Vị Tính:</label>
+    <p style="margin-top: 5px">{{ khoan_thu.get_don_vi_tinh_display }}</p>
+  </div>
+  <div
+    class="detail-group"
+    style="margin-bottom: 25px; border-top: 1px solid #eee; padding-top: 15px"
+  >
+    <label style="font-weight: 700; color: var(--primary)">Đơn Giá:</label>
+    <p
+      style="
+        margin-top: 5px;
+        font-size: 1.2em;
+        font-weight: 700;
+        color: var(--primary);
+      "
+    >
+      {{ khoan_thu.don_gia|floatformat:0|intcomma }} VND
+    </p>
+  </div>
+
+  <div
+    class="income-actions-bottom"
+    style="
+      margin-top: 30px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+      text-align: center;
+    "
+  >
+    <button
+      type="button"
+      class="btn btn-secondary-outline modal-close-btn"
+      style="min-width: 180px"
+    >
+      <i class="fa-solid fa-xmark"></i> Đóng
+    </button>
+  </div>
+</div>

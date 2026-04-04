@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký cư trú - BlueMoon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
+</head>
+<body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+        {% include 'core/accountant_header.html' %}
+        <section class="main-content">
+            <div class="main-panel" style="max-width: 700px; margin: 0 auto;">
+                <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 25px">
+                    ĐĂNG KÝ BIẾN ĐỘNG CƯ TRÚ <span class="title-icon">🔄</span>
+                </h2>
+
+                <div class="income-summary-box" style="margin-bottom: 25px; background-color: #f0f7ff; border-color: #bae7ff;">
+                    <p style="margin: 0; color: #003a8c;">
+                        <i class="fa-solid fa-user-tag"></i> Nhân khẩu: <strong>{{ nhan_khau.ho_ten }}</strong> (ID: #{{ nhan_khau.id_nhankhau }})
+                    </p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Loại trạng thái cư trú muốn đăng ký <span class="required-star">*</span></label>
+                        <select name="loai_bien_dong" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                            <option value="" disabled selected>-- Chọn loại cư trú --</option>
+                            <option value="tam vang">Tạm vắng</option>
+                            <option value="thuong tru">Thường trú</option>
+                            <option value="tam tru">Tạm trú</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Ngày bắt đầu <span class="required-star">*</span></label>
+                            <input type="date" name="ngay_batdau" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ngày kết thúc</label>
+                            <input type="date" name="ngay_ketthuc" placeholder="Bỏ trống nếu là thường trú">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Lý do biến động</label>
+                        <textarea name="ly_do" rows="3" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit;" placeholder="Nhập lý do đăng ký..."></textarea>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 30px;">
+                        <a href="{% url 'nhan_khau_profile' nhan_khau.id_nhankhau %}" class="btn btn-secondary-outline" style="text-decoration: none;">
+                            <i class="fa-solid fa-xmark"></i> Hủy bỏ
+                        </a>
+                        <button type="submit" class="btn btn-primary" style="min-width: 180px;">
+                            <i class="fa-solid fa-paper-plane"></i> Gửi đăng ký
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

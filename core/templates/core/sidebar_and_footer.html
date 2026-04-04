@@ -1,0 +1,48 @@
+{% load static %}
+<div id="overlay" class="overlay" tabindex="-1" hidden></div>
+
+<aside id="sidebar" class="sidebar" role="navigation" aria-hidden="true">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <span class="brand-dot"></span>
+      <h2>BLUEMOON</h2>
+    </div>
+
+    <button id="btnClose" class="icon-btn sidebar-close" aria-label="Đóng menu">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <nav class="nav">
+    <a class="nav-link" href="/admin_home">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </a>
+
+    <a class="nav-link" href="/hrmanage">
+      <i class="fa-solid fa-building-user"></i>
+      <span>Quản lý hộ khẩu</span>
+    </a>
+
+    <a class="nav-link" href="/demomanage">
+      <i class="fa-solid fa-users"></i>
+      <span>Quản lý nhân khẩu</span>
+    </a>
+
+    <a class="nav-link" href="/accountmanage">
+      <i class="fa-solid fa-user-gear"></i>
+      <span>Quản lý tài khoản</span>
+    </a>
+
+    <a class="nav-link" href="/demomanage/biendongnhankhau">
+      <i class="fa-solid fa-arrow-right-arrow-left"></i>
+      <span>Biến động nhân khẩu</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <small>© 2025 BLUEMOON</small>
+  </div>
+</aside>
+
+<script src="{% static 'js/sidebar.js' %}"></script>

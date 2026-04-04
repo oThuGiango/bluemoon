@@ -1,0 +1,158 @@
+ * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/*
+body {
+  font-family: Arial, sans-serif;
+  background-color: #9bd4c6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  background-color: #1e3a8a;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.topbar h1 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.search-bar {
+  width: 100%;
+  background: #aee1d3;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: center;
+  border-bottom: 2px solid #77b5a7;
+}
+
+.search-bar form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-bar input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #888;
+  min-width: 250px;
+}
+
+.search-bar button,
+.search-bar a {
+  background-color: #fff4b2;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #c2a700;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  color: black;
+}
+
+.search-bar button:hover,
+.search-bar a:hover {
+  background-color: #ffe36e;
+}
+
+.main-content {
+  padding: 30px;
+  flex: 1; 
+}
+
+.main-content h1 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.household-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+  transition: transform .15s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card p {
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.card-buttons {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.card-buttons button {
+  background-color: #fff4b2;
+  border: 1px solid #c2a700;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.card-buttons button:hover {
+  background-color: #ffe36e;
+}
+
+.card-buttons a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
+
+.add-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.add-btn button {
+  padding: 10px 18px;
+  background-color: #fff4b2;
+  border-radius: 8px;
+  border: 1px solid #c2a700;
+  cursor: pointer;
+}
+
+.add-btn button:hover {
+  background-color: #ffe36e;
+}
+
+.add-btn a {
+  text-decoration: none;
+  font-weight: bold;
+  color: black;
+} */

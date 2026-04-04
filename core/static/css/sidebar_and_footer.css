@@ -1,0 +1,216 @@
+:root {
+  --blue: #1e3a8a;
+  --bg: #f4f8ff;
+  --card: #fff;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e6ecff;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 1050;
+}
+.overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Sidebar shell */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+
+  height: 100vh;
+  width: 320px;
+  max-width: 85vw;
+
+  background: var(--card);
+  box-shadow: var(--shadow);
+  border-right: 1px solid var(--line);
+
+  transform: translateX(-110%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--blue);
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
+}
+
+.sidebar-brand h2 {
+  margin: 0;
+  color: var(--blue);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+/* Close button */
+.icon-btn.sidebar-close {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background: #fff;
+  border: 2px solid rgba(30, 58, 138, 0.18);
+  color: var(--blue);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+.icon-btn.sidebar-close:hover {
+  background: #f1f5ff;
+}
+.icon-btn.sidebar-close:focus {
+  outline: 3px solid rgba(30, 58, 138, 0.18);
+  outline-offset: 2px;
+}
+
+/* Nav */
+.nav {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Link with icon */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+
+  color: var(--text);
+  font-weight: 650;
+  font-size: 16px; /* chữ to hơn */
+  line-height: 1.2;
+
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease,
+    transform 0.12s ease;
+}
+
+.nav-link i {
+  width: 22px;
+  text-align: center;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.nav-link:hover {
+  background: #f1f5ff;
+  border-color: rgba(30, 58, 138, 0.14);
+}
+
+.nav-link:hover i {
+  color: var(--blue);
+}
+
+/* “active” state (tự thêm class active ở template hoặc JS) */
+.nav-link.active {
+  background: rgba(30, 58, 138, 0.1);
+  border-color: rgba(30, 58, 138, 0.22);
+}
+.nav-link.active i {
+  color: var(--blue);
+}
+
+/* Separator */
+.nav-sep {
+  height: 1px;
+  background: var(--line);
+  margin: 8px 0;
+}
+
+/* Badge */
+.nav-badge {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--blue);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+/* Footer */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Optional: mobile spacing better */
+@media (max-width: 420px) {
+  .sidebar {
+    width: 300px;
+    padding: 16px;
+  }
+  .nav-link {
+    font-size: 15px;
+    padding: 11px 10px;
+  }
+}
+
+/* Sidebar luôn nổi trên mọi header */
+.overlay {
+  z-index: 9998 !important;
+}
+.sidebar {
+  z-index: 9999 !important;
+}
+
+/* Nếu header/topbar fixed đang quá cao thì kéo nó xuống */
+.topbar,
+header,
+.header,
+.site-header {
+  z-index: 1000 !important;
+}

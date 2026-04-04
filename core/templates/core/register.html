@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng ký tài khoản</title>
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+
+<div class="auth-box">
+  <h2>Đăng ký tài khoản</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <label>Tên đăng nhập</label>
+    <input type="text" name="username" required>
+
+    <label>Mật khẩu</label>
+    <input type="password" name="password1" required>
+
+    <label>Nhập lại mật khẩu</label>
+    <input type="password" name="password2" required>
+
+    <!-- 🔥 CHỌN VAI TRÒ -->
+    <label>Vai trò</label>
+    <select name="vaitro" required>
+      <option value="">-- Chọn vai trò --</option>
+      <option value="admin">Admin</option>
+      <option value="user">User</option>
+      <option value="ketoan">Kế toán</option>
+    </select>
+
+    <button type="submit">Đăng ký</button>
+  </form>
+
+  <p>Đã có tài khoản?
+    <a href="{% url 'login' %}">Đăng nhập</a>
+  </p>
+</div>
+
+{% if error %}
+  <p style="color:red;">{{ error }}</p>
+{% endif %}
+
+</body>
+</html>

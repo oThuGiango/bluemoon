@@ -1,0 +1,55 @@
+{% load static %}
+{% load humanize %}
+
+<div class="form-container" style="max-width: 600px; width: 95%; margin: 0 auto;">
+    <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;">
+        CHI TIẾT HÓA ĐƠN <span class="title-icon">📄</span>
+    </h2>
+
+    <div class="detail-grid" style="display: grid; grid-template-columns: 1fr; gap: 12px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 25px;">
+        
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+            <span style="font-weight: bold; color: #666;">Mã hóa đơn:</span>
+            <span style="font-weight: 600; color: #333;">#{{ hoadon.id_hoadon }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+            <span style="font-weight: bold; color: #666;">Căn hộ:</span>
+            <span style="font-weight: 700; color: var(--primary);">{{ hoadon.id_hokhau.so_can_ho }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+            <span style="font-weight: bold; color: #666;">Đợt thu:</span>
+            <span style="text-align: right; max-width: 60%;">{{ hoadon.id_dotthu.ten_dotthu }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+            <span style="font-weight: bold; color: #666;">Khoản thu:</span>
+            <span>{{ hoadon.id_dotthu.id_khoanthu.ten_khoanthu }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+            <span style="font-weight: bold; color: #666;">Tổng tiền:</span>
+            <span style="font-size: 1.2rem; font-weight: 700; color: #d32f2f;">{{ hoadon.tong_tien|floatformat:0|intcomma }}đ</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; padding-top: 10px;">
+            <span style="font-weight: bold; color: #666;">Trạng thái:</span>
+            {% if hoadon.ngay_nop %}
+                <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                    <i class="fa-solid fa-check-circle"></i> Đã nộp: {{ hoadon.ngay_nop|date:"d/m/Y" }}
+                </span>
+            {% else %}
+                <span style="background: #ffebee; color: #c62828; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                    <i class="fa-solid fa-clock"></i> Chưa thanh toán
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-actions" style="text-align: right; border-top: 1px solid #eee; padding-top: 20px;">
+        <button type="button" class="btn btn-secondary-outline modal-close-btn" style="padding: 10px 30px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 6px; font-weight: 600;">
+            Đóng
+        </button>
+    </div>
+</div>

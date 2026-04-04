@@ -1,0 +1,382 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap");
+
+/* ===== Reset & Base ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  font-family: Arial, sans-serif;
+  background: #fff;
+  color: #000;
+}
+
+/* ===== Design Tokens (biến toàn cục) ===== */
+:root {
+  --font-sans: "Inter", "Segoe UI", "Noto Sans", system-ui, -apple-system, Arial,
+    sans-serif;
+  --brand-navy: #1e3a8a;
+  --brand-blue: #4b9ad7;
+  --brand-blue-shadow: #5d9ed0;
+  --mint: #aee1d3;
+  --yellow: #fff4b2;
+  --yellow-dark: #c2a700;
+  --yellow-hover: #ffe36e;
+  --border-strong: #000;
+  --radius: 12px;
+  --gap: 12px;
+  --shadow-brutal: 10px 10px 0 var(--brand-blue-shadow);
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased; /* mượt hơn trên WebKit */
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ===== Layout khung chung ===== */
+.main-section {
+  margin-top: 80px;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+.container-narrow {
+  width: 520px;
+}
+.container-wide {
+  width: 80%;
+  max-width: 980px;
+}
+
+/* ===== Topbar dùng chung ===== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 20px;
+  color: #fff;
+  background: var(--brand-navy);
+}
+.topbar h1 {
+  font-size: 22px;
+  font-weight: 700;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* ===== Search bar dùng chung ===== */
+.search-bar {
+  width: 100%;
+  background: var(--mint);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: center;
+  border-bottom: 2px solid #77b5a7;
+}
+.search-bar form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.search-bar input {
+  padding: 8px 10px;
+  border: 1px solid #888;
+  border-radius: 6px;
+  min-width: 250px;
+}
+.search-bar button,
+.search-bar a {
+  background: var(--yellow);
+  border: 1px solid var(--yellow-dark);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #000;
+  text-decoration: none;
+}
+.search-bar button:hover,
+.search-bar a:hover {
+  background: var(--yellow-hover);
+}
+
+/* ===== Form chung ===== */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.form-row label {
+  font-weight: 700;
+}
+.brutalist-input {
+  padding: 10px 12px;
+  border: 2px solid var(--border-strong);
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+  transition: box-shadow 0.2s ease, transform 0.05s ease;
+}
+.brutalist-input:focus {
+  box-shadow: 6px 6px 0 var(--border-strong);
+  transform: translate(-2px, -2px);
+}
+.form-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* ===== Panel / Card brutalist (khung trắng viền xanh, bóng đổ) ===== */
+.brutalist-panel {
+  background: #fff;
+  border: 4px solid var(--brand-blue);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-brutal);
+  padding: 24px 28px;
+}
+.brutalist-panel--narrow {
+  width: 520px;
+}
+.brutalist-panel--wide {
+  width: 80%;
+  max-width: 980px;
+}
+
+.brutalist-card {
+  border: 4px solid var(--brand-blue);
+  border-radius: 10px;
+  background: #fff;
+  padding: 1rem;
+}
+.brutalist-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.75rem;
+}
+.brutalist-card__title {
+  font-weight: 900;
+  color: #000;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+.brutalist-card__meta {
+  margin-top: 0.5rem;
+  color: #000;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.75rem;
+  font-weight: 600;
+}
+.brutalist-card__actions {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* ===== Button system (thống nhất toàn site) ===== */
+.btn,
+.brutalist-card__button {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  background: #578cc5;
+  color: #000;
+}
+.btn--primary,
+.brutalist-card__button--primary {
+  background: #ff4141;
+  color: #fff;
+}
+.btn--secondary,
+.brutalist-card__button--secondary {
+  background: #578cc5;
+  color: #fff;
+}
+.btn--yellow,
+.brutalist-card__button--yellow {
+  background: var(--yellow);
+  border-color: var(--yellow-dark);
+  color: #000;
+}
+
+.btn::before,
+.brutalist-card__button::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 -100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: all 0.6s;
+}
+.btn:hover::before,
+.brutalist-card__button:hover::before {
+  left: 100%;
+}
+.btn:hover,
+.brutalist-card__button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 #000;
+}
+.btn--secondary:hover,
+.brutalist-card__button--secondary:hover {
+  background: #296fbb;
+  border-color: #296fbb;
+  color: #fff;
+  box-shadow: 7px 7px 0 #004280;
+}
+.btn--primary:hover,
+.brutalist-card__button--primary:hover {
+  background: #ff0000;
+  border-color: #ff0000;
+  box-shadow: 7px 7px 0 #800000;
+}
+.btn:active,
+.brutalist-card__button:active {
+  transform: translate(5px, 5px);
+  box-shadow: none;
+}
+.btn--compact,
+.brutalist-card__button--compact {
+  width: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.25rem;
+  white-space: nowrap;
+  flex: 0 0 auto !important;
+}
+.btn--xs,
+.brutalist-card__button--xs {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.92rem;
+  box-shadow: 5px 5px 0 #000;
+}
+
+/* ===== Bảng kiểu brutalist ===== */
+.brutalist-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  background: #fff;
+}
+.brutalist-table th,
+.brutalist-table td {
+  border: 2px solid #000;
+  padding: 8px 10px;
+  text-align: center;
+  font-weight: 600;
+}
+.brutalist-table th {
+  background: var(--mint);
+  text-transform: uppercase;
+}
+.brutalist-table tr:nth-child(even) {
+  background: #f7f7f7;
+}
+
+/* ===== Tiện ích nhỏ ===== */
+.grid-autofit-260 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+.text-uc {
+  text-transform: uppercase;
+}
+
+/* === Refresh 1: Card chỉ dùng shadow, không còn viền màu === */
+.brutalist-panel,
+.brutalist-card {
+  border: 0 !important; /* bỏ viền xanh */
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16),
+    /* bóng mềm chính */ 0 2px 6px rgba(0, 0, 0, 0.08); /* bóng phụ sát mép */
+  border-radius: var(--radius);
+}
+
+/* (giữ nguyên các đường kẻ bên trong card: header/meta vẫn border-bottom:2px #000) */
+
+/* === Refresh 2: Viền nút đậm hơn cho xanh & đỏ === */
+/* thêm biến màu đậm hơn một cấp */
+:root {
+  --btn-blue: #578cc5;
+  --btn-blue-border: #2d5f99; /* xanh đậm hơn */
+  --btn-red: #ff4141;
+  --btn-red-border: #b80000; /* đỏ đậm hơn */
+}
+
+/* base button giữ nguyên, chỉ set border-color theo biến ở biến thể */
+.btn--secondary,
+.brutalist-card__button--secondary {
+  background: var(--btn-blue);
+  color: #fff;
+  border-color: var(--btn-blue-border);
+}
+.btn--secondary:hover,
+.brutalist-card__button--secondary:hover {
+  background: #296fbb; /* đã có */
+  border-color: #1f4f8f; /* đậm hơn khi hover */
+}
+
+.btn--primary,
+.brutalist-card__button--primary {
+  background: var(--btn-red);
+  color: #fff;
+  border-color: var(--btn-red-border);
+}
+.btn--primary:hover,
+.brutalist-card__button--primary:hover {
+  background: #ff0000; /* đã có */
+  border-color: #8f0000; /* đậm hơn khi hover */
+}
+
+/* === Hiệu ứng nổi lên khi hover card/panel === */
+.brutalist-card,
+.brutalist-panel {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Khi hover: nổi nhẹ + bóng sâu hơn */
+.brutalist-card:hover,
+.brutalist-panel:hover {
+  transform: translateY(-6px); /* nổi lên 6px */
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22), 0 6px 12px rgba(0, 0, 0, 0.12);
+}

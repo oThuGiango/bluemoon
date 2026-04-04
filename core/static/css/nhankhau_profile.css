@@ -1,0 +1,50 @@
+.page-wrap {
+  margin-top: 80px;
+  padding: 20px;
+  max-width: 980px;
+  margin-inline: auto;
+}
+.nk-profile {
+  padding: 22px;
+}
+.nk-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.nk-avatar {
+  width: 180px;
+  height: 220px;
+  border: 4px solid #000;
+  border-radius: 12px;
+  box-shadow: 6px 6px 0 #000;
+  overflow: hidden;
+  background: #eee;
+}
+.nk-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.nk-name {
+  margin: 0 0 8px;
+  font: 900 22px/1.2 Arial, sans-serif;
+  text-transform: uppercase;
+  border-bottom: 2px solid #000;
+  padding-bottom: 8px;
+}
+.nk-meta {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  row-gap: 6px;
+  font-weight: 600;
+}
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

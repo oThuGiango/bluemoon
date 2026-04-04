@@ -1,0 +1,23 @@
+/* Chỉ style riêng cho trang này, còn lại dùng style.css */
+
+/* Khoảng cách giữa các panel */
+.hkd-panel {
+  margin-bottom: 18px;
+}
+
+/* Tiêu đề panel có gạch chân đậm */
+.hkd-title {
+  margin: 0 0 12px 0;
+  border-bottom: 2px solid #000;
+  padding-bottom: 8px;
+}
+
+/* Danh sách meta gọn gàng */
+.hkd-meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  row-gap: 6px;
+  font-weight: 600;
+}
