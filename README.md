@@ -1,12 +1,10 @@
 # 🏨 Dự án Quản lý Chung cư BlueMoon
 
-Đây là một ứng dụng web (Web App) nội bộ, được xây dựng bằng Python và Django, nhằm giúp Ban quản lý chung cư BlueMoon thực hiện các nghiệp vụ quản lý dân cư, tài khoản hệ thống và thu phí dịch vụ.
+Đây là một ứng dụng web (Web App) nội bộ, được xây dựng bằng Django, nhằm giúp Ban quản lý chung cư BlueMoon thực hiện các nghiệp vụ quản lý dân cư và thu phí dịch vụ.
 
 ## ⭐ Tính năng chính
 
-Dự án hiện tại (dựa trên `core/views.py`) đã triển khai các chức năng cho vai trò Tổ trưởng/Quản trị viên.
-
-### 1. Quản lý Hộ khẩu
+### 1. Quản lý Hộ cư dân
 
 - Xem danh sách toàn bộ hộ khẩu trong chung cư (`hrmanage`).
 - Thêm một hộ khẩu mới (`add_hokhau`).
@@ -108,8 +106,8 @@ Dự án hiện tại (dựa trên `core/views.py`) đã triển khai các chứ
     _(Lệnh này sẽ đọc `core/models.py` và tạo các bảng trong CSDL PostgreSQL bạn vừa cấu hình)_
 
     ```bash
-    py manage.py makemigrations
-    py manage.py migrate
+    python manage.py makemigrations
+    python manage.py migrate
     ```
 
 6.  **Tạo tài khoản Admin (Tổ trưởng) đầu tiên:**

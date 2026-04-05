@@ -1,5 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
 
+:root {
+  --themecolor: #373a95;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -12,73 +16,175 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: url("../img/login_background.jpg") no-repeat;
-  background-size: cover;
-  background-position: center;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #f2f4f8;
+}
+
+.login-layout {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  background: #fff;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.left-panel {
+  position: relative;
+  flex: 0 0 44%;
+  min-width: 380px;
+  background: url("../img/login_background.png") center center / cover no-repeat;
+}
+
+.left-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 40, 0.45);
+}
+
+.left-panel .intro {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.left-panel .brand {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.left-panel h2 {
+  font-size: 36px;
+  line-height: 1.1;
+  margin-bottom: 18px;
+}
+
+.left-panel p {
+  max-width: 320px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.right-panel {
+  flex: 0 0 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #f8fafc;
 }
 
 .wrapper {
-  width: 420px;
-  background: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  color: #fff;
-  border-radius: 10px;
-  padding: 30px 40px 14px;
+  width: min(380px, 100%);
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
+  color: #1d1f27;
+  perspective: 1200px;
+  overflow: visible;
+  margin: 0 auto;
 }
 
 .wrapper h1 {
   font-size: 36px;
   text-align: center;
+  color: #1d1f27;
+  margin: 15px 0px;
 }
 
 .wrapper .input-box {
   width: 100%;
   height: 50px;
-  margin: 30px 0;
+  margin: 25px 0;
   position: relative;
 }
 
 .input-box input {
   width: 100%;
   height: 100%;
-  background: transparent;
-  border: none;
+  background: #f4f6fb;
+  border: 1px solid rgba(45, 55, 72, 0.14);
   outline: none;
-  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 40px;
   font-size: 16px;
-  color: #fff;
-  padding: 20px 45px 20px 20px;
+  color: #1d1f27;
+  padding: 20px 45px 20px 50px;
+}
+
+.input-box input[type="password"] {
+  padding-right: 95px;
 }
 
 .input-box input::placeholder {
-  color: #ffff;
+  color: rgba(29, 31, 39, 0.55);
 }
 
 .input-box i {
   position: absolute;
-  right: 20px;
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 20px;
+  color: rgba(29, 31, 39, 0.55);
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: rgba(29, 31, 39, 0.85);
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.password-toggle i {
+  font-size: 20px;
+  line-height: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .wrapper .remember-forgot {
   display: flex;
   justify-content: space-between;
   font-size: 14.5px;
-  margin: -15px 0 15px;
+  margin: 15px 0 25px;
+  color: #5f6e85;
 }
 
 .remember-forgot label input {
-  accent-color: #fff;
-  margin-right: 3px;
+  accent-color: var(--themecolor);
+  margin-right: 8px;
 }
 
 .remember-forgot a {
-  color: #fff;
+  color: #1d1f27;
   text-decoration: none;
 }
 .remember-forgot a:hover {
@@ -107,7 +213,9 @@ body {
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
+  transition:
+    stroke-dasharray 0.5s ease,
+    stroke-dashoffset 0.5s ease;
   stroke-dasharray: 241 9999999;
   stroke-dashoffset: 0;
 }
@@ -125,8 +233,8 @@ body {
 .wrapper .btn {
   width: 100%;
   height: 45px;
-  border: 2px solid #2c2c2c;
-  background-color: #1a1a1a;
+  border: 2px solid var(--themecolor);
+  background-color: var(--themecolor);
   color: #ffffff;
   font-size: 16px;
   font-weight: 700;
@@ -184,11 +292,6 @@ body {
 }
 
 /* Flip card khi xoay */
-.wrapper {
-  perspective: 1200px;
-  overflow: visible;
-}
-
 .flip {
   position: relative;
   width: 100%;

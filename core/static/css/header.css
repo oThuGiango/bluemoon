@@ -72,7 +72,9 @@ body {
   font-size: 1.08em;
   cursor: pointer;
   border-left: 4px solid transparent;
-  transition: background 0.18s, border-left 0.18s;
+  transition:
+    background 0.18s,
+    border-left 0.18s;
 }
 .sidebar nav ul li.active,
 .sidebar nav ul li:hover {
@@ -159,7 +161,9 @@ main {
   cursor: pointer;
   outline: 2px solid #fff;
   border: 2px solid #fff;
-  transition: box-shadow 0.18s, border 0.15s;
+  transition:
+    box-shadow 0.18s,
+    border 0.15s;
 }
 .user-avatar:active,
 .user-avatar:focus {
@@ -310,7 +314,9 @@ main {
   box-shadow: var(--shadow);
   padding: 24px 20px;
   gap: 20px;
-  transition: box-shadow 0.18s, transform 0.14s;
+  transition:
+    box-shadow 0.18s,
+    transform 0.14s;
 }
 .dash-card:hover {
   box-shadow: 0 8px 32px rgba(30, 30, 50, 0.11);
