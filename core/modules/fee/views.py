@@ -32,7 +32,7 @@ def fee_management(request):
         "form": form,
         "query": query,
     }
-    return render(request, "core/FeeManagement.html", context)
+    return render(request, "fee/FeeManagement.html", context)
 
 
 @login_required(login_url="login")

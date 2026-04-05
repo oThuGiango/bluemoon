@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="vi">
   <head>
     {% load static %} {% load humanize %}
@@ -13,7 +13,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
-    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
   </head>
   <body>
@@ -22,8 +22,10 @@
       {% include 'core/layout_header.html' %}
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel" id="income-container">
-          {% if messages %} {% for message in messages %} {% if message.tags ==
-          'success' %}
+          <!-- prettier-ignore -->
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'success' %}
           <div
             class="message-container success"
             style="
@@ -34,7 +36,10 @@
           >
             {{ message }}
           </div>
-          {% endif %} {% endfor %} {% endif %}
+          <!-- prettier-ignore -->
+          {% endif %}
+          {% endfor %}
+          {% endif %}
 
           <div class="income-controls-top">
             <form
@@ -69,16 +74,42 @@
             </form>
           </div>
 
-          <div class="income-summary-box">
-            <h3 class="box-title">Tổng quan Khoản thu</h3>
-            <div class="summary-details">
-              <p>
-                Tổng số Khoản Thu đã định nghĩa: {{ total_count|default:"0" }}
-              </p>
-            </div>
+          <div class="income-actions-bottom income-actions-top-left">
+            <button
+              id="createNewFeeBtn"
+              class="btn btn-create-new btn-create-compact"
+              data-url="{% url 'add_khoanthu' %}"
+            >
+              <i class="fa-solid fa-plus"></i> Tạo khoản thu mới
+            </button>
           </div>
 
-          <h2 class="table-title">DANH SÁCH KHOẢN THU HIỆN TẠI</h2>
+          <h2
+            class="table-title"
+            style="border-bottom: none; margin-bottom: 8px"
+          >
+            DANH SÁCH KHOẢN THU HIỆN TẠI
+          </h2>
+          <div
+            style="
+              width: 100%;
+              border-bottom: 2px solid #f0f0f0;
+              margin: 0 0 20px;
+              padding-bottom: 10px;
+            "
+          >
+            <p
+              style="
+                margin: 0;
+                width: 100%;
+                text-align: right;
+                color: #555;
+                font-size: 1rem;
+              "
+            >
+              Tổng số Khoản Thu: {{ total_count|default:"0" }}
+            </p>
+          </div>
           <div class="table-responsive">
             <table class="data-table">
               <thead>
@@ -138,24 +169,8 @@
               </tbody>
             </table>
           </div>
-
-          <div class="income-actions-bottom">
-            <button
-              id="createNewFeeBtn"
-              class="btn btn-create-new"
-              style="min-width: 180px"
-              data-url="{% url 'add_khoanthu' %}"
-            >
-              <i class="fa-solid fa-plus"></i> Tạo khoản thu mới
-            </button>
-          </div>
         </div>
       </section>
-
-      <footer>
-        &copy; BlueMoon Apartment 2025. Created by the ChatGPT's son-in-law
-        team.
-      </footer>
     </main>
 
     <div id="mainModal" class="modal">

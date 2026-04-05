@@ -1,0 +1,350 @@
+/* ---------------------------------------------------------------------------------- */
+/* --- BỔ SUNG CSS CHO CÁC TRANG QUẢN LÝ --- */
+/* ---------------------------------------------------------------------------------- */
+
+.income-management-page .main-panel,
+.fee-collection-page .main-panel {
+  flex: 1 1 100%;
+  min-width: 95%;
+  max-width: none;
+  padding: 24px;
+}
+
+/* Search Box & Filter/New Buttons */
+.income-controls-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.income-controls-top form {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+  flex: 1 1 100%;
+}
+
+.income-controls-top .search-box-container {
+  position: relative;
+  max-width: none;
+  flex: 1 1 auto;
+}
+.search-box-container input[type="text"] {
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-size: 1em;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.search-box-container input[type="text"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  outline: none;
+}
+.search-box-container i {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 1.05em;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+/* Nút Tạo mới (Xanh lá) */
+.btn-create-new {
+  background-color: var(--green);
+  color: #fff;
+  border: 2px solid var(--green);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.18s;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-create-new:hover {
+  background-color: #27ae60;
+  border-color: #27ae60;
+}
+
+.btn-create-compact {
+  min-width: 160px;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+}
+
+/* Nút Lọc (Xanh dương) */
+.btn-filter {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  background-color: var(--primary);
+  color: #fff;
+  border: 2px solid var(--primary);
+  transition: background 0.15s;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-filter:hover {
+  background-color: #1565c0;
+}
+
+/* Summary Box - Khoản thu */
+.income-summary-box {
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.income-summary-box .box-title {
+  font-size: 1.3em;
+  color: var(--primary);
+  margin-bottom: 10px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+}
+.income-summary-box .summary-details p {
+  font-size: 1em;
+  color: #444;
+}
+
+/* Summary Box - Đợt thu */
+.fee-collection-summary-box {
+  background: #e0f7fa;
+  border: 1px solid #b2ebf2;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.fee-collection-summary-box .box-title {
+  font-size: 1.3em;
+  color: #00bcd4;
+  margin-bottom: 10px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+}
+.fee-collection-summary-box .summary-details p {
+  font-size: 1em;
+  color: #444;
+}
+
+/* Table */
+.table-title {
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 25px 0 25px 0;
+  letter-spacing: 0.5px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+  width: 100%;
+}
+.table-responsive {
+  overflow-x: auto;
+  margin-bottom: 24px;
+  width: 100%;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+.data-table th,
+.data-table td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid #f3f3f3;
+}
+.data-table th {
+  background-color: var(--gray-bg);
+  color: #555;
+  font-weight: 600;
+  font-size: 0.95em;
+  text-transform: uppercase;
+}
+
+/* Status Badges */
+.status {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status-active {
+  background-color: #e6f7d9;
+  color: #52c41a;
+}
+.status-inactive {
+  background-color: #fff1f0;
+  color: #ff4d4f;
+}
+
+/* Action Button */
+.action-btn {
+  background: #e1f5fe;
+  color: var(--primary);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+}
+.action-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.4);
+}
+
+/* Bottom Actions */
+.income-actions-bottom {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+  width: 100%;
+}
+
+.income-actions-top-left {
+  justify-content: flex-start;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* Custom Buttons */
+.btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.18s;
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary {
+  background-color: var(--primary);
+  color: #fff;
+  border: 2px solid var(--primary);
+}
+.btn-primary:hover {
+  background-color: #1565c0;
+  border-color: #1565c0;
+}
+.btn-primary-outline {
+  background-color: #fff;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+.btn-primary-outline:hover {
+  background-color: var(--primary);
+  color: #fff;
+}
+.btn-secondary-outline {
+  background-color: #fff;
+  color: #555;
+  border: 2px solid #ccc;
+}
+.btn-secondary-outline:hover {
+  background-color: #f7f7f7;
+  border-color: #aaa;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .income-controls-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .control-buttons {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .income-controls-top .search-box-container {
+    max-width: 100%;
+  }
+
+  .data-table thead {
+    display: none;
+  }
+  .data-table,
+  .data-table tbody,
+  .data-table tr,
+  .data-table td {
+    display: block;
+    width: 100%;
+  }
+  .data-table tr {
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .data-table td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+  .data-table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding-left: 15px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .income-actions-bottom {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .income-actions-top-left {
+    align-items: stretch;
+  }
+
+  .income-actions-bottom .btn {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
