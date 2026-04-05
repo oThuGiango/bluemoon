@@ -44,7 +44,6 @@ class TrangThaiDotThu(models.TextChoices):
 
 # ===== 1) VaiTro =====
 class VaiTro(models.Model):
-    # SỬA: Dùng AutoField để ID tự tăng (1, 2, 3...)
     id_vaitro = models.AutoField(primary_key=True)
     ten_vaitro = models.CharField(max_length=50)
     class Meta:

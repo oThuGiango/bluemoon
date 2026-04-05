@@ -1,84 +1,115 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Biến động nhân khẩu - BlueMoon</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}">
-</head>
-<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}" />
+  </head>
+  <body>
     {% include 'core/Sidebar.html' %}
     <main>
-        {% include 'core/accountant_header.html' %}
+      {% include 'core/layout_header.html' %}
 
-        <section class="main-content income-management-page">
-            <div class="main-panel data-table-panel">
-                <h2 class="table-title">LỊCH SỬ BIẾN ĐỘNG NHÂN KHẨU</h2>
-                
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Mã BD</th>
-                                <th>Nhân khẩu</th>
-                                <th>Loại biến động</th>
-                                <th>Thời gian</th>
-                                <th>Lý do</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for bd in biendongs %}
-                            <tr>
-                                <td data-label="Mã BD"><strong>#{{ bd.id_biendong }}</strong></td>
-                                <td data-label="Nhân khẩu">{{ bd.id_nhankhau.ho_ten }}</td>
-                                <td data-label="Loại biến động">
-                                    {% if bd.loai_biendong == "tam tru" %}
-                                        <span class="status status-active" style="background: #fffbe6; color: #d4b106; border: 1px solid #ffe58f;">Tạm trú</span>
-                                    {% elif bd.loai_biendong == "thuong tru" %}
-                                        <span class="status status-active">Thường trú</span>
-                                    {% elif bd.loai_biendong == "tam vang" %}
-                                        <span class="status status-inactive">Tạm vắng</span>
-                                    {% else %}
-                                        <span class="status" style="background: #f5f5f5; color: #8c8c8c;">{{ bd.loai_label }}</span>
-                                    {% endif %}
-                                </td>
-                                <td data-label="Thời gian">
-                                    {{ bd.ngay_batdau|date:"d/m/Y" }} 
-                                    {% if bd.ngay_ketthuc %}
-                                        <i class="fa-solid fa-arrow-right-long" style="font-size: 0.8rem; margin: 0 5px; color: #999;"></i> 
-                                        {{ bd.ngay_ketthuc|date:"d/m/Y" }}
-                                    {% endif %}
-                                </td>
-                                <td data-label="Lý do">
-                                    <small style="color: #666;">{{ bd.ly_do|default:"—" }}</small>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" style="text-align: center;">Chưa có bản ghi biến động nào.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+      <section class="main-content income-management-page">
+        <div class="main-panel data-table-panel">
+          <h2 class="table-title">LỊCH SỬ BIẾN ĐỘNG NHÂN KHẨU</h2>
 
-                <div class="income-actions-bottom">
-                    <a href="{% url 'demomanage' %}" class="btn btn-secondary-outline" style="text-decoration: none;">
-                        <i class="fa-solid fa-arrow-left"></i> Quay lại quản lý nhân khẩu
-                    </a>
-                </div>
-                <div class="income-actions-bottom">
-                    
-                    <a href="{% url 'export_biendong_excel' %}" class="btn btn-secondary-outline" style="text-decoration: none;">
-                                                <i ></i> 📥 Xuất Excel
-                    </a>
-                </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã BD</th>
+                  <th>Nhân khẩu</th>
+                  <th>Loại biến động</th>
+                  <th>Thời gian</th>
+                  <th>Lý do</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for bd in biendongs %}
+                <tr>
+                  <td data-label="Mã BD">
+                    <strong>#{{ bd.id_biendong }}</strong>
+                  </td>
+                  <td data-label="Nhân khẩu">{{ bd.id_nhankhau.ho_ten }}</td>
+                  <td data-label="Loại biến động">
+                    {% if bd.loai_biendong == "tam tru" %}
+                    <span
+                      class="status status-active"
+                      style="
+                        background: #fffbe6;
+                        color: #d4b106;
+                        border: 1px solid #ffe58f;
+                      "
+                      >Tạm trú</span
+                    >
+                    {% elif bd.loai_biendong == "thuong tru" %}
+                    <span class="status status-active">Thường trú</span>
+                    {% elif bd.loai_biendong == "tam vang" %}
+                    <span class="status status-inactive">Tạm vắng</span>
+                    {% else %}
+                    <span
+                      class="status"
+                      style="background: #f5f5f5; color: #8c8c8c"
+                      >{{ bd.loai_label }}</span
+                    >
+                    {% endif %}
+                  </td>
+                  <td data-label="Thời gian">
+                    {{ bd.ngay_batdau|date:"d/m/Y" }} {% if bd.ngay_ketthuc %}
+                    <i
+                      class="fa-solid fa-arrow-right-long"
+                      style="font-size: 0.8rem; margin: 0 5px; color: #999"
+                    ></i>
+                    {{ bd.ngay_ketthuc|date:"d/m/Y" }} {% endif %}
+                  </td>
+                  <td data-label="Lý do">
+                    <small style="color: #666"
+                      >{{ bd.ly_do|default:"—" }}</small
+                    >
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" style="text-align: center">
+                    Chưa có bản ghi biến động nào.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
 
-            </div>
-        </section>
+          <div class="income-actions-bottom">
+            <a
+              href="{% url 'demomanage' %}"
+              class="btn btn-secondary-outline"
+              style="text-decoration: none"
+            >
+              <i class="fa-solid fa-arrow-left"></i> Quay lại quản lý nhân khẩu
+            </a>
+          </div>
+          <div class="income-actions-bottom">
+            <a
+              href="{% url 'export_biendong_excel' %}"
+              class="btn btn-secondary-outline"
+              style="text-decoration: none"
+            >
+              <i></i> 📥 Xuất Excel
+            </a>
+          </div>
+        </div>
+      </section>
     </main>
-</body>
+  </body>
 </html>
