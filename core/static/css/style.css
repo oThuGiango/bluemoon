@@ -18,7 +18,8 @@ body {
 
 /* ===== Design Tokens (biến toàn cục) ===== */
 :root {
-  --font-sans: "Inter", "Segoe UI", "Noto Sans", system-ui, -apple-system, Arial,
+  --font-sans:
+    "Inter", "Segoe UI", "Noto Sans", system-ui, -apple-system, Arial,
     sans-serif;
   --brand-navy: #1e3a8a;
   --brand-blue: #4b9ad7;
@@ -31,6 +32,7 @@ body {
   --radius: 12px;
   --gap: 12px;
   --shadow-brutal: 10px 10px 0 var(--brand-blue-shadow);
+  --themecolor: #373a95;
 }
 
 html,
@@ -152,7 +154,9 @@ body {
   border-radius: 8px;
   background: #fff;
   outline: none;
-  transition: box-shadow 0.2s ease, transform 0.05s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.05s ease;
 }
 .brutalist-input:focus {
   box-shadow: 6px 6px 0 var(--border-strong);
@@ -346,7 +350,8 @@ body {
 .brutalist-panel,
 .brutalist-card {
   border: 0 !important; /* bỏ viền xanh */
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16),
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.16),
     /* bóng mềm chính */ 0 2px 6px rgba(0, 0, 0, 0.08); /* bóng phụ sát mép */
   border-radius: var(--radius);
 }
@@ -390,14 +395,18 @@ body {
 /* === Hiệu ứng nổi lên khi hover card/panel === */
 .brutalist-card,
 .brutalist-panel {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 /* Khi hover: nổi nhẹ + bóng sâu hơn */
 .brutalist-card:hover,
 .brutalist-panel:hover {
   transform: translateY(-6px); /* nổi lên 6px */
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22), 0 6px 12px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.22),
+    0 6px 12px rgba(0, 0, 0, 0.12);
 }
 
 /* ================================
@@ -432,7 +441,9 @@ body {
   box-shadow: none !important;
   transform: none !important;
 
-  transition: background-color 0.15s ease, border-color 0.15s ease,
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
     color 0.15s ease;
 }
 
@@ -654,4 +665,12 @@ body {
 /* Đảm bảo dropdown user bung ra không bị cắt */
 .topbar {
   overflow: visible !important;
+}
+
+.error {
+  margin: 8px 0;
+  color: #d93025;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
 }

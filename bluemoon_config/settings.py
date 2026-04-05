@@ -5,6 +5,10 @@ AUTH_USER_MODEL = "core.Taikhoan"
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -96,8 +100,7 @@ DATABASES = {
         'HOST': os.getenv("DB_HOST", "localhost"),
         'PORT': os.getenv("DB_PORT", "5432"),
         'OPTIONS': {
-            'sslmode': 'require',
-            'channel_binding': 'require',
+            'sslmode': 'require'
         },
         'CONN_MAX_AGE': 0, 
     }
