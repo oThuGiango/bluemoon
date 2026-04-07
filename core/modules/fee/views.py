@@ -48,12 +48,12 @@ def add_khoanthu(request):
     if request.method == "POST":
         form = KhoanThuForm(request.POST)
         if form.is_valid():
-            new_id = form.cleaned_data.get("id_khoanthu")
-            if KhoanThu.objects.filter(id_khoanthu=new_id).exists():
+            ten_khoanthu = form.cleaned_data.get("ten_khoanthu").strip()
+            if KhoanThu.objects.filter(ten_khoanthu__iexact=ten_khoanthu).exists():
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                    return JsonResponse({"error": "Mã khoản thu này đã tồn tại!"}, status=400)
-                messages.error(request, "Mã khoản thu này đã tồn tại!")
-                return render(request, "core/AddFeeModal.html", {"form": form})
+                    return JsonResponse({"error": "Tên khoản thu này đã tồn tại!"}, status=400)
+                messages.error(request, "Tên khoản thu này đã tồn tại!")
+                return render(request, "fee/AddFeeModal.html", {"form": form})
 
             form.save()
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -65,7 +65,7 @@ def add_khoanthu(request):
                 return JsonResponse({"error": "Dữ liệu không hợp lệ!"}, status=400)
     else:
         form = KhoanThuForm()
-    return render(request, "core/AddFeeModal.html", {"form": form})
+    return render(request, "fee/AddFeeModal.html", {"form": form})
 
 
 @login_required(login_url="login")

@@ -122,8 +122,6 @@
     py manage.py runserver
     ```
 
-Bây giờ bạn có thể mở trình duyệt và truy cập vào `http://127.0.0.1:8000/` để xem ứng dụng web.
-
 ---
 
 ## 📁 Cấu trúc Thư mục

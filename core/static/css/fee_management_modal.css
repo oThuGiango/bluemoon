@@ -41,8 +41,8 @@
 
 /* Tiêu đề Form */
 .form-title {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: bold;
   color: var(--primary);
   border-bottom: 2px solid var(--light-bg);
   padding-bottom: 15px;
@@ -51,6 +51,7 @@
 .form-title .title-icon {
   font-size: 1.5rem;
   vertical-align: middle;
+  display: none;
 }
 
 .form-group {
@@ -76,7 +77,7 @@
 .form-group textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid #c9c9c9;
   border-radius: 6px;
   box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều rộng */
   font-size: 1rem;

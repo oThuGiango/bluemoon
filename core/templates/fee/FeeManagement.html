@@ -118,6 +118,7 @@
                   <th>Tên Khoản Thu</th>
                   <th>Đơn Vị Tính</th>
                   <th>Đơn Giá</th>
+                  <th>Loại phí</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -131,6 +132,13 @@
                   </td>
                   <td data-label="Đơn Giá">
                     {{ item.don_gia|floatformat:0|intcomma }} VND
+                  </td>
+                  <td data-label="Phí bắt buộc">
+                    {% if item.phi_bat_buoc %}
+                    <span style="color: #27ae60; font-weight: bold">✓</span>
+                    {% else %}
+                    <span style="color: #999">○</span>
+                    {% endif %}
                   </td>
 
                   <td data-label="Thao tác">
@@ -161,7 +169,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="5" style="text-align: center">
+                  <td colspan="6" style="text-align: center">
                     Không có khoản thu nào được tìm thấy.
                   </td>
                 </tr>

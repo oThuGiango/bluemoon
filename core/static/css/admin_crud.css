@@ -1,6 +1,9 @@
 /* ---------------------------------------------------------------------------------- */
 /* --- BỔ SUNG CSS CHO CÁC TRANG QUẢN LÝ --- */
 /* ---------------------------------------------------------------------------------- */
+.required-star {
+  color: red;
+}
 
 .income-management-page .main-panel,
 .fee-collection-page .main-panel {
@@ -347,4 +350,3 @@
     min-width: unset;
   }
 }
-
