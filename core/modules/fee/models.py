@@ -13,6 +13,9 @@ class KhoanThu(models.Model):
         default=DonViTinh.NGUOI,
     )
     phi_bat_buoc = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    updated_by = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         managed = True
@@ -23,8 +26,8 @@ class KhoanThu(models.Model):
 
 
 class DotThuPhi(models.Model):
-    id_dotthu = models.IntegerField(primary_key=True)
-    ten_dotthu = models.CharField(max_length=100)
+    id_dotthu = models.AutoField(primary_key=True)
+    ten_dotthu = models.CharField(max_length=250)
     ngay_batdau = models.DateField()
     ngay_ketthuc = models.DateField(null=True, blank=True)
     trang_thai = models.CharField(
@@ -32,20 +35,19 @@ class DotThuPhi(models.Model):
         choices=TrangThaiDotThu.choices,
         default=TrangThaiDotThu.OPEN,
     )
-    id_khoanthu = models.ForeignKey(
+    id_khoanthu = models.ManyToManyField(
         "core.KhoanThu",
-        on_delete=models.RESTRICT,
-        db_column="id_khoanthu",
+        db_table="dotthuphi_khoanthu",
         related_name="dot_thuphi",
-        default=1,
+        blank=True,
     )
+    is_deleted = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    updated_by = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         managed = True
         db_table = "dotthuphi"
-        indexes = [
-            models.Index(fields=["id_khoanthu"], name="idx_dotthu_khoanthu"),
-        ]
 
     def __str__(self):
         return self.ten_dotthu
@@ -69,6 +71,9 @@ class HoaDon(models.Model):
         related_name="hoa_dons",
         default=1,
     )
+    is_deleted = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    updated_by = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         managed = True

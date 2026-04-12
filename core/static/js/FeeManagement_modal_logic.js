@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
       phiBatBuocSelect.addEventListener("change", updateDonGiaField);
       updateDonGiaField();
     }
-    
+
     if (addFeeForm) {
       addFeeForm.addEventListener("submit", function () {
         if (donGiaInput) {
@@ -143,6 +143,22 @@ document.addEventListener("DOMContentLoaded", function () {
           })
           .catch((err) => alert("Lỗi khi xóa: " + err));
       });
+    }
+
+    // Khởi tạo Select2 cho tất cả các select có class 'select2' trong modal
+    if (
+      window.jQuery &&
+      $(modalContent).find("select.select2").length > 0 &&
+      $.fn.select2
+    ) {
+      $(modalContent)
+        .find("select.select2")
+        .select2({
+          theme: "bootstrap-5",
+          allowClear: true,
+          placeholder: "Chọn các khoản thu...",
+          dropdownParent: $(modalContent),
+        });
     }
   }
 

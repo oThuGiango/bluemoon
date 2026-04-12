@@ -83,24 +83,11 @@
 4.  **Cấu hình Database (Quan trọng):**
     Dự án này được thiết lập để kết nối với CSDL PostgreSQL.
 
-    - Mở file `bluemoon_config/settings.py`.
-    - Tìm đến phần `DATABASES`.
-    - **Thay đổi** thông tin `NAME`, `USER`, `PASSWORD`, `HOST`, `PORT` để trỏ đến CSDL PostgreSQL **local** của bạn.
-
-    _Ví dụ cấu hình CSDL local:_
-
-    ```python
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'bluemoon_db',  # Tên CSDL bạn đã tạo
-            'USER': 'postgres',       # User của bạn
-            'PASSWORD': 'password',   # Mật khẩu của bạn
-            'HOST': 'localhost',      # Chạy ở local
-            'PORT': '5432',           # Port mặc định của Postgres
-        }
-    }
+    ```bash
+    copy env.example .env
     ```
+
+    **Thay đổi** thông tin `NAME`, `USER`, `PASSWORD`, `HOST`, `PORT` để trỏ đến CSDL PostgreSQL của bạn.
 
 5.  **Chạy "Migrations" (Tạo các bảng CSDL):**
     _(Lệnh này sẽ đọc `core/models.py` và tạo các bảng trong CSDL PostgreSQL bạn vừa cấu hình)_
@@ -135,63 +122,23 @@ BlueMoonProject/ (Thư mục gốc)
 ├── db.sqlite3
 ├── manage.py             <-- File quản lý chính của Django
 ├── README.md
-├── requirements.txt      <-- Danh sách thư viện 
+├── requirements.txt      <-- Danh sách thư viện
 ├── structure.txt
 │
-├── core/                 <-- 📁 APP CHÍNH (chứa nghiệp vụ)
-│   ├── models.py         
-│   ├── views.py          
-│   ├── tests.py
-│   ├── urls.py
-│   ├── admin.py
-│   ├── forms.py
-│   ├── apps.py
-│   ├── __init__.py
-│   ├── static/           <-- 📁 Chứa file "tĩnh" (CSS, JS, Images)
-│   │   ├── css/
-│   │   ├── js/
-│   │   └── img/
-│   └── templates/        <-- 📁 Chứa file HTML
-│       └── core/
-│           ├── accountmanage.html
-│           ├── accountmanage_addaccount.html
-│           ├── accountmanage_change.html
-│           ├── accountmanage_view.html
-│           ├── add_demo.html
-│           ├── add_hokhau.html
-│           ├── demomanage.html
-│           ├── edit_nhan_khau.html
-│           ├── header.html
-│           ├── hokhau_detail.html
-│           ├── hokhau_edit.html
-│           ├── home.html
-│           ├── hrmanage.html
-│           ├── login.html
-│           ├── main_page.html
-│           ├── nhan_khau_delete.html
-│           ├── nhan_khau_profile.html
-│           ├── profile.html
-│           ├── search.html
-│           ├── Sidebar.html
-│           ├── sidebar_and_footer.html
-│           ├── temp.html
-│           └── test.html
+├── core/**module                 <-- 📁 APP CHÍNH (chia theo từng nghiệp vụ)
+│   ├── modules/               # Các module con: account, resident, fee, ...
+│   ├── templates/             # Thư mục chứa các template HTML
+│   ├── static/                # Thư mục chứa file tĩnh (CSS, JS, ảnh)
+│   └── ...
 │
-├── design/               <-- 📁 Thư mục thiết kế (Django không dùng)
-│   └── Database/
-│       ├── dbHandler.py
-│       ├── khoi_tao_database.sql
-│       ├── test.py
-│       └── test_db.py
-│
-├── bluemoon_config/           <-- 📁 Thư mục Cấu hình Dự án
-│   ├── settings.py       <-- File cài đặt chính 
-│   ├── urls.py           <-- File URL tổng 
+├── bluemoon_config/           # Thư mục cấu hình dự án
+│   ├── settings.py            # File cài đặt chính
+│   ├── urls.py                # File URL tổng
 │   ├── asgi.py
 │   ├── wsgi.py
 │   └── __init__.py
 │
-└── venv/                 <-- Thư mục môi trường ảo
+└── venv/                      # Thư mục môi trường ảo (không commit lên git)
 ```
 
 ---

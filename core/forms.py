@@ -3,6 +3,8 @@ from django import forms
 from .models import KhoanThu
 from .models import DotThuPhi
 
+from datetime import datetime
+
 
 class ReservationForm(forms.Form):
     first_name = forms.CharField(max_length=50)
@@ -40,14 +42,24 @@ class KhoanThuForm(forms.ModelForm):
 
 
 class DotThuPhiForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Chỉ lấy các KhoanThu chưa bị xóa
+        self.fields['id_khoanthu'].queryset = KhoanThu.objects.filter(
+            is_deleted=False)
+
+        # Đặt placeholder động cho tên đợt thu
+        now = datetime.now()
+        self.fields['ten_dotthu'].widget.attrs[
+            'placeholder'] = f"VD: Thu phí tháng {now.month}/{now.year}"
+
     class Meta:
         model = DotThuPhi
-        fields = ['id_dotthu', 'ten_dotthu', 'ngay_batdau',
+        fields = ['ten_dotthu', 'ngay_batdau',
                   'ngay_ketthuc', 'trang_thai', 'id_khoanthu']
         widgets = {
-            'id_dotthu': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'VD: 123456'}),
-            'ten_dotthu': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'VD: Thu phí tháng 9/2023'}),
-            'id_khoanthu': forms.Select(attrs={'class': 'form-control'}),
+            'ten_dotthu': forms.TextInput(attrs={'class': 'form-control'}),
+            'id_khoanthu': forms.SelectMultiple(attrs={'class': 'form-control select2'}),
             'ngay_batdau': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'ngay_ketthuc': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'trang_thai': forms.Select(attrs={'class': 'form-control'}),

@@ -195,7 +195,7 @@
   background: #fff;
   border-radius: 12px;
   padding: 32px 24px 24px 24px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 .modal-title {
   text-align: center;
@@ -241,4 +241,73 @@
 /* Modal xóa thu gọn hơn */
 .delete-modal-width {
   max-width: 450px;
+}
+
+/* --- Fee Collection Summary Cards (final polish) --- */
+.fee-collection-header-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  margin-top: 0px;
+  gap: 24px;
+  width: 100%;
+}
+.fee-collection-header-left {
+  display: flex;
+  align-items: flex-start;
+}
+.fee-collection-summary-cards {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin: 0;
+  margin-left: auto;
+}
+.summary-card {
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 480px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 6px 18px;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-start;
+  height: auto;
+  overflow: hidden;
+}
+.summary-number {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-right: 12px;
+  min-width: 38px;
+  text-align: right;
+  display: inline-block;
+}
+.summary-number-green {
+  color: #27ae60;
+}
+.summary-number-blue {
+  color: #3498db;
+}
+.summary-label {
+  font-size: 0.97rem;
+  color: #555;
+  font-weight: 500;
+  width: 100%;
+  overflow-wrap: break-word;
+  white-space: normal;
+  display: block;
+  vertical-align: middle;
+  text-align: left;
+  margin: 0;
+}
+/* Align action buttons to right */
+.income-actions-bottom.income-actions-top-left {
+  display: flex;
+  justify-content: flex-end;
 }

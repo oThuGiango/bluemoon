@@ -2,8 +2,8 @@
 <form method="post" action="{% url 'delete_khoanthu' pk=khoan_thu.pk %}" id="deleteForm">
     {% csrf_token %}
     <div class="form-container" style="margin: 0 auto;">
-        <h2 class="form-title" style="color: #d93025; border-bottom: 2px solid #fce8e6; padding-bottom: 10px">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.2rem; margin-right: 8px;"></i>
+        <h2 class="form-title" style="border-bottom: 2px solid #fce8e6; padding-bottom: 10px">
+            <i class="fa-solid fa-triangle-exclamation" style="color: #d93025; font-size: 1.2rem; margin-right: 8px;"></i>
             Xác nhận xóa khoản thu
         </h2>
 

@@ -9,6 +9,8 @@ class HoKhau(models.Model):
     dien_tich = models.FloatField(null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    updated_by = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         db_table = "hokhau"
@@ -22,6 +24,8 @@ class NhanKhau(models.Model):
     is_deleted = models.BooleanField(default=False)
     cccd = models.CharField(max_length=12, unique=True, null=True, blank=True)
     quan_he_chu_ho = models.CharField(max_length=50, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    updated_by = models.CharField(max_length=100, null=True, blank=True)
     id_hokhau = models.ForeignKey(
         HoKhau,
         on_delete=models.RESTRICT,
@@ -48,6 +52,8 @@ class BienDongNhanKhau(models.Model):
     ngay_batdau = models.DateField()
     ngay_ketthuc = models.DateField(null=True, blank=True)
     ly_do = models.TextField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    updated_by = models.CharField(max_length=100, null=True, blank=True)
     id_nhankhau = models.ForeignKey(
         NhanKhau,
         on_delete=models.CASCADE,

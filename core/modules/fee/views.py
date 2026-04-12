@@ -19,11 +19,13 @@ from .models import DotThuPhi, HoaDon, KhoanThu
 @login_required(login_url="login")
 def fee_management(request):
     query = request.GET.get("search_khoanthu")
-    khoan_thu_list = KhoanThu.objects.all().order_by('id_khoanthu')
+    khoan_thu_list = KhoanThu.objects.filter(
+        is_deleted=False).order_by('id_khoanthu')
 
     if query:
         khoan_thu_list = khoan_thu_list.filter(
-            Q(ten_khoanthu__icontains=query) | Q(id_khoanthu__icontains=query)
+            (Q(ten_khoanthu__icontains=query) | Q(
+                id_khoanthu__icontains=query)) & Q(is_deleted=False)
         ).order_by('id_khoanthu')
     total_count = khoan_thu_list.count()
     form = KhoanThuForm()
@@ -78,12 +80,16 @@ def edit_khoanthu(request, pk):
 
     if request.method == "POST":
         form = KhoanThuForm(request.POST, instance=khoan_thu)
-
         if form.is_valid():
             khoan_thu = form.save(commit=False)
             if not khoan_thu.phi_bat_buoc:
                 khoan_thu.don_gia = 1
-            khoan_thu.save()
+            khoan_thu.updated_at = timezone.now()
+            if request.user.is_authenticated:
+                khoan_thu.updated_by = str(request.user)
+            khoan_thu.save(update_fields=[
+                field for field in ["ten_khoanthu", "don_gia", "phi_bat_buoc", "updated_at", "updated_by"] if hasattr(khoan_thu, field)
+            ])
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success"})
             messages.success(
@@ -112,7 +118,12 @@ def delete_khoanthu(request, pk):
     khoan_thu = get_object_or_404(KhoanThu, id_khoanthu=pk)
 
     if request.method == "POST":
-        khoan_thu.delete()
+        khoan_thu.is_deleted = True
+        khoan_thu.updated_at = timezone.now()
+        if request.user.is_authenticated:
+            khoan_thu.updated_by = str(request.user)
+        khoan_thu.save(
+            update_fields=["is_deleted", "updated_at", "updated_by"])
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({"status": "success", "message": "Khoản thu đã được xóa thành công!"})
         return redirect("fee_management")
@@ -122,21 +133,26 @@ def delete_khoanthu(request, pk):
 @login_required(login_url="login")
 def fee_collection_period(request):
     query = request.GET.get("search_dotthu")
-    dot_thu_phi_list = DotThuPhi.objects.select_related("id_khoanthu").all()
-    active_count = dot_thu_phi_list.filter(trang_thai="open").count()
+    dot_thu_phi_list = DotThuPhi.objects.prefetch_related(
+        "id_khoanthu").filter(is_deleted=False)
+    active_count = dot_thu_phi_list.filter(
+        trang_thai="open", is_deleted=False).count()
     if query:
         dot_thu_phi_list = dot_thu_phi_list.filter(
-            Q(ten_dotthu__icontains=query) | Q(id_dotthu__icontains=query))
+            (Q(ten_dotthu__icontains=query) | Q(
+                id_dotthu__icontains=query)) & Q(is_deleted=False)
+        )
     context = {
         "dot_thu_phi_list": dot_thu_phi_list,
         "active_count": active_count,
         "query": query,
     }
-    return render(request, "core/FeeCollectionPeriod.html", context)
+    return render(request, "invoice/FeeCollectionPeriod.html", context)
 
 
+# Trang chi tiết đợt thu phí (page, không phải modal)
 @login_required(login_url="login")
-def view_dotthu_detail_modal(request, pk):
+def fee_collection_period_detail(request, pk):
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=pk)
     danh_sach_hoa_don = dot_thu.hoa_dons.select_related(
         "id_hokhau").all().order_by("id_hokhau__so_can_ho")
@@ -147,7 +163,7 @@ def view_dotthu_detail_modal(request, pk):
         "danh_sach_hoa_don": danh_sach_hoa_don,
         "tat_ca_ho_khau": tat_ca_ho_khau,
     }
-    return render(request, "core/ViewPeriodDetailModal.html", context)
+    return render(request, "invoice/FeeCollectionPeriodDetail.html", context)
 
 
 @login_required(login_url="login")
@@ -210,9 +226,11 @@ def add_dotthu(request):
     if request.method == "POST":
         form = DotThuPhiForm(request.POST)
         if form.is_valid():
-            new_id = form.cleaned_data.get("id_dotthu")
-            if DotThuPhi.objects.filter(id_dotthu=new_id).exists():
-                return JsonResponse({"error": "Mã đợt thu phí này đã tồn tại!"}, status=400)
+            ngay_batdau = form.cleaned_data.get("ngay_batdau")
+            trang_thai = form.cleaned_data.get("trang_thai")
+            id_khoanthu = form.cleaned_data.get("id_khoanthu")
+            if DotThuPhi.objects.filter(ngay_batdau=ngay_batdau, trang_thai=trang_thai, id_khoanthu=id_khoanthu).exists():
+                return JsonResponse({"error": "Đợt thu phí này đã tồn tại (trùng mã hoặc trùng ngày bắt đầu, trạng thái, khoản thu)!"}, status=400)
 
             form.save()
 
@@ -222,7 +240,7 @@ def add_dotthu(request):
             return redirect("fee_collection_period")
     else:
         form = DotThuPhiForm()
-    return render(request, "core/AddPeriodModal.html", {"form": form})
+    return render(request, "invoice/AddPeriodModal.html", {"form": form})
 
 
 @login_required(login_url="login")
@@ -231,7 +249,13 @@ def edit_dotthu(request, pk):
     if request.method == "POST":
         form = DotThuPhiForm(request.POST, instance=dot_thu)
         if form.is_valid():
-            form.save()
+            dot_thu = form.save(commit=False)
+            dot_thu.updated_at = timezone.now()
+            if request.user.is_authenticated:
+                dot_thu.updated_by = str(request.user)
+            dot_thu.save(update_fields=[
+                field for field in ["ten_dotthu", "ngay_batdau", "ngay_ketthuc", "trang_thai", "updated_at", "updated_by"] if hasattr(dot_thu, field)
+            ])
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success"})
             return redirect("fee_collection_period")
@@ -246,7 +270,11 @@ def edit_dotthu(request, pk):
 def delete_dotthu(request, pk):
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=pk)
     if request.method == "POST":
-        dot_thu.delete()
+        dot_thu.is_deleted = True
+        dot_thu.updated_at = timezone.now()
+        if request.user.is_authenticated:
+            dot_thu.updated_by = str(request.user)
+        dot_thu.save(update_fields=["is_deleted", "updated_at", "updated_by"])
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({"status": "success", "message": "Đợt thu phí đã được xóa thành công!"})
         return redirect("fee_collection_period")
