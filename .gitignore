@@ -6,6 +6,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 build/
 develop-eggs/
@@ -31,7 +32,7 @@ db.sqlite3
 /static/
 
 # IDE
-.vscode/
+# .vscode/
 .idea/
 *.swp
 *.swo

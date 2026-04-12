@@ -1,11 +1,11 @@
 """
 Django settings for Bluemoon project.
 """
+from dotenv import load_dotenv
+from pathlib import Path
+import os
 AUTH_USER_MODEL = "core.Taikhoan"
 
-import os
-from pathlib import Path
-from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-e0ux%pa*h-0h=cyd)669!8+a!a&%-08+@0mecspsc((j5y$5bu
 DEBUG = True
 
 # Cho phép tất cả các host
-ALLOWED_HOSTS = ['*'] 
+ALLOWED_HOSTS = ['*']
 
 
 # =========================================================
@@ -31,9 +31,9 @@ ALLOWED_HOSTS = ['*']
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 1209600 
+SESSION_COOKIE_AGE = 1209600
 
-# 2. Đổi tên Cookie 
+# 2. Đổi tên Cookie
 SESSION_COOKIE_NAME = 'bluemoon_final_session'
 
 # 3. Lưu vào FILE
@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions', 
+    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
@@ -62,7 +62,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware', 
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -89,22 +89,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bluemoon_config.wsgi.application'
 
-
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DB_NAME", "defaultdb"),
-        'USER': os.getenv("DB_USER", "postgres"),
-        'PASSWORD': os.getenv("DB_PASSWORD", ""),
-        'HOST': os.getenv("DB_HOST", "localhost"),
-        'PORT': os.getenv("DB_PORT", "5432"),
-        'OPTIONS': {
-            'sslmode': 'require'
-        },
-        'CONN_MAX_AGE': 0, 
+sqlite3_engine = 'django.db.backends.sqlite3'
+DB_ENGINE = os.getenv("DB_ENGINE", sqlite3_engine)
+
+if DB_ENGINE == sqlite3_engine:
+    DATABASES = {
+        'default': {
+            'ENGINE': sqlite3_engine,
+            'NAME': BASE_DIR / os.getenv("DB_NAME", "db.sqlite3"),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': DB_ENGINE,
+            'NAME': os.getenv("DB_NAME", ""),
+            'USER': os.getenv("DB_USER", "postgres"),
+            'PASSWORD': os.getenv("DB_PASSWORD", ""),
+            'HOST': os.getenv("DB_HOST", "localhost"),
+            'PORT': os.getenv("DB_PORT", "5432"),
+            'OPTIONS': {
+                'sslmode': 'require'
+            },
+            'CONN_MAX_AGE': 0,
+        }
+    }
 
 
 # Password validation
@@ -143,5 +153,4 @@ STATICFILES_DIRS = [
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-import os
 STATIC_ROOT = os.path.join(BASE_DIR, "static")

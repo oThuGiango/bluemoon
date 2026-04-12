@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="vi">
   <head>
     {% load static %} {% load humanize %}
@@ -13,7 +13,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
-    <link rel="stylesheet" href="{% static 'css/Accountant.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
   </head>
   <body>
@@ -22,19 +22,25 @@
       {% include 'core/layout_header.html' %}
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel" id="income-container">
-          {% if messages %} {% for message in messages %} {% if message.tags ==
-          'success' %}
+          <!-- prettier-ignore -->
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'success' %}
           <div
             class="message-container success"
             style="
               background-color: #e6f7d9;
               color: #52c41a;
               border: 1px solid #b7eb8f;
+              margin: auto;
             "
           >
             {{ message }}
           </div>
-          {% endif %} {% endfor %} {% endif %}
+          <!-- prettier-ignore -->
+          {% endif %}
+          {% endfor %}
+          {% endif %}
 
           <div class="income-controls-top">
             <form
@@ -46,7 +52,7 @@
               <div class="search-box-container" style="flex-grow: 1">
                 <input
                   type="text"
-                  placeholder="Nhập vào đây để tìm kiếm..."
+                  placeholder="Tìm kiếm theo Mã/Tên khoản thu..."
                   name="search_khoanthu"
                   value="{{ query|default:'' }}"
                 />
@@ -69,16 +75,42 @@
             </form>
           </div>
 
-          <div class="income-summary-box">
-            <h3 class="box-title">Tổng quan Khoản thu</h3>
-            <div class="summary-details">
-              <p>
-                Tổng số Khoản Thu đã định nghĩa: {{ total_count|default:"0" }}
-              </p>
-            </div>
+          <div class="income-actions-bottom income-actions-top-left">
+            <button
+              id="createNewFeeBtn"
+              class="btn btn-create-new btn-create-compact"
+              data-url="{% url 'add_khoanthu' %}"
+            >
+              <i class="fa-solid fa-plus"></i> Tạo khoản thu mới
+            </button>
           </div>
 
-          <h2 class="table-title">DANH SÁCH KHOẢN THU HIỆN TẠI</h2>
+          <h2
+            class="table-title"
+            style="border-bottom: none; margin-bottom: 8px"
+          >
+            DANH SÁCH KHOẢN THU HIỆN TẠI
+          </h2>
+          <div
+            style="
+              width: 100%;
+              border-bottom: 2px solid #f0f0f0;
+              margin: 0 0 20px;
+              padding-bottom: 10px;
+            "
+          >
+            <p
+              style="
+                margin: 0;
+                width: 100%;
+                text-align: right;
+                color: #555;
+                font-size: 1rem;
+              "
+            >
+              Tổng số Khoản Thu: {{ total_count|default:"0" }}
+            </p>
+          </div>
           <div class="table-responsive">
             <table class="data-table">
               <thead>
@@ -87,6 +119,7 @@
                   <th>Tên Khoản Thu</th>
                   <th>Đơn Vị Tính</th>
                   <th>Đơn Giá</th>
+                  <th>Loại phí</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -101,6 +134,13 @@
                   <td data-label="Đơn Giá">
                     {{ item.don_gia|floatformat:0|intcomma }} VND
                   </td>
+                  <td data-label="Phí bắt buộc">
+                    {% if item.phi_bat_buoc %}
+                    <span style="color: #27ae60; font-weight: bold">✓</span>
+                    {% else %}
+                    <span style="color: #999">○</span>
+                    {% endif %}
+                  </td>
 
                   <td data-label="Thao tác">
                     <button
@@ -108,7 +148,7 @@
                       title="Chi tiết"
                       data-url="{% url 'view_khoanthu_detail_modal' pk=item.id_khoanthu %}"
                     >
-                      <i class="fa-solid fa-file-invoice"></i>
+                      <i class="fa-solid fa-eye"></i>
                     </button>
 
                     <button
@@ -124,13 +164,13 @@
                       data-url="{% url 'delete_khoanthu' pk=item.id_khoanthu %}"
                       data-name="{{item.ten_khoanthu}}"
                     >
-                      <i class="fa-solid fa-trash"></i>
+                      <i class="fa-solid fa-trash" style="color: #e74c3c;"></i>
                     </button>
                   </td>
                 </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="5" style="text-align: center">
+                  <td colspan="6" style="text-align: center">
                     Không có khoản thu nào được tìm thấy.
                   </td>
                 </tr>
@@ -138,24 +178,8 @@
               </tbody>
             </table>
           </div>
-
-          <div class="income-actions-bottom">
-            <button
-              id="createNewFeeBtn"
-              class="btn btn-create-new"
-              style="min-width: 180px"
-              data-url="{% url 'add_khoanthu' %}"
-            >
-              <i class="fa-solid fa-plus"></i> Tạo khoản thu mới
-            </button>
-          </div>
         </div>
       </section>
-
-      <footer>
-        &copy; BlueMoon Apartment 2025. Created by the ChatGPT's son-in-law
-        team.
-      </footer>
     </main>
 
     <div id="mainModal" class="modal">

@@ -1,5 +1,5 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'styles/Accountant.css' %}" />
+<link rel="stylesheet" href="{% static 'styles/main.css' %}" />
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <i class="fa-regular fa-building"></i>
@@ -15,16 +15,21 @@
         </a>
       </li>
     </ul>
-    <!-- {% elif user.is_authenticated %}
+
+    <!-- prettier-ignore -->
+    {% elif user.is_authenticated %}
+    {% comment %}
     <ul>
       <li>
-        <a href="/"
-          ><i class="fa-solid fa-house"></i><span>Trang chủ</span></a
-        >
+        <a href="/"><i class="fa-solid fa-house"></i><span>Trang chủ</span></a>
       </li>
-    </ul> -->
+    </ul>
+    <!-- prettier-ignore -->
+    {% endcomment %}
     {% endif %} 
-    <!-- {% if user.is_superuser or user.vaitro.id_vaitro == 1 %}
+    
+    {% if user.is_superuser or user.vaitro.id_vaitro == 1 %}
+    {% comment %}
     <ul id="menu-accountmanage">
       <li>
         <a href="/hrmanage"
@@ -51,8 +56,11 @@
         >
       </li>
     </ul>
+    <!-- prettier-ignore -->
+    {% endcomment %}
+    {% endif %} 
+    
 
-    {% endif %}  -->
     {% if user.is_superuser or user.vaitro.id_vaitro == 3 %}
     <ul id="menu-account">
       <li>
@@ -67,6 +75,7 @@
           ><span>Quản lý kỳ thu</span></a
         >
       </li>
+      {% comment %}
       <li>
         <a href="/statistics_view"
           ><i class="fa-solid fa-magnifying-glass"></i
@@ -79,6 +88,7 @@
           ><span>Lịch sử hóa đơn</span></a
         >
       </li>
+      {% endcomment %}
     </ul>
     {% endif %}
   </nav>

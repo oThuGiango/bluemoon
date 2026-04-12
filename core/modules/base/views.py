@@ -50,7 +50,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             if request.user.is_superuser:
-                return redirect("admin_home")
+                return redirect("home")
 
             id_vaitro = request.user.vaitro.id_vaitro
             if id_vaitro is not None:

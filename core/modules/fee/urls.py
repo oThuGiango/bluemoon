@@ -11,6 +11,8 @@ urlpatterns = [
          views.delete_khoanthu, name="delete_khoanthu"),
     path("fee_management/detail/<int:pk>/modal/",
          views.view_khoanthu_detail_modal, name="view_khoanthu_detail_modal"),
+
+    #     Kỳ thu
     path("fee_collection_period/", views.fee_collection_period,
          name="fee_collection_period"),
     path("fee_collection_period/add/", views.add_dotthu, name="add_dotthu"),
@@ -20,6 +22,8 @@ urlpatterns = [
          views.delete_dotthu, name="delete_dotthu"),
     path("fee_collection_period/detail/<int:pk>/modal/",
          views.view_dotthu_detail_modal, name="view_dotthu_detail_modal"),
+
+    #     Hóa đơn
     path("update_payment_status/", views.update_payment_status,
          name="update_payment_status"),
     path("create_invoices/", views.create_invoices_for_period,

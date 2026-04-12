@@ -512,11 +512,6 @@ body {
   white-space: nowrap;
 }
 
-/* ==========================================
-   GLOBAL MENU ICON FIX (ALL PAGES)
-   -> ép icon menu luôn đen (trên header trắng)
-   DÁN CUỐI FILE style.css
-========================================== */
 
 /* Nút menu (hamburger) */
 .topbar .icon-btn,

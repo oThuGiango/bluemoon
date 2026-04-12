@@ -4,7 +4,7 @@ from core.modules.base.models import DonViTinh, TrangThaiDotThu
 
 
 class KhoanThu(models.Model):
-    id_khoanthu = models.IntegerField(primary_key=True)
+    id_khoanthu = models.AutoField(primary_key=True)
     ten_khoanthu = models.CharField(max_length=100)
     don_gia = models.DecimalField(max_digits=15, decimal_places=2)
     don_vi_tinh = models.CharField(
@@ -12,6 +12,7 @@ class KhoanThu(models.Model):
         choices=DonViTinh.choices,
         default=DonViTinh.NGUOI,
     )
+    phi_bat_buoc = models.BooleanField(default=True)
 
     class Meta:
         managed = True
