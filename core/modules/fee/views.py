@@ -19,11 +19,12 @@ from .models import DotThuPhi, HoaDon, KhoanThu
 @login_required(login_url="login")
 def fee_management(request):
     query = request.GET.get("search_khoanthu")
-    khoan_thu_list = KhoanThu.objects.all()
+    khoan_thu_list = KhoanThu.objects.all().order_by('id_khoanthu')
 
     if query:
         khoan_thu_list = khoan_thu_list.filter(
-            Q(ten_khoanthu__icontains=query) | Q(id_khoanthu__icontains=query))
+            Q(ten_khoanthu__icontains=query) | Q(id_khoanthu__icontains=query)
+        ).order_by('id_khoanthu')
     total_count = khoan_thu_list.count()
     form = KhoanThuForm()
     context = {
@@ -40,7 +41,7 @@ def view_khoanthu_detail_modal(request, pk):
     khoan_thu = get_object_or_404(KhoanThu, id_khoanthu=pk)
     if not request.headers.get("x-requested-with") == "XMLHttpRequest":
         pass
-    return render(request, "core/ViewFeeDetailModal.html", {"khoan_thu": khoan_thu})
+    return render(request, "fee/ViewFeeDetailModal.html", {"khoan_thu": khoan_thu})
 
 
 @login_required(login_url="login")
@@ -55,7 +56,10 @@ def add_khoanthu(request):
                 messages.error(request, "Tên khoản thu này đã tồn tại!")
                 return render(request, "fee/AddFeeModal.html", {"form": form})
 
-            form.save()
+            khoan_thu = form.save(commit=False)
+            if not khoan_thu.phi_bat_buoc:
+                khoan_thu.don_gia = 1
+            khoan_thu.save()
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success"})
             messages.success(request, "Thêm khoản thu thành công!")
@@ -76,7 +80,10 @@ def edit_khoanthu(request, pk):
         form = KhoanThuForm(request.POST, instance=khoan_thu)
 
         if form.is_valid():
-            form.save()
+            khoan_thu = form.save(commit=False)
+            if not khoan_thu.phi_bat_buoc:
+                khoan_thu.don_gia = 1
+            khoan_thu.save()
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success"})
             messages.success(
@@ -84,12 +91,12 @@ def edit_khoanthu(request, pk):
             return redirect("fee_management")
         else:
             context = {"form": form, "khoan_thu": khoan_thu}
-            return render(request, "core/EditFeeModal.html", context, status=400)
+            return render(request, "fee/EditFeeModal.html", context, status=400)
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         form = KhoanThuForm(instance=khoan_thu)
         context = {"form": form, "khoan_thu": khoan_thu}
-        return render(request, "core/EditFeeModal.html", context)
+        return render(request, "fee/EditFeeModal.html", context)
     else:
         form = KhoanThuForm(instance=khoan_thu)
         context = {
@@ -97,7 +104,7 @@ def edit_khoanthu(request, pk):
             "khoan_thu": khoan_thu,
             "page_title": f"CHỈNH SỬA KHOẢN THU - {khoan_thu.ten_khoanthu}",
         }
-        return render(request, "core/EditFee.html", context)
+        return render(request, "fee/EditFeeModal.html", context)
 
 
 @login_required(login_url="login")
@@ -109,7 +116,7 @@ def delete_khoanthu(request, pk):
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({"status": "success", "message": "Khoản thu đã được xóa thành công!"})
         return redirect("fee_management")
-    return render(request, "core/DeleteFeeModal.html", {"khoan_thu": khoan_thu})
+    return render(request, "fee/DeleteFeeModal.html", {"khoan_thu": khoan_thu})
 
 
 @login_required(login_url="login")

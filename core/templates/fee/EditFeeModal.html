@@ -22,24 +22,6 @@
   >
     {% csrf_token %}
 
-    <div class="form-group">
-      <label class="form-label" style="font-weight: bold; color: #555"
-        >Mã Khoản Thu</label
-      >
-      <input
-        type="text"
-        value="{{ khoan_thu.id_khoanthu }}"
-        disabled
-        class="form-control-disabled"
-        style="
-          background-color: #e9ecef;
-          color: #495057;
-          border: 1px solid #ced4da;
-          cursor: not-allowed;
-        "
-      />
-      <small class="form-text text-muted">Mã này không thể chỉnh sửa.</small>
-    </div>
     {% for field in form.visible_fields %}
     <div class="form-group">
       <label for="{{ field.id_for_label }}" class="form-label">

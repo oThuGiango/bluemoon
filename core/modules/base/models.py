@@ -13,6 +13,7 @@ class DonViTinh(models.TextChoices):
     THANG = "thang", "Tháng"
     NAM = "nam", "Năm"
     LUOT = "luot", "Lượt"
+    DIENTICH = "dientich", "Diện tích (m2)"
 
 
 class TrangThaiDotThu(models.TextChoices):

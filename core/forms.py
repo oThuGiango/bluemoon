@@ -21,7 +21,7 @@ class KhoanThuForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         initial=True,
         label='Loại phí',
-        required=False 
+        required=False
     )
 
     class Meta:

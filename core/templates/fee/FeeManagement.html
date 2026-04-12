@@ -32,6 +32,7 @@
               background-color: #e6f7d9;
               color: #52c41a;
               border: 1px solid #b7eb8f;
+              margin: auto;
             "
           >
             {{ message }}
@@ -51,7 +52,7 @@
               <div class="search-box-container" style="flex-grow: 1">
                 <input
                   type="text"
-                  placeholder="Nhập vào đây để tìm kiếm..."
+                  placeholder="Tìm kiếm theo Mã/Tên khoản thu..."
                   name="search_khoanthu"
                   value="{{ query|default:'' }}"
                 />
@@ -147,7 +148,7 @@
                       title="Chi tiết"
                       data-url="{% url 'view_khoanthu_detail_modal' pk=item.id_khoanthu %}"
                     >
-                      <i class="fa-solid fa-file-invoice"></i>
+                      <i class="fa-solid fa-eye"></i>
                     </button>
 
                     <button
@@ -163,7 +164,7 @@
                       data-url="{% url 'delete_khoanthu' pk=item.id_khoanthu %}"
                       data-name="{{item.ten_khoanthu}}"
                     >
-                      <i class="fa-solid fa-trash"></i>
+                      <i class="fa-solid fa-trash" style="color: #e74c3c;"></i>
                     </button>
                   </td>
                 </tr>
