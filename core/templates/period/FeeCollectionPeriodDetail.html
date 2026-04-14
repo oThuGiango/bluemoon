@@ -14,10 +14,10 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
-  </head>
-  <body>
-    {% include 'core/Sidebar.html' %}
+                      <th style="padding: 10px; text-align: center; width: 10%">Chọn</th>
+                      <th style="padding: 10px; text-align: center; width: 20%">Căn hộ</th>
+                      <th style="padding: 10px; text-align: center; width: 25%">Tổng số tiền phải đóng</th>
+                      <th style="padding: 10px; text-align: center; width: 45%">Chi tiết</th>
     <main>
       {% include 'core/layout_header.html' %}
       <section class="main-content fee-collection-page">
@@ -56,67 +56,90 @@
             </h2>
 
             <div
-              class="detail-grid"
               style="
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
+                display: flex;
                 border: #ededed 1px solid;
                 padding: 20px;
                 border-radius: 12px;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
                 margin-bottom: 25px;
+                gap: 30px;
+                align-items: flex-start;
               "
             >
-              <div class="detail-item">
-                <label
-                  style="
-                    font-weight: bold;
-                    color: #666;
-                    display: block;
-                    margin-bottom: 5px;
-                  "
-                  >Trạng Thái:</label
-                >
-                {% if dot_thu.trang_thai == 'open' %}
-                <span
-                  class="status status-active"
-                  style="
-                    background: #e8f5e9;
-                    color: #2e7d32;
-                    padding: 4px 12px;
-                    border-radius: 20px;
-                    font-size: 0.85rem;
-                  "
-                  >Đang mở</span
-                >
-                {% elif dot_thu.trang_thai == 'closed' %}
-                <span
-                  class="status status-inactive"
-                  style="
-                    background: #ffebee;
-                    color: #c62828;
-                    padding: 4px 12px;
-                    border-radius: 20px;
-                    font-size: 0.85rem;
-                  "
-                  >Đã đóng</span
-                >
-                {% else %}
-                <span
-                  class="status status-draft"
-                  style="
-                    background: #eceff1;
-                    color: #455a64;
-                    padding: 4px 12px;
-                    border-radius: 20px;
-                    font-size: 0.85rem;
-                  "
-                  >Bản nháp</span
-                >
-                {% endif %}
+              <div style="flex: 0 0 40%; min-width: 180px; max-width: 320px">
+                <p id="display-dot-thu-id" style="display: none">#{{ dot_thu.id_dotthu }}</p>
+                <div class="detail-item">
+                  <label
+                    style="
+                      font-weight: bold;
+                      color: #666;
+                      display: block;
+                      margin-bottom: 5px;
+                    "
+                    >Tên Đợt Thu:</label
+                  >
+                  <p
+                    style="
+                      font-size: 1.2rem;
+                      font-weight: 600;
+                      color: var(--primary);
+                      margin: 0;
+                    "
+                  >
+                    {{ dot_thu.ten_dotthu }}
+                  </p>
+                </div>
+                <div class="detail-item" style="margin-top: 12px">
+                  <label
+                    style="
+                      font-weight: bold;
+                      color: #666;
+                      display: block;
+                      margin-bottom: 5px;
+                    "
+                    >Trạng Thái:</label
+                  >
+                  {% if dot_thu.trang_thai == 'open' %}
+                  <span
+                    class="status status-active"
+                    style="
+                      background: #e8f5e9;
+                      color: #2e7d32;
+                      padding: 4px 12px;
+                      border-radius: 20px;
+                      font-size: 0.85rem;
+                    "
+                    >Đang mở</span
+                  >
+                  {% elif dot_thu.trang_thai == 'closed' %}
+                  <span
+                    class="status status-inactive"
+                    style="
+                      background: #ffebee;
+                      color: #c62828;
+                      padding: 4px 12px;
+                      border-radius: 20px;
+                      font-size: 0.85rem;
+                    "
+                    >Đã đóng</span
+                  >
+                  {% else %}
+                  <span
+                    class="status status-draft"
+                    style="
+                      background: #eceff1;
+                      color: #455a64;
+                      padding: 4px 12px;
+                      border-radius: 20px;
+                      font-size: 0.85rem;
+                    "
+                    >Bản nháp</span
+                  >
+                  {% endif %}
+                </div>
               </div>
-              <div class="detail-item">
+              <div style="flex: 1 1 60%; min-width: 220px; max-width: 100%">
                 <label
                   style="
                     font-weight: bold;
@@ -124,39 +147,25 @@
                     display: block;
                     margin-bottom: 5px;
                   "
-                  >Tên Đợt Thu:</label
+                  >Khoản Thu Áp Dụng:</label
                 >
-                <p
+                <ul
                   style="
-                    font-size: 1.2rem;
-                    font-weight: 600;
-                    color: var(--primary);
                     margin: 0;
-                  "
-                >
-                  {{ dot_thu.ten_dotthu }}
-                </p>
-              </div>
-              <div class="detail-item" style="grid-column: span 2">
-                <label
-                  style="
-                    font-weight: bold;
-                    color: #666;
-                    display: block;
-                    margin-bottom: 5px;
-                  "
-                  >Tên Đợt Thu:</label
-                >
-                <p
-                  style="
-                    font-size: 1.2rem;
-                    font-weight: 600;
+                    padding-left: 18px;
+                    font-size: 1.1rem;
                     color: var(--primary);
-                    margin: 0;
+                    font-weight: 600;
                   "
                 >
-                  {{ dot_thu.ten_dotthu }}
-                </p>
+                  {% for kt in khoanthu_list %}
+                  <li>{{ kt.ten_khoanthu }}</li>
+                  {% empty %}
+                  <li style="color: #888; font-weight: 400">
+                    Không có khoản thu nào
+                  </li>
+                  {% endfor %}
+                </ul>
               </div>
             </div>
 
@@ -196,6 +205,7 @@
               </button>
             </div>
 
+            <!-- Modal for Add Resident -->
             <div
               id="addResidentSection"
               style="
@@ -231,64 +241,44 @@
                   >
                     <tr>
                       <th
-                        style="padding: 10px; text-align: center; width: 40px"
+                        style="padding: 10px; text-align: center; width: 60px"
                       >
                         Chọn
                       </th>
-                      <th style="padding: 10px; text-align: left">Căn hộ</th>
-                      <th style="padding: 10px; text-align: right">Đơn giá</th>
                       <th
-                        style="padding: 10px; text-align: center; width: 100px"
+                        style="padding: 10px; text-align: center; width: 110px"
                       >
-                        Hệ số
+                        Căn hộ
                       </th>
-                      <th style="padding: 10px; text-align: right">
-                        Thành tiền
+                      <th
+                        style="padding: 10px; text-align: center; width: 160px"
+                      >
+                        Tổng số tiền phải đóng
+                      </th>
+                      <th
+                        style="padding: 10px; text-align: center; width: 220px"
+                      >
+                        Chi tiết
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for hokhau in tat_ca_ho_khau %}
+                    {% for id_hokhau, info in tong_tien_ho.items %}
                     <tr
-                      style="border-bottom: 1px solid #f1f1f1"
+                      style="border-bottom: 1px solid #f1f1f1; line-height: 1.7"
                       class="new-resident-row"
                     >
                       <td style="padding: 10px; text-align: center">
                         <input
                           type="checkbox"
                           name="new_hokhau_ids"
-                          value="{{ hokhau.id_hokhau }}"
+                          value="{{ id_hokhau }}"
                         />
                       </td>
                       <td style="padding: 10px">
-                        <strong>{{ hokhau.so_can_ho }}</strong>
+                        <strong>{{ info.so_can_ho }}</strong>
                       </td>
-                      <td style="padding: 10px; text-align: right">
-                        <span
-                          class="unit-price"
-                          data-price="{{ dot_thu.id_khoanthu.don_gia }}"
-                        >
-                          {{ dot_thu.id_khoanthu.don_gia|floatformat:0|intcomma
-                          }}đ
-                        </span>
-                      </td>
-                      <td style="padding: 10px; text-align: center">
-                        <input
-                          type="number"
-                          class="multiplier-input"
-                          value="1"
-                          step="0.1"
-                          min="0"
-                          style="
-                            width: 70px;
-                            padding: 5px;
-                            text-align: center;
-                            border: 1px solid #ccc;
-                            border-radius: 4px;
-                          "
-                        />
-                      </td>
-                      <td
+                      <td class="new-tong-tien"
                         style="
                           padding: 10px;
                           text-align: right;
@@ -296,16 +286,31 @@
                           color: #d32f2f;
                         "
                       >
-                        <span class="row-total"
-                          >{{ dot_thu.id_khoanthu.don_gia|floatformat:0|intcomma
-                          }}đ</span
-                        >
+                        {{ info.tong|floatformat:0|intcomma }} đ
                       </td>
+                      <td class="new-chi-tiet"
+                        style="
+                          padding: 10px;
+                          text-align: left;
+                          line-height: 1.7;
+                        "
+                        {% for ct in info.chi_tiet %}
+                          data-id-khoanthu-{{ forloop.counter }}="{{ ct.id_khoanthu }}"
+                          data-so-luong-{{ forloop.counter }}="{{ ct.so_luong }}"
+                          data-so-tien-{{ forloop.counter }}="{{ ct.so_tien }}"
+                        {% endfor %}
+                        data-chi-tiet-count="{{ info.chi_tiet|length }}"
+                      >
+                        {% for ct in info.chi_tiet %} {{ ct.khoanthu }}:
+                        {{ct.so_tien|floatformat:0|intcomma }} đ<br />
+                        {% endfor %}
+                      </td>
+                     
                     </tr>
                     {% empty %}
                     <tr>
                       <td
-                        colspan="5"
+                        colspan="3"
                         style="padding: 20px; text-align: center; color: #999"
                       >
                         Tất cả các hộ đã có hóa đơn.
@@ -475,6 +480,14 @@
           </div>
         </div>
       </section>
+
+      <footer>&copy; BlueMoon Apartment 2026.</footer>
     </main>
+
+    <div id="mainModal" class="modal">
+      <div class="modal-content"></div>
+    </div>
+
+    <script src="{% static 'js/FeeManagement_modal_logic.js' %}"></script>
   </body>
 </html>

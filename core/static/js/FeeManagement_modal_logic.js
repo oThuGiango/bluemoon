@@ -16,6 +16,24 @@ document.addEventListener("DOMContentLoaded", function () {
     modalContent.innerHTML = "";
   }
 
+  // 2. Nút Hiện/Ẩn thêm hộ dân
+  const btnToggle = document.querySelector("#btnToggleAddResident");
+
+  if (btnToggle) {
+    btnToggle.addEventListener("click", function () {
+      const section = document.getElementById("addResidentSection");
+      if (section) {
+        const isHidden =
+          section.style.display === "none" || section.style.display === "";
+        section.style.display = isHidden ? "block" : "none";
+        this.innerHTML = isHidden
+          ? '<i class="fa-solid fa-xmark"></i> Hủy thêm hộ'
+          : '<i class="fa-solid fa-user-plus"></i> Thêm hộ vào đợt này';
+      }
+    });
+    attachModalListeners();
+  }
+
   function attachModalListeners() {
     // 1. Đóng Modal
     modalContent
@@ -24,23 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.addEventListener("click", closeModal);
       });
 
-    // 2. Nút Hiện/Ẩn thêm hộ dân
-    const btnToggle = modalContent.querySelector("#btnToggleAddResident");
-    if (btnToggle) {
-      btnToggle.addEventListener("click", function () {
-        const section = document.getElementById("addResidentSection");
-        if (section) {
-          const isHidden =
-            section.style.display === "none" || section.style.display === "";
-          section.style.display = isHidden ? "block" : "none";
-          this.innerHTML = isHidden
-            ? '<i class="fa-solid fa-xmark"></i> Hủy thêm hộ'
-            : '<i class="fa-solid fa-user-plus"></i> Thêm hộ vào đợt này';
-        }
-      });
-    }
-
-    // 3.1. Logic tự động disable/enable ô Đơn giá khi chọn loại phí trong modal tạo khoản thu
+    // 2. Logic tự động disable/enable ô Đơn giá khi chọn loại phí trong modal tạo khoản thu
     const phiBatBuocSelect = modalContent.querySelector(
       '[name="phi_bat_buoc"]',
     );
@@ -52,9 +54,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (phiBatBuocSelect && donGiaInput) {
         if (phiBatBuocSelect.value === "False") {
           donGiaInput.value = 1;
-          donGiaInput.setAttribute("disabled", "disabled");
+          // donGiaInput.setAttribute("disabled", "disabled");
         } else {
-          donGiaInput.removeAttribute("disabled");
+          // donGiaInput.removeAttribute("disabled");
         }
       }
     }
@@ -79,38 +81,23 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // 3. Logic tính tiền tự động khi thay đổi hệ số
-    const multiplierInputs = modalContent.querySelectorAll(".multiplier-input");
-    multiplierInputs.forEach((input) => {
-      input.addEventListener("input", function () {
-        const row = this.closest("tr");
-        const priceText = row.querySelector(".unit-price").dataset.price;
-        const price = parseFloat(priceText) || 0;
-        const multiplier = parseFloat(this.value) || 0;
-        const total = price * multiplier;
-        // Cập nhật hiển thị thành tiền (định dạng tiếng Việt)
-        row.querySelector(".row-total").innerText =
-          total.toLocaleString("vi-VN") + "đ";
-      });
-    });
-
     // 4. Nút Xác nhận thêm hộ (Gửi dữ liệu nhân lên Server)
-    const btnAdd = modalContent.querySelector("#btnConfirmAddResidents");
+    const btnAdd = document.querySelector("#btnConfirmAddResidents");
     if (btnAdd) {
       btnAdd.addEventListener("click", handleSaveNewResidents);
     }
 
     // 5. Nút Xác nhận đóng tiền (Thanh toán)
-    const btnPay = modalContent.querySelector("#btnConfirmPayment");
+    const btnPay = document.querySelector("#btnConfirmPayment");
     if (btnPay) {
       btnPay.addEventListener("click", handleConfirmPayment);
     }
 
     // 6. Chọn tất cả hóa đơn trong bảng chờ thu
-    const selectAll = modalContent.querySelector("#selectAllInvoices");
+    const selectAll = document.querySelector("#selectAllInvoices");
     if (selectAll) {
       selectAll.addEventListener("change", function () {
-        const checkboxes = modalContent.querySelectorAll(
+        const checkboxes = document.querySelectorAll(
           'input[name="invoice_ids"]:not(:disabled)',
         );
         checkboxes.forEach((cb) => (cb.checked = this.checked));
@@ -164,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function handleSaveNewResidents() {
     const selectedRows = Array.from(
-      modalContent.querySelectorAll(".new-resident-row"),
+      document.querySelectorAll(".new-resident-row"),
     ).filter(
       (row) => row.querySelector('input[name="new_hokhau_ids"]').checked,
     );
@@ -174,42 +161,63 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const dotThuId = modalContent
+    const dotThuId = document
       .querySelector("#display-dot-thu-id")
       .innerText.replace("#", "")
       .trim();
+
     const formData = new FormData();
     formData.append("id_dotthu", dotThuId);
     formData.append(
       "csrfmiddlewaretoken",
-      modalContent.querySelector("[name=csrfmiddlewaretoken]").value,
+      document.querySelector("[name=csrfmiddlewaretoken]").value,
     );
 
-    // Duyệt qua các hàng đã chọn để lấy ID, Hệ số và Đơn giá
+    // Lấy info từ data attribute trên từng dòng đã chọn
+    const hokhauDataList = [];
     selectedRows.forEach((row) => {
-      const hokhauId = row.querySelector('input[name="new_hokhau_ids"]').value;
-      const multiplier = row.querySelector(".multiplier-input").value;
-      const price = row.querySelector(".unit-price").dataset.price;
-
-      formData.append("hokhau_ids[]", hokhauId);
-      formData.append("multipliers[]", multiplier);
-      formData.append("prices[]", price);
+      const tongTien = row
+        .querySelector(".new-tong-tien")
+        .innerText.replace(/[^\d]/g, "");
+      const chiTietTd = row.querySelector(".new-chi-tiet");
+      const chiTietCount = parseInt(chiTietTd.dataset.chiTietCount || "0");
+      const chiTietArr = [];
+      for (let i = 1; i <= chiTietCount; i++) {
+        chiTietArr.push({
+          id_khoanthu: chiTietTd.getAttribute(`data-id-khoanthu-${i}`),
+          so_luong: chiTietTd.getAttribute(`data-so-luong-${i}`),
+          so_tien: chiTietTd.getAttribute(`data-so-tien-${i}`),
+        });
+      }
+      const id_hokhau = row.querySelector('input[name="new_hokhau_ids"]').value;
+      hokhauDataList.push({
+        id_hokhau: id_hokhau,
+        tong: tongTien,
+        chi_tiet: chiTietArr,
+      });
     });
+    formData.append("hokhau_data", JSON.stringify(hokhauDataList));
 
-    fetch("/create_invoices/", {
-      method: "POST",
-      body: formData,
-      headers: { "X-Requested-With": "XMLHttpRequest" },
-    })
-      .then((res) => res.text())
-      .then((html) => {
-        // Nạp lại nội dung Modal (Lúc này các hộ mới đã chuyển xuống bảng chờ thu)
-        modalContent.innerHTML = html;
-        attachModalListeners();
-        alert("Đã thêm hộ và tạo hóa đơn thành công!");
-      })
-      .catch((err) => alert("Lỗi hệ thống: " + err));
+    // Log toàn bộ formData để kiểm tra
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ":", pair[1]);
+    }
+
+    // fetch("/create_invoices/", {
+    //   method: "POST",
+    //   body: formData,
+    //   headers: { "X-Requested-With": "XMLHttpRequest" },
+    // })
+    //   .then((res) => res.text())
+    //   .then((html) => {
+    //     // Nạp lại nội dung Modal (Lúc này các hộ mới đã chuyển xuống bảng chờ thu)
+    //     modalContent.innerHTML = html;
+    //     attachModalListeners();
+    //     alert("Đã thêm hộ và tạo hóa đơn thành công!");
+    //   })
+    //   .catch((err) => alert("Lỗi hệ thống: " + err));
   }
+
   function handleFormSubmission(e) {
     e.preventDefault(); // Chặn hành động chuyển trang của form
 

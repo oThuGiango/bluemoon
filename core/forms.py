@@ -55,9 +55,18 @@ class DotThuPhiForm(forms.ModelForm):
 
     class Meta:
         model = DotThuPhi
-        fields = ['ten_dotthu', 'ngay_batdau',
-                  'ngay_ketthuc', 'trang_thai', 'id_khoanthu']
+        fields = ['ten_dotthu', 'ngay_batdau', 'ngay_ketthuc',
+                  'loai_dot_thu', 'trang_thai', 'id_khoanthu']
+        labels = {
+            'ten_dotthu': 'Tên đợt thu',
+            'ngay_batdau': 'Ngày bắt đầu',
+            'ngay_ketthuc': 'Ngày kết thúc',
+            'loai_dot_thu': 'Loại đợt thu',
+            'trang_thai': 'Trạng thái',
+            'id_khoanthu': 'Khoản thu áp dụng',
+        }
         widgets = {
+            'loai_dot_thu': forms.Select(attrs={'class': 'form-control'}),
             'ten_dotthu': forms.TextInput(attrs={'class': 'form-control'}),
             'id_khoanthu': forms.SelectMultiple(attrs={'class': 'form-control select2'}),
             'ngay_batdau': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),

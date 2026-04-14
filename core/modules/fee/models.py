@@ -30,6 +30,17 @@ class DotThuPhi(models.Model):
     ten_dotthu = models.CharField(max_length=250)
     ngay_batdau = models.DateField()
     ngay_ketthuc = models.DateField(null=True, blank=True)
+    LOAI_DOT_THU_CHOICES = [
+        ("dinh_ky", "Định kỳ"),
+        ("bo_sung", "Bổ sung"),
+        ("tu_nguyen", "Tự nguyện"),
+        ("khac", "Khác"),
+    ]
+    loai_dot_thu = models.CharField(
+        max_length=20,
+        choices=LOAI_DOT_THU_CHOICES,
+        default="dinh_ky",
+    )
     trang_thai = models.CharField(
         max_length=6,
         choices=TrangThaiDotThu.choices,
