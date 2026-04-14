@@ -1,29 +1,61 @@
 import json
+from .models import DotThuPhi, HoaDon, KhoanThu, HoaDonChiTiet
+from core.modules.resident.models import HoKhau
+from core.forms import DotThuPhiForm, KhoanThuForm
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+from openpyxl import Workbook
+from django.utils import timezone
+from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponse, JsonResponse
+from django.db.models.functions import ExtractMonth, ExtractYear
+from django.db.models import Count, Q, Sum
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from datetime import datetime
 
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Q, Sum
-from django.db.models.functions import ExtractMonth, ExtractYear
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
-from core.forms import DotThuPhiForm, KhoanThuForm
-from core.modules.resident.models import HoKhau
-from .models import DotThuPhi, HoaDon, KhoanThu
+def calculate_invoice(tat_ca_ho_khau, khoanthu_objs):
+    """
+    Return:
+      tong_tien_ho: dict[id_hokhau] = {"tong": ..., "chi_tiet": [...], "so_can_ho": ...}
+      tong_tien_dot: tổng toàn đợt
+    """
+    tong_tien_ho = {}
+    tong_tien_dot = 0
+    for hokhau in tat_ca_ho_khau:
+        tong = 0
+        chi_tiet = []
+        for kt in khoanthu_objs:
+            if kt.don_vi_tinh == "dientich":
+                so_luong = float(getattr(hokhau, "dien_tich", 0) or 0)
+                so_tien = float(kt.don_gia) * so_luong
+            else:
+                so_luong = 1
+                so_tien = float(kt.don_gia)
+
+            chi_tiet.append({
+                "id_khoanthu": kt.id_khoanthu,
+                "khoanthu": kt.ten_khoanthu,
+                "so_tien": so_tien,
+                "so_luong": so_luong
+            })
+            tong += so_tien
+        tong_tien_ho[hokhau.id_hokhau] = {
+            "tong": tong, "chi_tiet": chi_tiet, "so_can_ho": hokhau.so_can_ho}
+        tong_tien_dot += tong
+    return tong_tien_ho, tong_tien_dot
 
 
 @login_required(login_url="login")
 def fee_management(request):
     query = request.GET.get("search_khoanthu")
-    khoan_thu_list = KhoanThu.objects.all().order_by('id_khoanthu')
+    khoan_thu_list = KhoanThu.objects.filter(
+        is_deleted=False).order_by('id_khoanthu')
 
     if query:
         khoan_thu_list = khoan_thu_list.filter(
-            Q(ten_khoanthu__icontains=query) | Q(id_khoanthu__icontains=query)
+            (Q(ten_khoanthu__icontains=query) | Q(
+                id_khoanthu__icontains=query)) & Q(is_deleted=False)
         ).order_by('id_khoanthu')
     total_count = khoan_thu_list.count()
     form = KhoanThuForm()
@@ -57,8 +89,8 @@ def add_khoanthu(request):
                 return render(request, "fee/AddFeeModal.html", {"form": form})
 
             khoan_thu = form.save(commit=False)
-            if not khoan_thu.phi_bat_buoc:
-                khoan_thu.don_gia = 1
+            # if not khoan_thu.phi_bat_buoc:
+            #     khoan_thu.don_gia = 1
             khoan_thu.save()
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success"})
@@ -78,12 +110,16 @@ def edit_khoanthu(request, pk):
 
     if request.method == "POST":
         form = KhoanThuForm(request.POST, instance=khoan_thu)
-
         if form.is_valid():
             khoan_thu = form.save(commit=False)
-            if not khoan_thu.phi_bat_buoc:
-                khoan_thu.don_gia = 1
-            khoan_thu.save()
+            # if not khoan_thu.phi_bat_buoc:
+            #     khoan_thu.don_gia = 1
+            khoan_thu.updated_at = timezone.now()
+            if request.user.is_authenticated:
+                khoan_thu.updated_by = str(request.user)
+            khoan_thu.save(update_fields=[
+                field for field in ["ten_khoanthu", "don_gia", "phi_bat_buoc", "updated_at", "updated_by"] if hasattr(khoan_thu, field)
+            ])
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success"})
             messages.success(
@@ -112,7 +148,12 @@ def delete_khoanthu(request, pk):
     khoan_thu = get_object_or_404(KhoanThu, id_khoanthu=pk)
 
     if request.method == "POST":
-        khoan_thu.delete()
+        khoan_thu.is_deleted = True
+        khoan_thu.updated_at = timezone.now()
+        if request.user.is_authenticated:
+            khoan_thu.updated_by = str(request.user)
+        khoan_thu.save(
+            update_fields=["is_deleted", "updated_at", "updated_by"])
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({"status": "success", "message": "Khoản thu đã được xóa thành công!"})
         return redirect("fee_management")
@@ -122,32 +163,50 @@ def delete_khoanthu(request, pk):
 @login_required(login_url="login")
 def fee_collection_period(request):
     query = request.GET.get("search_dotthu")
-    dot_thu_phi_list = DotThuPhi.objects.select_related("id_khoanthu").all()
-    active_count = dot_thu_phi_list.filter(trang_thai="open").count()
+    dot_thu_phi_list = DotThuPhi.objects.prefetch_related(
+        "id_khoanthu").filter(is_deleted=False)
+    active_count = dot_thu_phi_list.filter(
+        trang_thai="open", is_deleted=False).count()
     if query:
         dot_thu_phi_list = dot_thu_phi_list.filter(
-            Q(ten_dotthu__icontains=query) | Q(id_dotthu__icontains=query))
+            (Q(ten_dotthu__icontains=query) | Q(
+                id_dotthu__icontains=query)) & Q(is_deleted=False)
+        )
     context = {
         "dot_thu_phi_list": dot_thu_phi_list,
         "active_count": active_count,
         "query": query,
     }
-    return render(request, "core/FeeCollectionPeriod.html", context)
+    return render(request, "period/FeeCollectionPeriod.html", context)
 
 
+# Trang chi tiết đợt thu phí (page, không phải modal)
 @login_required(login_url="login")
-def view_dotthu_detail_modal(request, pk):
+def fee_collection_period_detail(request, pk):
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=pk)
     danh_sach_hoa_don = dot_thu.hoa_dons.select_related(
-        "id_hokhau").all().order_by("id_hokhau__so_can_ho")
+        "id_hokhau").filter(is_deleted=False).order_by("id_hokhau__so_can_ho")
     ids_da_co = danh_sach_hoa_don.values_list("id_hokhau_id", flat=True)
     tat_ca_ho_khau = HoKhau.objects.exclude(id_hokhau__in=ids_da_co)
+    khoanthu_objs = list(dot_thu.id_khoanthu.all())
+    khoanthu_list = [
+        {"id_khoanthu": kt.id_khoanthu, "ten_khoanthu": kt.ten_khoanthu,
+            "don_gia": kt.don_gia, "don_vi_tinh": kt.don_vi_tinh}
+        for kt in khoanthu_objs
+    ]
+
+    tong_tien_ho, tong_tien_dot = calculate_invoice(
+        tat_ca_ho_khau, khoanthu_objs)
+
     context = {
         "dot_thu": dot_thu,
         "danh_sach_hoa_don": danh_sach_hoa_don,
         "tat_ca_ho_khau": tat_ca_ho_khau,
+        "khoanthu_list": khoanthu_list,
+        "tong_tien_ho": tong_tien_ho,
+        "tong_tien_dot": tong_tien_dot,
     }
-    return render(request, "core/ViewPeriodDetailModal.html", context)
+    return render(request, "period/FeeCollectionPeriodDetail.html", context)
 
 
 @login_required(login_url="login")
@@ -158,8 +217,13 @@ def update_payment_status(request):
         return JsonResponse({"status": "error", "message": "Không có hóa đơn nào được chọn"}, status=400)
 
     try:
-        HoaDon.objects.filter(id_hoadon__in=invoice_ids, ngay_nop__isnull=True).update(
-            ngay_nop=timezone.now())
+        # Lấy các hóa đơn cần cập nhật
+        invoices = HoaDon.objects.filter(
+            id_hoadon__in=invoice_ids, ngay_nop__isnull=True)
+        for invoice in invoices:
+            invoice.ngay_nop = timezone.now()
+            invoice.da_dong = invoice.tong_tien
+            invoice.save(update_fields=["ngay_nop", "da_dong"])
         return JsonResponse({"status": "success", "message": "Cập nhật trạng thái thành công"})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
@@ -168,40 +232,54 @@ def update_payment_status(request):
 @login_required(login_url="login")
 def create_invoices_for_period(request):
     id_dotthu = request.POST.get("id_dotthu")
-    hokhau_ids = request.POST.getlist("hokhau_ids[]")
-    multipliers = request.POST.getlist("multipliers[]")
-    prices = request.POST.getlist("prices[]")
+    hokhau_data = json.loads(request.POST.get("hokhau_data"))
 
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=id_dotthu)
-    last_invoice = HoaDon.objects.all().order_by("id_hoadon").last()
-    next_id = (last_invoice.id_hoadon + 1) if last_invoice else 1
 
-    for hk_id, mult, price in zip(hokhau_ids, multipliers, prices):
-        hokhau = get_object_or_404(HoKhau, id_hokhau=hk_id)
+    for ho in hokhau_data:
+        id_hokhau = ho["id_hokhau"]
+        tong_tien = ho["tong"]
+        chi_tiet = ho.get("chi_tiet", [])
+        hokhau = HoKhau.objects.get(pk=id_hokhau)
+        hoadon, created = HoaDon.objects.get_or_create(
+            id_dotthu=dot_thu,
+            id_hokhau=hokhau,
+            defaults={"tong_tien": tong_tien},
+        )
 
-        if not HoaDon.objects.filter(id_dotthu=dot_thu, id_hokhau=hokhau).exists():
-            final_amount = float(price) * float(mult)
+        if not created and getattr(hoadon, "is_deleted", False):
+            hoadon.is_deleted = False
+            hoadon.save(update_fields=["is_deleted"])
 
-            HoaDon.objects.create(
-                id_hoadon=next_id,
-                id_dotthu=dot_thu,
-                id_hokhau=hokhau,
-                tong_tien=final_amount,
+        for ct in chi_tiet:
+            khoanthu = KhoanThu.objects.get(pk=ct["id_khoanthu"])
+
+            HoaDonChiTiet.objects.get_or_create(
+                hoadon=hoadon,
+                khoanthu=khoanthu,
+                defaults={
+                    "so_luong": ct["so_luong"],
+                    "thanh_tien": ct["so_tien"]
+                }
             )
-            next_id += 1
+
     danh_sach_hoa_don = dot_thu.hoa_dons.select_related(
         "id_hokhau").all().order_by("id_hokhau__so_can_ho")
     tat_ca_ho_khau = HoKhau.objects.exclude(
         id_hokhau__in=danh_sach_hoa_don.values_list("id_hokhau_id", flat=True))
 
+    context = {
+        "dot_thu": dot_thu,
+        "danh_sach_hoa_don": danh_sach_hoa_don,
+        "tat_ca_ho_khau": tat_ca_ho_khau,
+        # "khoanthu_list": khoanthu_list,
+        # "tong_tien_ho": tong_tien_ho,
+        # "tong_tien_dot": tong_tien_dot,
+    }
+
     return render(
         request,
-        "core/ViewPeriodDetailModal.html",
-        {
-            "dot_thu": dot_thu,
-            "danh_sach_hoa_don": danh_sach_hoa_don,
-            "tat_ca_ho_khau": tat_ca_ho_khau,
-        },
+        "period/FeeCollectionPeriodDetail.html", context
     )
 
 
@@ -210,11 +288,17 @@ def add_dotthu(request):
     if request.method == "POST":
         form = DotThuPhiForm(request.POST)
         if form.is_valid():
-            new_id = form.cleaned_data.get("id_dotthu")
-            if DotThuPhi.objects.filter(id_dotthu=new_id).exists():
-                return JsonResponse({"error": "Mã đợt thu phí này đã tồn tại!"}, status=400)
+            ngay_batdau = form.cleaned_data.get("ngay_batdau")
+            trang_thai = form.cleaned_data.get("trang_thai")
+            id_khoanthu = form.cleaned_data.get("id_khoanthu")
 
-            form.save()
+            # Kiểm tra trùng đợt thu phí (nếu cần, có thể cần sửa lại điều kiện cho phù hợp ManyToMany)
+            # if DotThuPhi.objects.filter(ngay_batdau=ngay_batdau, trang_thai=trang_thai, id_khoanthu__in=id_khoanthu).exists():
+            #     return JsonResponse({"error": "Đợt thu phí này đã tồn tại (trùng mã hoặc trùng ngày bắt đầu, trạng thái, khoản thu)!"}, status=400)
+
+            instance = form.save(commit=False)
+            instance.save()
+            form.save_m2m()
 
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success"})
@@ -222,7 +306,7 @@ def add_dotthu(request):
             return redirect("fee_collection_period")
     else:
         form = DotThuPhiForm()
-    return render(request, "core/AddPeriodModal.html", {"form": form})
+    return render(request, "period/AddPeriodModal.html", {"form": form})
 
 
 @login_required(login_url="login")
@@ -231,26 +315,47 @@ def edit_dotthu(request, pk):
     if request.method == "POST":
         form = DotThuPhiForm(request.POST, instance=dot_thu)
         if form.is_valid():
-            form.save()
+            ngay_batdau = form.cleaned_data.get("ngay_batdau")
+            trang_thai = form.cleaned_data.get("trang_thai")
+            id_khoanthu = form.cleaned_data.get("id_khoanthu")
+            # # Nếu chỉ cần trùng 1 khoản thu là báo lỗi:
+            # qs = DotThuPhi.objects.exclude(id_dotthu=pk).filter(
+            #     ngay_batdau=ngay_batdau, trang_thai=trang_thai, id_khoanthu__in=id_khoanthu
+            # )
+            # if qs.exists():
+            #     return JsonResponse({"error": "Đợt thu phí này đã tồn tại (trùng mã hoặc trùng ngày bắt đầu, trạng thái, khoản thu)!"}, status=400)
+
+            dot_thu = form.save(commit=False)
+            dot_thu.updated_at = timezone.now()
+            if request.user.is_authenticated:
+                dot_thu.updated_by = str(request.user)
+            dot_thu.save(update_fields=[
+                field for field in ["ten_dotthu", "ngay_batdau", "ngay_ketthuc", "trang_thai", "updated_at", "updated_by"] if hasattr(dot_thu, field)
+            ])
+            form.save_m2m()
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success"})
             return redirect("fee_collection_period")
         else:
-            return render(request, "core/EditPeriodModal.html", {"form": form, "dot_thu": dot_thu}, status=400)
+            return render(request, "period/EditPeriodModal.html", {"form": form, "dot_thu": dot_thu}, status=400)
 
     form = DotThuPhiForm(instance=dot_thu)
-    return render(request, "core/EditPeriodModal.html", {"form": form, "dot_thu": dot_thu})
+    return render(request, "period/EditPeriodModal.html", {"form": form, "dot_thu": dot_thu})
 
 
 @login_required(login_url="login")
 def delete_dotthu(request, pk):
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=pk)
     if request.method == "POST":
-        dot_thu.delete()
+        dot_thu.is_deleted = True
+        dot_thu.updated_at = timezone.now()
+        if request.user.is_authenticated:
+            dot_thu.updated_by = str(request.user)
+        dot_thu.save(update_fields=["is_deleted", "updated_at", "updated_by"])
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({"status": "success", "message": "Đợt thu phí đã được xóa thành công!"})
         return redirect("fee_collection_period")
-    return render(request, "core/DeletePeriodModal.html", {"dot_thu": dot_thu})
+    return render(request, "period/DeletePeriodModal.html", {"dot_thu": dot_thu})
 
 
 @login_required(login_url="login")
@@ -388,7 +493,7 @@ def invoice_history(request):
     selected_month = request.GET.get("month", "")
     selected_year = request.GET.get("year", "")
     invoice_list = HoaDon.objects.select_related(
-        "id_hokhau", "id_dotthu").all().order_by("-ngay_nop")
+        "id_hokhau", "id_dotthu").filter(is_deleted=False).order_by("-ngay_nop")
     if query:
         invoice_list = invoice_list.filter(
             Q(id_hoadon__icontains=query) | Q(id_hokhau__so_can_ho__icontains=query))
@@ -407,16 +512,22 @@ def invoice_history(request):
         "years": range(2020, datetime.now().year + 1),
         "months": range(1, 13),
     }
-    return render(request, "core/InvoiceHistory.html", context)
+    return render(request, "invoice/InvoiceHistory.html", context)
 
 
 @login_required(login_url="login")
 def view_invoice_detail_modal(request, pk):
     hoadon = get_object_or_404(
-        HoaDon.objects.select_related("id_hokhau", "id_dotthu__id_khoanthu"),
+        HoaDon.objects.select_related("id_hokhau", "id_dotthu"),
         id_hoadon=pk,
     )
-    return render(request, "core/ViewInvoiceDetailModal.html", {"hoadon": hoadon})
+    khoanthu_list = hoadon.id_dotthu.id_khoanthu.all()
+    hoadon_chitiet_list = hoadon.chi_tiets.all()
+    return render(request, "invoice/ViewInvoiceDetailModal.html", {
+        "hoadon": hoadon,
+        "khoanthu_list": khoanthu_list,
+        "hoadon_chitiet_list": hoadon_chitiet_list,
+    })
 
 
 @login_required(login_url="login")
@@ -425,7 +536,8 @@ def delete_invoice_modal(request, pk):
 
     if request.method == "POST":
         if hoadon.ngay_nop is None:
-            hoadon.delete()
+            hoadon.is_deleted = True
+            hoadon.save(update_fields=["is_deleted"])
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success", "message": f"Hóa đơn #{pk} đã được xóa thành công!"})
             return redirect("invoice_history")
@@ -433,4 +545,4 @@ def delete_invoice_modal(request, pk):
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "error", "message": "Không thể xóa hóa đơn đã thanh toán!"}, status=400)
             return redirect("invoice_history")
-    return render(request, "core/DeleteInvoiceModal.html", {"hoadon": hoadon})
+    return render(request, "invoice/DeleteInvoiceModal.html", {"hoadon": hoadon})

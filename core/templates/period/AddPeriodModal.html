@@ -24,7 +24,6 @@
           >*</span
         >{% endif %}
       </label>
-
       {{ field }} {% if field.errors %}
       <div class="field-error-message">
         {% for error in field.errors %}
@@ -52,3 +51,13 @@
     </div>
   </form>
 </div>
+<script>
+  $(function () {
+    $("#id_id_khoanthu").select2({
+      placeholder: "Chọn khoản thu",
+      allowClear: true,
+      width: "100%",
+      dropdownParent: $("#addPeriodFormContainer"),
+    });
+  });
+</script>

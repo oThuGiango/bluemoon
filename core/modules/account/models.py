@@ -46,6 +46,8 @@ class TaiKhoan(AbstractBaseUser, PermissionsMixin):
     is_deleted = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    updated_by = models.CharField(max_length=100, null=True, blank=True)
 
     objects = TaiKhoanManager()
     USERNAME_FIELD = "username"

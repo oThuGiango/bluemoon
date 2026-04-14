@@ -20,14 +20,16 @@ urlpatterns = [
          views.edit_dotthu, name="edit_dotthu"),
     path("fee_collection_period/delete/<int:pk>/",
          views.delete_dotthu, name="delete_dotthu"),
-    path("fee_collection_period/detail/<int:pk>/modal/",
-         views.view_dotthu_detail_modal, name="view_dotthu_detail_modal"),
+
+    path("fee_collection_period/detail/<int:pk>/",
+         views.fee_collection_period_detail, name="fee_collection_period_detail"),
 
     #     Hóa đơn
     path("update_payment_status/", views.update_payment_status,
          name="update_payment_status"),
     path("create_invoices/", views.create_invoices_for_period,
          name="create_invoices_for_period"),
+    
     path("statistics_view/", views.statistics_view, name="statistics_view"),
     path("statistics/export/", views.export_finance_excel,
          name="export_finance_excel"),

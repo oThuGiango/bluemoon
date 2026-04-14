@@ -329,7 +329,7 @@
 }
 
 .amount-positive {
-  color: #d32f2f; /* Màu đỏ cho số tiền cần thu */
+  color: #2f73d3; 
   font-weight: 700;
   font-family: "Montserrat", sans-serif;
 }
