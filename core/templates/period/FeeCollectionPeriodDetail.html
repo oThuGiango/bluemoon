@@ -14,10 +14,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-                      <th style="padding: 10px; text-align: center; width: 10%">Chọn</th>
-                      <th style="padding: 10px; text-align: center; width: 20%">Căn hộ</th>
-                      <th style="padding: 10px; text-align: center; width: 25%">Tổng số tiền phải đóng</th>
-                      <th style="padding: 10px; text-align: center; width: 45%">Chi tiết</th>
+  <body>
+    {% include 'core/Sidebar.html' %}  
     <main>
       {% include 'core/layout_header.html' %}
       <section class="main-content fee-collection-page">
@@ -246,12 +244,12 @@
                         Chọn
                       </th>
                       <th
-                        style="padding: 10px; text-align: center; width: 110px"
+                        style="padding: 10px; text-align: left; width: 110px"
                       >
                         Căn hộ
                       </th>
                       <th
-                        style="padding: 10px; text-align: center; width: 160px"
+                        style="padding: 10px; text-align: left; width: 160px"
                       >
                         Tổng số tiền phải đóng
                       </th>
@@ -389,20 +387,12 @@
                     {% for hoadon in danh_sach_hoa_don %}
                     <tr style="border-bottom: 1px solid #eee">
                       <td style="padding: 12px; text-align: center">
-                        <input
-                          type="checkbox"
-                          name="invoice_ids"
-                          value="{{ hoadon.id_hoadon }}"
-                          {%
-                          if
-                          hoadon.ngay_nop
-                          %}
-                          disabled
-                          checked
-                          {%
-                          endif
-                          %}
-                        />
+                          <input
+                            type="checkbox"
+                            name="invoice_ids"
+                            value="{{ hoadon.id_hoadon }}"
+                            {% if hoadon.ngay_nop %}disabled checked{% endif %}
+                          />
                       </td>
                       <td style="padding: 12px">
                         <strong>{{ hoadon.id_hokhau.so_can_ho }}</strong>

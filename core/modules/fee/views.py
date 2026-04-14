@@ -1,5 +1,5 @@
 import json
-from .models import DotThuPhi, HoaDon, KhoanThu
+from .models import DotThuPhi, HoaDon, KhoanThu, HoaDonChiTiet
 from core.modules.resident.models import HoKhau
 from core.forms import DotThuPhiForm, KhoanThuForm
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
@@ -32,7 +32,7 @@ def calculate_invoice(tat_ca_ho_khau, khoanthu_objs):
             else:
                 so_luong = 1
                 so_tien = float(kt.don_gia)
-                
+
             chi_tiet.append({
                 "id_khoanthu": kt.id_khoanthu,
                 "khoanthu": kt.ten_khoanthu,
@@ -185,7 +185,7 @@ def fee_collection_period(request):
 def fee_collection_period_detail(request, pk):
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=pk)
     danh_sach_hoa_don = dot_thu.hoa_dons.select_related(
-        "id_hokhau").all().order_by("id_hokhau__so_can_ho")
+        "id_hokhau").filter(is_deleted=False).order_by("id_hokhau__so_can_ho")
     ids_da_co = danh_sach_hoa_don.values_list("id_hokhau_id", flat=True)
     tat_ca_ho_khau = HoKhau.objects.exclude(id_hokhau__in=ids_da_co)
     khoanthu_objs = list(dot_thu.id_khoanthu.all())
@@ -217,8 +217,13 @@ def update_payment_status(request):
         return JsonResponse({"status": "error", "message": "Không có hóa đơn nào được chọn"}, status=400)
 
     try:
-        HoaDon.objects.filter(id_hoadon__in=invoice_ids, ngay_nop__isnull=True).update(
-            ngay_nop=timezone.now())
+        # Lấy các hóa đơn cần cập nhật
+        invoices = HoaDon.objects.filter(
+            id_hoadon__in=invoice_ids, ngay_nop__isnull=True)
+        for invoice in invoices:
+            invoice.ngay_nop = timezone.now()
+            invoice.da_dong = invoice.tong_tien
+            invoice.save(update_fields=["ngay_nop", "da_dong"])
         return JsonResponse({"status": "success", "message": "Cập nhật trạng thái thành công"})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
@@ -227,40 +232,54 @@ def update_payment_status(request):
 @login_required(login_url="login")
 def create_invoices_for_period(request):
     id_dotthu = request.POST.get("id_dotthu")
-    hokhau_ids = request.POST.getlist("hokhau_ids[]")
-    multipliers = request.POST.getlist("multipliers[]")
-    prices = request.POST.getlist("prices[]")
+    hokhau_data = json.loads(request.POST.get("hokhau_data"))
 
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=id_dotthu)
-    last_invoice = HoaDon.objects.all().order_by("id_hoadon").last()
-    next_id = (last_invoice.id_hoadon + 1) if last_invoice else 1
 
-    for hk_id, mult, price in zip(hokhau_ids, multipliers, prices):
-        hokhau = get_object_or_404(HoKhau, id_hokhau=hk_id)
+    for ho in hokhau_data:
+        id_hokhau = ho["id_hokhau"]
+        tong_tien = ho["tong"]
+        chi_tiet = ho.get("chi_tiet", [])
+        hokhau = HoKhau.objects.get(pk=id_hokhau)
+        hoadon, created = HoaDon.objects.get_or_create(
+            id_dotthu=dot_thu,
+            id_hokhau=hokhau,
+            defaults={"tong_tien": tong_tien},
+        )
 
-        if not HoaDon.objects.filter(id_dotthu=dot_thu, id_hokhau=hokhau).exists():
-            final_amount = float(price) * float(mult)
+        if not created and getattr(hoadon, "is_deleted", False):
+            hoadon.is_deleted = False
+            hoadon.save(update_fields=["is_deleted"])
 
-            HoaDon.objects.create(
-                id_hoadon=next_id,
-                id_dotthu=dot_thu,
-                id_hokhau=hokhau,
-                tong_tien=final_amount,
+        for ct in chi_tiet:
+            khoanthu = KhoanThu.objects.get(pk=ct["id_khoanthu"])
+
+            HoaDonChiTiet.objects.get_or_create(
+                hoadon=hoadon,
+                khoanthu=khoanthu,
+                defaults={
+                    "so_luong": ct["so_luong"],
+                    "thanh_tien": ct["so_tien"]
+                }
             )
-            next_id += 1
+
     danh_sach_hoa_don = dot_thu.hoa_dons.select_related(
         "id_hokhau").all().order_by("id_hokhau__so_can_ho")
     tat_ca_ho_khau = HoKhau.objects.exclude(
         id_hokhau__in=danh_sach_hoa_don.values_list("id_hokhau_id", flat=True))
 
+    context = {
+        "dot_thu": dot_thu,
+        "danh_sach_hoa_don": danh_sach_hoa_don,
+        "tat_ca_ho_khau": tat_ca_ho_khau,
+        # "khoanthu_list": khoanthu_list,
+        # "tong_tien_ho": tong_tien_ho,
+        # "tong_tien_dot": tong_tien_dot,
+    }
+
     return render(
         request,
-        "core/ViewPeriodDetailModal.html",
-        {
-            "dot_thu": dot_thu,
-            "danh_sach_hoa_don": danh_sach_hoa_don,
-            "tat_ca_ho_khau": tat_ca_ho_khau,
-        },
+        "period/FeeCollectionPeriodDetail.html", context
     )
 
 
@@ -474,7 +493,7 @@ def invoice_history(request):
     selected_month = request.GET.get("month", "")
     selected_year = request.GET.get("year", "")
     invoice_list = HoaDon.objects.select_related(
-        "id_hokhau", "id_dotthu").all().order_by("-ngay_nop")
+        "id_hokhau", "id_dotthu").filter(is_deleted=False).order_by("-ngay_nop")
     if query:
         invoice_list = invoice_list.filter(
             Q(id_hoadon__icontains=query) | Q(id_hokhau__so_can_ho__icontains=query))
@@ -493,16 +512,22 @@ def invoice_history(request):
         "years": range(2020, datetime.now().year + 1),
         "months": range(1, 13),
     }
-    return render(request, "core/InvoiceHistory.html", context)
+    return render(request, "invoice/InvoiceHistory.html", context)
 
 
 @login_required(login_url="login")
 def view_invoice_detail_modal(request, pk):
     hoadon = get_object_or_404(
-        HoaDon.objects.select_related("id_hokhau", "id_dotthu__id_khoanthu"),
+        HoaDon.objects.select_related("id_hokhau", "id_dotthu"),
         id_hoadon=pk,
     )
-    return render(request, "core/ViewInvoiceDetailModal.html", {"hoadon": hoadon})
+    khoanthu_list = hoadon.id_dotthu.id_khoanthu.all()
+    hoadon_chitiet_list = hoadon.chi_tiets.all()
+    return render(request, "invoice/ViewInvoiceDetailModal.html", {
+        "hoadon": hoadon,
+        "khoanthu_list": khoanthu_list,
+        "hoadon_chitiet_list": hoadon_chitiet_list,
+    })
 
 
 @login_required(login_url="login")
@@ -511,7 +536,8 @@ def delete_invoice_modal(request, pk):
 
     if request.method == "POST":
         if hoadon.ngay_nop is None:
-            hoadon.delete()
+            hoadon.is_deleted = True
+            hoadon.save(update_fields=["is_deleted"])
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "success", "message": f"Hóa đơn #{pk} đã được xóa thành công!"})
             return redirect("invoice_history")
@@ -519,4 +545,4 @@ def delete_invoice_modal(request, pk):
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 return JsonResponse({"status": "error", "message": "Không thể xóa hóa đơn đã thanh toán!"}, status=400)
             return redirect("invoice_history")
-    return render(request, "core/DeleteInvoiceModal.html", {"hoadon": hoadon})
+    return render(request, "invoice/DeleteInvoiceModal.html", {"hoadon": hoadon})

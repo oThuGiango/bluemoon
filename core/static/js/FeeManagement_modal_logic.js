@@ -203,19 +203,17 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log(pair[0] + ":", pair[1]);
     }
 
-    // fetch("/create_invoices/", {
-    //   method: "POST",
-    //   body: formData,
-    //   headers: { "X-Requested-With": "XMLHttpRequest" },
-    // })
-    //   .then((res) => res.text())
-    //   .then((html) => {
-    //     // Nạp lại nội dung Modal (Lúc này các hộ mới đã chuyển xuống bảng chờ thu)
-    //     modalContent.innerHTML = html;
-    //     attachModalListeners();
-    //     alert("Đã thêm hộ và tạo hóa đơn thành công!");
-    //   })
-    //   .catch((err) => alert("Lỗi hệ thống: " + err));
+    fetch("/create_invoices/", {
+      method: "POST",
+      body: formData,
+      headers: { "X-Requested-With": "XMLHttpRequest" },
+    })
+      .then((res) => res.text())
+      .then((html) => {
+        alert("Đã thêm hộ và tạo hóa đơn thành công!");
+        window.location.reload(); // F5 lại cả trang
+      })
+      .catch((err) => alert("Lỗi hệ thống: " + err));
   }
 
   function handleFormSubmission(e) {
@@ -253,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Xử lý xác nhận thanh toán (Cập nhật ngày nộp)
   function handleConfirmPayment() {
     const selectedIds = Array.from(
-      modalContent.querySelectorAll(
+      document.querySelectorAll(
         'input[name="invoice_ids"]:checked:not(:disabled)',
       ),
     ).map((cb) => cb.value);
@@ -267,7 +265,7 @@ document.addEventListener("DOMContentLoaded", function () {
       selectedIds.forEach((id) => formData.append("invoice_ids[]", id));
       formData.append(
         "csrfmiddlewaretoken",
-        modalContent.querySelector("[name=csrfmiddlewaretoken]").value,
+        document.querySelector("[name=csrfmiddlewaretoken]").value,
       );
 
       fetch("/update_payment_status/", {

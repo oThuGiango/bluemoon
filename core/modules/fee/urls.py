@@ -29,6 +29,7 @@ urlpatterns = [
          name="update_payment_status"),
     path("create_invoices/", views.create_invoices_for_period,
          name="create_invoices_for_period"),
+    
     path("statistics_view/", views.statistics_view, name="statistics_view"),
     path("statistics/export/", views.export_finance_excel,
          name="export_finance_excel"),
