@@ -17,9 +17,16 @@
     <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script></head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  </head>
   <body>
     {% include 'core/Sidebar.html' %}
     <main>
@@ -127,6 +134,7 @@
                   <td data-label="Tên Đợt Thu">{{ dot.ten_dotthu }}</td>
 
                   <td data-label="Thời gian">
+                    <!-- prettier-ignore -->
                     {{ dot.ngay_batdau|date:"d/m/Y" }} - 
                     {{ dot.ngay_ketthuc|date:"d/m/Y" }}
                   </td>
@@ -188,6 +196,6 @@
       <div class="modal-content"></div>
     </div>
 
-    <script src="{% static 'js/FeeManagement_modal_logic.js' %}"></script>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
   </body>
 </html>

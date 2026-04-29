@@ -1,4 +1,6 @@
 import json
+
+from core.decorators import role_required
 from .models import DotThuPhi, HoaDon, KhoanThu, HoaDonChiTiet
 from core.modules.resident.models import HoKhau
 from core.forms import DotThuPhiForm, KhoanThuForm
@@ -47,6 +49,7 @@ def calculate_invoice(tat_ca_ho_khau, khoanthu_objs):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def fee_management(request):
     query = request.GET.get("search_khoanthu")
     khoan_thu_list = KhoanThu.objects.filter(
@@ -69,6 +72,7 @@ def fee_management(request):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def view_khoanthu_detail_modal(request, pk):
     khoan_thu = get_object_or_404(KhoanThu, id_khoanthu=pk)
     if not request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -77,6 +81,7 @@ def view_khoanthu_detail_modal(request, pk):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def add_khoanthu(request):
     if request.method == "POST":
         form = KhoanThuForm(request.POST)
@@ -105,6 +110,7 @@ def add_khoanthu(request):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def edit_khoanthu(request, pk):
     khoan_thu = get_object_or_404(KhoanThu, id_khoanthu=pk)
 
@@ -144,6 +150,7 @@ def edit_khoanthu(request, pk):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def delete_khoanthu(request, pk):
     khoan_thu = get_object_or_404(KhoanThu, id_khoanthu=pk)
 
@@ -161,6 +168,7 @@ def delete_khoanthu(request, pk):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def fee_collection_period(request):
     query = request.GET.get("search_dotthu")
     dot_thu_phi_list = DotThuPhi.objects.prefetch_related(
@@ -170,7 +178,7 @@ def fee_collection_period(request):
     if query:
         dot_thu_phi_list = dot_thu_phi_list.filter(
             (Q(ten_dotthu__icontains=query) | Q(
-                id_dotthu__icontains=query)) & Q(is_deleted=False)
+                id_dotthu__icontains=query))
         )
     context = {
         "dot_thu_phi_list": dot_thu_phi_list,
@@ -182,6 +190,7 @@ def fee_collection_period(request):
 
 # Trang chi tiết đợt thu phí (page, không phải modal)
 @login_required(login_url="login")
+@role_required([3])
 def fee_collection_period_detail(request, pk):
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=pk)
     danh_sach_hoa_don = dot_thu.hoa_dons.select_related(
@@ -210,6 +219,7 @@ def fee_collection_period_detail(request, pk):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def update_payment_status(request):
     invoice_ids = request.POST.getlist("invoice_ids[]")
 
@@ -219,7 +229,7 @@ def update_payment_status(request):
     try:
         # Lấy các hóa đơn cần cập nhật
         invoices = HoaDon.objects.filter(
-            id_hoadon__in=invoice_ids, ngay_nop__isnull=True)
+            id_hoadon__in=invoice_ids, ngay_nop__isnull=True, is_deleted=False)
         for invoice in invoices:
             invoice.ngay_nop = timezone.now()
             invoice.da_dong = invoice.tong_tien
@@ -230,6 +240,7 @@ def update_payment_status(request):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def create_invoices_for_period(request):
     id_dotthu = request.POST.get("id_dotthu")
     hokhau_data = json.loads(request.POST.get("hokhau_data"))
@@ -284,6 +295,7 @@ def create_invoices_for_period(request):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def add_dotthu(request):
     if request.method == "POST":
         form = DotThuPhiForm(request.POST)
@@ -310,6 +322,7 @@ def add_dotthu(request):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def edit_dotthu(request, pk):
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=pk)
     if request.method == "POST":
@@ -344,6 +357,7 @@ def edit_dotthu(request, pk):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def delete_dotthu(request, pk):
     dot_thu = get_object_or_404(DotThuPhi, id_dotthu=pk)
     if request.method == "POST":
@@ -359,6 +373,7 @@ def delete_dotthu(request, pk):
 
 
 @login_required(login_url="login")
+@role_required([1, 3])
 def statistics_view(request):
     year_str = request.GET.get("year", str(datetime.now().year))
     try:
@@ -366,16 +381,23 @@ def statistics_view(request):
     except ValueError:
         year = datetime.now().year
 
-    phi_status = KhoanThu.objects.filter(dot_thuphi__hoa_dons__ngay_nop__year=year).annotate(
-        total_revenue=Sum("dot_thuphi__hoa_dons__tong_tien")
-    ).order_by("-total_revenue")[:5]
+    phi_status = KhoanThu.objects.filter(
+        dot_thuphi__hoa_dons__ngay_nop__year=year,
+        dot_thuphi__is_deleted=False,
+        dot_thuphi__hoa_dons__is_deleted=False
+    ).annotate(
+        total_revenue=Sum("dot_thuphi__hoa_dons__da_dong")
+    ).order_by("-total_revenue")[:7]
 
     pie_labels = [item.ten_khoanthu for item in phi_status]
     pie_data = [float(item.total_revenue) for item in phi_status]
 
-    monthly_income = HoaDon.objects.filter(ngay_nop__year=year).annotate(month=ExtractMonth("ngay_nop")).values(
+    monthly_income = HoaDon.objects.filter(
+        ngay_nop__year=year,
+        is_deleted=False
+    ).annotate(month=ExtractMonth("ngay_nop")).values(
         "month"
-    ).annotate(total=Sum("tong_tien")).order_by("month")
+    ).annotate(total=Sum("da_dong")).order_by("month")
 
     line_labels = ["T1", "T2", "T3", "T4", "T5",
                    "T6", "T7", "T8", "T9", "T10", "T11", "T12"]
@@ -384,16 +406,19 @@ def statistics_view(request):
         if item["month"]:
             line_data[item["month"] - 1] = float(item["total"])
 
-    tong_da_thu = HoaDon.objects.filter(ngay_nop__year=year).aggregate(
-        Sum("tong_tien"))["tong_tien__sum"] or 0
+    tong_da_thu = HoaDon.objects.filter(
+        ngay_nop__year=year,
+        is_deleted=False
+    ).aggregate(Sum("da_dong"))["da_dong__sum"] or 0
 
-    so_ho = HoKhau.objects.filter(is_active=True).count()
-    dot_thus = DotThuPhi.objects.filter(ngay_batdau__year=year)
-    tong_can_thu = 0
-    for dot in dot_thus:
-        tong_can_thu += float(dot.id_khoanthu.don_gia) * so_ho
+    dot_thus = DotThuPhi.objects.filter(
+        ngay_batdau__year=year, is_deleted=False)
+    tong_can_thu = HoaDon.objects.filter(
+        id_dotthu__in=dot_thus,
+        is_deleted=False
+    ).aggregate(Sum("tong_tien"))["tong_tien__sum"] or 0
 
-    phan_tram = round((float(tong_da_thu) / tong_can_thu)
+    phan_tram = round((float(tong_da_thu) / float(tong_can_thu))
                       * 100, 1) if tong_can_thu > 0 else 0
 
     context = {
@@ -405,6 +430,7 @@ def statistics_view(request):
         "tong_can_thu": tong_can_thu,
         "phan_tram": phan_tram,
         "selected_year": year,
+        "years": range(datetime.now().year - 1, datetime.now().year + 1),
     }
     return render(request, "core/Statistics.html", context)
 
@@ -432,53 +458,89 @@ def export_finance_excel(request):
     header_fill = PatternFill(start_color="1976D2",
                               end_color="1976D2", fill_type="solid")
 
-    ws.merge_cells("A1:C1")
+    ws.row_dimensions[1].height = 20
+    ws.merge_cells("A1:D1")
     ws["A1"] = f"BÁO CÁO TÀI CHÍNH NĂM {year} - CHUNG CƯ BLUEMOON"
     ws["A1"].font = Font(bold=True, size=14)
     ws["A1"].alignment = center_align
+    ws["A1"].alignment = Alignment(
+        horizontal="center", vertical="center", wrap_text=True)
 
-    headers = ["Tháng", "Số lượng hóa đơn", "Doanh thu thực tế (VND)"]
+    headers = ["Tháng", "Số hóa đơn đã thanh toán",
+               "Đã thanh toán (VND)", "Còn phải thu (VND)"]
     ws.append([])
     ws.append(headers)
 
     for cell in ws[3]:
         cell.font = bold_font
         cell.fill = header_fill
-        cell.alignment = center_align
-        cell.border = border
+        # cell.border = border
+        cell.alignment = Alignment(
+            horizontal="center", vertical="center", wrap_text=True)
 
-    monthly_data = (
-        HoaDon.objects.filter(ngay_nop__year=year)
-        .annotate(month=ExtractMonth("ngay_nop"))
-        .values("month")
-        .annotate(count=Count("id_hoadon"), total=Sum("tong_tien"))
-        .order_by("month")
+    all_invoices = HoaDon.objects.filter(
+        (
+            Q(id_dotthu__ngay_batdau__year=year) |
+            Q(id_dotthu__ngay_ketthuc__year=year)
+        ),
+        is_deleted=False
     )
+    paid_invoices = HoaDon.objects.filter(
+        ngay_nop__year=year,
+        is_deleted=False
+    )
+    # Nếu user là cư dân
+    if hasattr(request.user, 'id_vaitro') and getattr(request.user, 'id_vaitro', None) == 2:
+        all_invoices = all_invoices.filter(id_taikhoan=request.user.id)
+        paid_invoices = paid_invoices.filter(id_taikhoan=request.user.id)
 
+    # Group by month
     total_year_money = 0
+    remaining_year_money = 0
     for m in range(1, 13):
-        data = next(
-            (item for item in monthly_data if item["month"] == m), None)
-        count = data["count"] if data else 0
-        money = float(data["total"]) if data else 0
-        total_year_money += money
+        # Tổng số hóa đơn đã thanh toán
+        count = all_invoices.filter(
+            ngay_nop__month=m, ngay_nop__year=year).count()
 
-        ws.append([f"Tháng {m}", count, money])
-        for cell in ws[ws.max_row]:
-            cell.border = border
-            cell.alignment = Alignment(horizontal="right") if isinstance(
-                cell.value, (int, float)) else center_align
+        # Tổng số tiền phải thu
+        total = all_invoices.filter(
+            Q(id_dotthu__ngay_batdau__month=m) |
+            Q(id_dotthu__ngay_ketthuc__month=m)
+        ).aggregate(
+            Sum("tong_tien"))["tong_tien__sum"] or 0
 
-    ws.append(["TỔNG CỘNG", "", total_year_money])
+        # Tổng số tiền đã thanh toán
+        paid = paid_invoices.filter(ngay_nop__month=m).aggregate(
+            Sum("da_dong"))["da_dong__sum"] or 0
+        total_year_money += paid
+
+        remain = total - paid
+        remaining_year_money += remain
+
+        ws.append([f"Tháng {m}", count, paid, remain])
+
+    for idx, cell in enumerate(ws[ws.max_row], start=1):
+        if idx == 1:
+            cell.alignment = Alignment(horizontal="left")
+        else:
+            cell.alignment = Alignment(horizontal="right")
+
+    ws.append(["Tổng", "", total_year_money, remaining_year_money])
+
     last_row = ws.max_row
     ws.cell(row=last_row, column=1).font = Font(bold=True)
     ws.cell(row=last_row, column=3).font = Font(bold=True)
-    for cell in ws[last_row]:
-        cell.border = border
+    ws.cell(row=last_row, column=4).font = Font(bold=True)
 
     ws.column_dimensions["A"].width = 15
-    ws.column_dimensions["B"].width = 20
-    ws.column_dimensions["C"].width = 25
+    ws.column_dimensions["B"].width = 14
+    ws.column_dimensions["C"].width = 17
+    ws.column_dimensions["D"].width = 27
+
+    number_format = '#,##0'
+    for row in ws.iter_rows(min_row=4, max_row=ws.max_row, min_col=2, max_col=4):
+        for cell in row:
+            cell.number_format = number_format
 
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
@@ -492,11 +554,28 @@ def invoice_history(request):
     query = request.GET.get("search_invoice", "")
     selected_month = request.GET.get("month", "")
     selected_year = request.GET.get("year", "")
+    dotthu_name = request.GET.get("dotthu_name", "")
+    # "1" (đã đóng), "0" (chưa đóng), "" (tất cả)
+    da_dong = request.GET.get("da_dong", "")
+
     invoice_list = HoaDon.objects.select_related(
         "id_hokhau", "id_dotthu").filter(is_deleted=False).order_by("-ngay_nop")
+
+    # Nếu user là cư dân (id_vaitro == 2)
+    if hasattr(request.user, 'id_vaitro') and getattr(request.user, 'id_vaitro', None) == 2:
+        invoice_list = invoice_list.filter(id_taikhoan=request.user.id)
+
     if query:
         invoice_list = invoice_list.filter(
-            Q(id_hoadon__icontains=query) | Q(id_hokhau__so_can_ho__icontains=query))
+            Q(id_hoadon__icontains=query) |
+            Q(id_hokhau__so_can_ho__icontains=query) |
+            Q(id_dotthu__ten_dotthu__icontains=query)
+        )
+
+    if da_dong == "1":
+        invoice_list = invoice_list.filter(da_dong__gt=0)
+    elif da_dong == "0":
+        invoice_list = invoice_list.filter(da_dong=0)
 
     if selected_month:
         invoice_list = invoice_list.annotate(
@@ -504,12 +583,15 @@ def invoice_history(request):
     if selected_year:
         invoice_list = invoice_list.annotate(
             year=ExtractYear("ngay_nop")).filter(year=selected_year)
+
     context = {
         "invoice_list": invoice_list,
         "query": query,
         "selected_month": selected_month,
         "selected_year": selected_year,
-        "years": range(2020, datetime.now().year + 1),
+        "dotthu_name": dotthu_name,
+        "da_dong": da_dong,
+        "years": range(2025, datetime.now().year + 1),
         "months": range(1, 13),
     }
     return render(request, "invoice/InvoiceHistory.html", context)
@@ -521,6 +603,10 @@ def view_invoice_detail_modal(request, pk):
         HoaDon.objects.select_related("id_hokhau", "id_dotthu"),
         id_hoadon=pk,
     )
+    # Nếu user là cư dân (id_vaitro == 2)
+    if hasattr(request.user, 'id_vaitro') and getattr(request.user, 'id_vaitro', None) == 2:
+        if getattr(hoadon, 'id_taikhoan_id', None) != request.user.id:
+            return render(request, "core/message.html", {"error": "Bạn không có quyền xem hóa đơn này."})
     khoanthu_list = hoadon.id_dotthu.id_khoanthu.all()
     hoadon_chitiet_list = hoadon.chi_tiets.all()
     return render(request, "invoice/ViewInvoiceDetailModal.html", {
@@ -531,6 +617,7 @@ def view_invoice_detail_modal(request, pk):
 
 
 @login_required(login_url="login")
+@role_required([3])
 def delete_invoice_modal(request, pk):
     hoadon = get_object_or_404(HoaDon, id_hoadon=pk)
 

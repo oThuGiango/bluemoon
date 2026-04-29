@@ -144,3 +144,4 @@ BlueMoonProject/ (Thư mục gốc)
 ---
 
 ## 👥 Tác giả
+Có sự tham gia của Github Copilot and ChatGPT ^^

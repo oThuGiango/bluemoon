@@ -48,6 +48,8 @@ class TaiKhoan(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     updated_by = models.CharField(max_length=100, null=True, blank=True)
+    create_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    create_by = models.CharField(max_length=100, null=True, blank=True)
 
     objects = TaiKhoanManager()
     USERNAME_FIELD = "username"

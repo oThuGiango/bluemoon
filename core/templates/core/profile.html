@@ -125,9 +125,11 @@
                     ></i>
                     Chức vụ:</span
                   >
-                  <span style="font-weight: 500"
-                    >{{ user.vaitro.ten_vaitro }} (Mã: {{ user.vaitro_id
-                    }})</span
+                  <span 
+                    >{{ user.vaitro.ten_vaitro }} 
+                    {% if user.vaitro_id %}{{ user.vaitro_id }}
+                    {% else %}SuperAdmin{% endif %}
+                  </span
                   >
                 </div>
                 <div
@@ -144,7 +146,7 @@
                     ></i>
                     Ngày tham gia:</span
                   >
-                  <span>{{ user.date_joined|date:"d/m/Y"|default:"---" }}</span>
+                  <span>{{ user.create_at|date:"d/m/Y"|default:"---" }}</span>
                 </div>
               </div>
             </div>

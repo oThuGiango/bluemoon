@@ -85,12 +85,11 @@
       .circle-wrap {
         width: 130px;
         height: 130px;
-        background: #e0e0e0;
         border-radius: 50%;
         display: inline-block;
         position: relative;
-        /* Conic gradient for progress */
-        /* background: conic-gradient(var(--primary) {{phan_tram}}%, #edf2f7 0); */
+        background: #e0e0e0;
+        /* background sẽ được set inline để nhận giá trị động */
       }
 
       .circle-wrap::after {
@@ -177,42 +176,15 @@
                 class="form-select"
                 onchange="this.form.submit()"
               >
-                <option
-                  value="2024"
-                  {%
-                  if
-                  selected_year=""
-                  ="2024"
-                  %}selected{%
-                  endif
-                  %}
-                >
-                  Năm 2024
+                {% for y in years %}
+                <!-- prettier-ignore -->
+                <option value="{{ y }}" 
+                  {% if y == selected_year %}
+                    selected
+                  {% endif %}>
+                  Năm {{ y }}
                 </option>
-                <option
-                  value="2025"
-                  {%
-                  if
-                  selected_year=""
-                  ="2025"
-                  %}selected{%
-                  endif
-                  %}
-                >
-                  Năm 2025
-                </option>
-                <option
-                  value="2026"
-                  {%
-                  if
-                  selected_year=""
-                  ="2026"
-                  %}selected{%
-                  endif
-                  %}
-                >
-                  Năm 2026
-                </option>
+                {% endfor %}
               </select>
             </form>
 
@@ -220,8 +192,8 @@
               href="{% url 'export_finance_excel' %}?year={{ selected_year }}"
               class="btn-excel"
             >
-              <i class="fa-solid fa-file-excel"></i> Xuất Báo Cáo {{
-              selected_year }}
+              <i class="fa-solid fa-file-excel"></i> Xuất Báo Cáo
+              {{selected_year }}
             </a>
           </div>
         </div>
@@ -229,30 +201,30 @@
         <div class="dashboard-grid">
           <div class="stat-card">
             <div class="card-header">
-              <i
-                class="fa-solid fa-chart-pie"
-                style="color: var(--primary)"
-              ></i>
-              Tiến độ thu ngân sách năm {{ selected_year }}
+              <i class="fa-solid fa-chart-pie" style="color: var(--purple)"></i>
+              Tổng quan năm {{ selected_year }}
             </div>
             <div class="progress-box">
-              <div class="circle-wrap">
+              <div
+                class="circle-wrap"
+                style="background: conic-gradient(var(--primary) {{ phan_tram }}%, #e0e0e0 0);"
+              >
                 <span class="circle-percent">{{ phan_tram }}%</span>
               </div>
               <div class="info-list">
                 <div style="margin-bottom: 15px">
                   <small style="color: #888; display: block"
-                    >Đã thu thực tế</small
+                    >Đã thanh toán</small
                   >
                   <strong style="font-size: 1.3rem; color: var(--success)"
                     >{{ tong_da_thu|floatformat:0|intcomma }}đ</strong
                   >
                 </div>
                 <div>
-                  <small style="color: #888; display: block"
-                    >Mục tiêu dự kiến</small
+                  <small style="color: #888; display: block; margin-bottom: 4px"
+                    >Tổng phí</small
                   >
-                  <strong style="font-size: 1.1rem; color: #333"
+                  <strong style="font-size: 1rem; color: #434344"
                     >{{ tong_can_thu|floatformat:0|intcomma }}đ</strong
                   >
                 </div>
@@ -266,7 +238,7 @@
                 class="fa-solid fa-layer-group"
                 style="color: var(--warning)"
               ></i>
-              Cơ cấu nguồn thu (Top 5 phí)
+              Cơ cấu các loại phí chính
             </div>
             <div class="chart-container" style="height: 200px">
               <canvas id="feeTypeChart"></canvas>
@@ -276,8 +248,8 @@
 
         <div class="stat-card" style="margin-bottom: 50px">
           <div class="card-header">
-            <i class="fa-solid fa-chart-line" style="color: var(--primary)"></i>
-            Biến động doanh thu thực tế theo 12 tháng
+            <i class="fa-solid fa-chart-line" style="color: var(--success)"></i>
+            Số tiền đã thanh toán trong 12 tháng
           </div>
           <div class="chart-container">
             <canvas id="monthlyTrendChart"></canvas>
@@ -285,9 +257,7 @@
         </div>
       </div>
 
-      <footer>
-        &copy; BlueMoon Apartment 2026.
-      </footer>
+      <footer>&copy; BlueMoon Apartment 2026.</footer>
     </main>
 
     <script>

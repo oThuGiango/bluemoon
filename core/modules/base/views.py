@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
+from core.decorators import role_required
 from core.modules.resident.models import HoKhau
 
 
@@ -69,12 +70,14 @@ def login_view(request):
 
 
 @login_required(login_url="login")
+@role_required([1])
 def admin_home(request):
     ho_khaus = HoKhau.objects.all()
     return render(request, "core/admin_home.html", {"admin_home": ho_khaus})
 
 
 @login_required(login_url="login")
+@role_required([3])
 def accountant_home(request):
     return render(request, "core/Accountant.html")
 
