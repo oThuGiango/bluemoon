@@ -1,0 +1,101 @@
+{% load static %} {% load humanize %}
+<div class="form-container detail-container">
+  <h2 class="modal-title">
+    THÔNG TIN TÀI KHOẢN <span class="title-icon">🔍</span>
+  </h2>
+
+  <div
+    class="summary-details"
+    style="background: var(--gray-bg); padding: 25px; border-radius: 12px"
+  >
+    <div
+      class="detail-item"
+      style="
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #dee2e6;
+      "
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-hashtag" style="width: 25px"></i> ID Tài
+        khoản:</span
+      >
+      <span class="invoice-id">#{{ taikhoan.id_taikhoan }}</span>
+    </div>
+    <div
+      class="detail-item"
+      style="
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #dee2e6;
+      "
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-user" style="width: 25px"></i> Tên đăng
+        nhập:</span
+      >
+      <span>{{ taikhoan.username }}</span>
+    </div>
+    <div
+      class="detail-item"
+      style="
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #dee2e6;
+      "
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-shield-halved" style="width: 25px"></i> Vai
+        trò:</span
+      >
+      <span
+        class="badge-paid"
+        style="
+          background: #e3f2fd !important;
+          color: #1976d2 !important;
+          border: 1px solid #bbdefb;
+        "
+      >
+        <!-- prettier-ignore -->
+        {% if taikhoan.vaitro %}{{ taikhoan.vaitro.ten_vaitro }} {% else %}
+        SuperUser{% endif %}
+      </span>
+    </div>
+    <div
+      class="detail-item"
+      style="display: flex; justify-content: space-between; padding: 12px 0"
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-key" style="width: 25px"></i> Mật khẩu:</span
+      >
+      <span style="color: #999">******** (Đã mã hóa)</span>
+    </div>
+  </div>
+
+  <div
+    class="form-actions"
+    style="margin-top: 30px; display: flex; justify-content: center; gap: 15px"
+  >
+    <a
+      href="{% url 'accountmanage' %}"
+      class="btn btn-secondary-outline"
+      style="text-decoration: none"
+    >
+      <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </a>
+    <a
+      href="{% url 'edit_taikhoan' taikhoan.id_taikhoan %}"
+      class="btn btn-primary"
+      style="
+        text-decoration: none;
+        background-color: #ff9800;
+        border-color: #ff9800;
+      "
+    >
+      <i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa
+    </a>
+  </div>
+</div>

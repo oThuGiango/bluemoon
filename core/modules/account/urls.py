@@ -10,7 +10,7 @@ urlpatterns = [
          views.accountmanage_addaccount, name="addaccount"),
     path("accountmanage/change/<int:id_taikhoan>/",
          views.edit_taikhoan, name="edit_taikhoan"),
-    path("accountmanage/view/<int:id_taikhoan>/",
+    path("accountmanage/detail/<int:pk>/modal/",
          views.view_taikhoan, name="view_taikhoan"),
     path("accountmanage/delete/<int:id_taikhoan>/",
          views.accountmanage_delete, name="accountmanage_delete"),

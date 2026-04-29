@@ -1,9 +1,9 @@
-{% load static %}
+{% load static %} {% load humanize %}
 <!doctype html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Quản lý tài khoản - BlueMoon</title>
+    <title>Quản lý tài khoản - Chung cư BlueMoon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
@@ -14,6 +14,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
   </head>
   <body>
     {% include 'core/Sidebar.html' %}
@@ -47,6 +48,16 @@
             </form>
           </div>
 
+          <div class="income-actions-bottom income-actions-top-left">
+            <a
+              href="{% url 'addaccount' %}"
+              class="btn btn-create-new"
+              style="text-decoration: none"
+            >
+              <i class="fa-solid fa-user-plus"></i> Thêm tài khoản mới
+            </a>
+          </div>
+
           <h2 class="table-title">DANH SÁCH TÀI KHOẢN HỆ THỐNG</h2>
 
           <div class="table-responsive">
@@ -62,26 +73,28 @@
               <tbody>
                 {% for tk in tai_khoan_list %}
                 <tr>
-                  <td data-label="ID">
-                    <strong>#{{ tk.id_taikhoan }}</strong>
-                  </td>
+                  <td data-label="ID">#{{ tk.id_taikhoan }}</td>
                   <td data-label="Username">{{ tk.username }}</td>
                   <td data-label="Vai trò">
+                    <!-- prettier-ignore -->
                     <span
-                      class="status {% if tk.vaitro.id_vaitro == 1 %}status-active{% else %}status-inactive{% endif %}"
+                      class="status 
+                      {% if tk.vaitro.id_vaitro == 1 %}status-active
+                      {% elif tk.vaitro.id_vaitro == 2 %}status-normal
+                      {% else %}{% endif %}"
                     >
-                      {{ tk.vaitro }}
+                      {% if tk.vaitro %}{{ tk.vaitro }} 
+                      {% else %} SuperUser{% endif %}
                     </span>
                   </td>
                   <td data-label="Thao tác">
-                    <a
-                      href="{% url 'view_taikhoan' tk.id_taikhoan %}"
-                      class="action-btn"
-                      title="Xem chi tiết"
-                      style="background: #e3f2fd; color: #1976d2"
+                    <button
+                      data-url="{% url 'view_taikhoan' pk=tk.id_taikhoan %}"
+                      class="action-btn view-detail modal-trigger"
+                      title="Chi tiết"
                     >
                       <i class="fa-solid fa-eye"></i>
-                    </a>
+                    </button>
                     <a
                       href="{% url 'edit_taikhoan' tk.id_taikhoan %}"
                       class="action-btn"
@@ -110,18 +123,12 @@
               </tbody>
             </table>
           </div>
-
-          <div class="income-actions-bottom">
-            <a
-              href="{% url 'addaccount' %}"
-              class="btn btn-create-new"
-              style="text-decoration: none"
-            >
-              <i class="fa-solid fa-user-plus"></i> Thêm tài khoản mới
-            </a>
-          </div>
         </div>
       </section>
     </main>
+    <div id="mainModal" class="modal">
+      <div class="modal-content"></div>
+    </div>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
   </body>
 </html>

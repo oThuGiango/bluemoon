@@ -205,6 +205,10 @@
   background-color: #fff1f0;
   color: #ff4d4f;
 }
+.status-normal {
+  background-color: #90d3e9;
+  color: #160aa2;
+}
 
 /* Action Button */
 .action-btn {
