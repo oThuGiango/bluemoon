@@ -1,9 +1,41 @@
 from django import forms
 
+from core.modules.account.models import TaiKhoan
+
 from .models import KhoanThu
 from .models import DotThuPhi
+from .models import VaiTro
 
 from datetime import datetime
+
+
+class TaiKhoanForm(forms.Form):
+    username = forms.CharField(max_length=150, required=True)
+    password1 = forms.CharField(
+        widget=forms.PasswordInput, required=True, label="Mật khẩu")
+    password2 = forms.CharField(
+        widget=forms.PasswordInput, required=True, label="Xác nhận mật khẩu")
+    vaitro = forms.ChoiceField(
+        choices=[(1, 'Ban Quản lý'), (2, 'Cư dân'), (3, 'Kế toán')],
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True,
+        label='Vai trò'
+    )
+
+
+class TaiKhoanEditForm(forms.ModelForm):
+
+    class Meta:
+        model = TaiKhoan
+        fields = ['username', 'vaitro']
+        labels = {
+            'username': 'Tên tài khoản',
+            'vaitro': 'Vai trò',
+        }
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập tên tài khoản'}),
+            'vaitro': forms.Select(attrs={'class': 'form-control', 'required': 'required'}),
+        }
 
 
 class ReservationForm(forms.Form):

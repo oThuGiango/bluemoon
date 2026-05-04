@@ -34,9 +34,37 @@
 
       <section class="main-content fee-collection-page">
         <div class="main-panel data-table-panel" id="income-container">
-          {% if messages %} {% for message in messages %}
-          <div class="message-container {{ message.tags }}">{{ message }}</div>
-          {% endfor %} {% endif %}
+          <!-- prettier-ignore -->
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'success' %}
+          <div
+            class="message-container success"
+            style="
+              background-color: #e6f7d9;
+              color: #52c41a;
+              border: 1px solid #b7eb8f;
+              margin: auto;
+            "
+          >
+            {{ message }}
+          </div>
+          {% elif message.tags == 'error' %}
+          <div
+            class="message-container error-alert"
+            style="
+              background-color: #fff1f0;
+              color: #ff4d4f;
+              border: 1px solid #ffa39e;
+              margin: auto;
+            "
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
+          </div>
+          <!-- prettier-ignore -->
+          {% endif %}
+          {% endfor %}
+          {% endif %}
 
           <div class="income-controls-top">
             <form

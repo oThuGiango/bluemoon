@@ -22,9 +22,9 @@
 ### 3. Quản lý Tài khoản
 
 - Xem danh sách các tài khoản trong hệ thống (`accountmanage`).
-- Thêm một tài khoản mới (username, password) và gán vai trò cho họ (`accountmanage_addaccount`).
-- Xem thông tin chi tiết của một tài khoản (`view_taikhoan`).
-- Chỉnh sửa thông tin tài khoản (cập nhật username, password, vai trò) (`edit_taikhoan`).
+- Thêm một tài khoản mới (username, password) và gán vai trò cho họ (`add_account`).
+- Xem thông tin chi tiết của một tài khoản (`view_account`).
+- Chỉnh sửa thông tin tài khoản (cập nhật username, password, vai trò) (`edit_account`).
 
 ### 4. Chức năng chung
 
@@ -144,4 +144,5 @@ BlueMoonProject/ (Thư mục gốc)
 ---
 
 ## 👥 Tác giả
+
 Có sự tham gia của Github Copilot and ChatGPT ^^

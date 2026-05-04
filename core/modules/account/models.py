@@ -22,13 +22,14 @@ class TaiKhoanManager(BaseUserManager):
 class VaiTro(models.Model):
     id_vaitro = models.AutoField(primary_key=True)
     ten_vaitro = models.CharField(max_length=50)
+    display = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         managed = True
         db_table = "vaitro"
 
     def __str__(self):
-        return self.ten_vaitro
+        return self.display
 
 
 class TaiKhoan(AbstractBaseUser, PermissionsMixin):

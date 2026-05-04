@@ -196,18 +196,20 @@
   font-size: 0.9em;
   font-weight: 600;
   white-space: nowrap;
+  background-color: #d3f4fd;
+  color: #3344ae;
 }
 .status-active {
-  background-color: #e6f7d9;
-  color: #52c41a;
+  background-color: #eaffda;
+  color: #3e8b18;
 }
 .status-inactive {
   background-color: #fff1f0;
   color: #ff4d4f;
 }
 .status-normal {
-  background-color: #90d3e9;
-  color: #160aa2;
+  background-color: #fafbcc;
+  color: #1b1d7f;
 }
 
 /* Action Button */

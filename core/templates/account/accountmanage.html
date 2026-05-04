@@ -23,13 +23,45 @@
 
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel">
+          <!-- prettier-ignore -->
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'success' %}
+          <div
+            class="message-container success"
+            style="
+              background-color: #e6f7d9;
+              color: #52c41a;
+              border: 1px solid #b7eb8f;
+              margin: auto;
+            "
+          >
+            {{ message }}
+          </div>
+          {% elif message.tags == 'error' %}
+          <div
+            class="message-container error-alert"
+            style="
+              background-color: #fff1f0;
+              color: #ff4d4f;
+              border: 1px solid #ffa39e;
+              margin: auto;
+            "
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
+          </div>
+          <!-- prettier-ignore -->
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+          
           <div class="income-controls-top">
             <form
               method="GET"
               action="{% url 'accountmanage' %}"
-              style="display: flex; gap: 10px; flex-grow: 1"
+              class="filter-group"
             >
-              <div class="search-box-container" style="flex-grow: 1">
+              <div class="search-box-container">
                 <input
                   type="text"
                   name="search_id"
@@ -45,17 +77,58 @@
               >
                 <i class="fa-solid fa-filter"></i> Tìm kiếm
               </button>
+
+              <select
+                name="status"
+                class="filter-select"
+                onchange="this.form.submit()"
+              >
+                <option value="">-- Trạng thái --</option>
+                <option value="1" {% if status == '1' %}selected{% endif %}>
+                  Đang hoạt động
+                </option>
+                <option value="0" {% if status == '0' %}selected{% endif %}>
+                  Dừng hoạt động
+                </option>
+              </select>
+
+              <select
+                name="role"
+                class="filter-select"
+                onchange="this.form.submit()"
+              >
+                <option value="">-- Vai trò --</option>
+                <option value="1" {% if role == "1" %}selected{% endif %}>
+                  BQL
+                </option>
+                <option value="0" {% if role == "2" %}selected{% endif %}>
+                  Cư dân
+                </option>
+                <option value="0" {% if role == "3" %}selected{% endif %}>
+                  Kế toán
+                </option>
+              </select>
+
+              {% if query or status or role%}
+              <a
+                href="{% url 'accountmanage' %}"
+                class="action-btn"
+                title="Xóa lọc"
+                style="background: #f5f5f5; color: #333"
+              >
+                <i class="fa-solid fa-rotate-right"></i>
+              </a>
+              {% endif %}
             </form>
           </div>
 
           <div class="income-actions-bottom income-actions-top-left">
-            <a
-              href="{% url 'addaccount' %}"
-              class="btn btn-create-new"
-              style="text-decoration: none"
+            <button
+              data-url="{% url 'add_account' %}"
+              class="btn btn-create-new btn-create-compact modal-trigger"
             >
               <i class="fa-solid fa-user-plus"></i> Thêm tài khoản mới
-            </a>
+            </button>
           </div>
 
           <h2 class="table-title">DANH SÁCH TÀI KHOẢN HỆ THỐNG</h2>
@@ -67,6 +140,7 @@
                   <th>ID</th>
                   <th>Tên đăng nhập</th>
                   <th>Vai trò</th>
+                  <th style="text-align: center">Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -83,34 +157,57 @@
                       {% elif tk.vaitro.id_vaitro == 2 %}status-normal
                       {% else %}{% endif %}"
                     >
-                      {% if tk.vaitro %}{{ tk.vaitro }} 
+                      {% if tk.vaitro %}{{ tk.vaitro.display }} 
                       {% else %} SuperUser{% endif %}
                     </span>
                   </td>
+                  <td data-label="Trạng thái" style="text-align: center">
+                    {% if tk.is_active %}
+                    <span
+                      style="
+                        display: inline-block;
+                        width: 14px;
+                        height: 14px;
+                        border-radius: 50%;
+                        background: #52c41a;
+                        border: 1.5px solid #e6f7d9;
+                      "
+                    ></span>
+                    {% else %}
+                    <span
+                      style="
+                        display: inline-block;
+                        width: 14px;
+                        height: 14px;
+                        border-radius: 50%;
+                        background: #bdbdbd;
+                        border: 1.5px solid #eee;
+                      "
+                    ></span>
+                    {% endif %}
+                  </td>
                   <td data-label="Thao tác">
                     <button
-                      data-url="{% url 'view_taikhoan' pk=tk.id_taikhoan %}"
+                      data-url="{% url 'view_account' pk=tk.id_taikhoan %}"
                       class="action-btn view-detail modal-trigger"
                       title="Chi tiết"
                     >
                       <i class="fa-solid fa-eye"></i>
                     </button>
-                    <a
-                      href="{% url 'edit_taikhoan' tk.id_taikhoan %}"
-                      class="action-btn"
+                    <button
+                      data-url="{% url 'edit_account' tk.id_taikhoan %}"
+                      class="action-btn modal-trigger"
                       title="Chỉnh sửa"
-                      style="background: #fff3e0; color: #ff9800"
                     >
                       <i class="fa-solid fa-pen"></i>
-                    </a>
-                    <a
-                      href="{% url 'accountmanage_delete' tk.id_taikhoan %}"
-                      class="action-btn"
+                    </button>
+                    <button
+                      data-url="{% url 'delete_account' tk.id_taikhoan %}"
+                      class="action-btn modal-trigger"
                       title="Xóa"
-                      style="background: #fff1f0; color: #ff4d4f"
                     >
                       <i class="fa-solid fa-trash"></i>
-                    </a>
+                    </button>
                   </td>
                 </tr>
                 {% empty %}
