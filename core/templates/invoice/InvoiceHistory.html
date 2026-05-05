@@ -23,14 +23,14 @@
                 
                 <div class="income-controls-top">
                     <div>
-                        <h2 style="margin-bottom: 5px;"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử thu phí</h2>
+                        <h1 style="margin-bottom: 5px; color: #2f73d3;"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử thu phí</h1>
                         <p style="color: #666; font-size: 0.95em;">Tra cứu hóa đơn cư dân theo thời gian và trạng thái</p>
                     </div>
                     
                     <form method="GET" action="{% url 'invoice_history' %}" class="filter-group">
                         <div class="search-box-container">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" name="search_invoice" placeholder="Số căn hộ hoặc mã HĐ..." value="{{ query }}">
+                            <input type="text" name="search_invoice" placeholder="Đọt thu phí, Số căn hộ hoặc mã HĐ..." value="{{ query }}">
                         </div>
 
                         <select name="month" class="filter-select" onchange="this.form.submit()">
@@ -46,8 +46,14 @@
                                 <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>Năm {{ y }}</option>
                             {% endfor %}
                         </select>
+
+                        <select name="da_dong" class="filter-select" onchange="this.form.submit()">
+                            <option value="">-- Trạng thái --</option>
+                            <option value="1" {% if da_dong == "1" %}selected{% endif %}>Đã đóng</option>
+                            <option value="0" {% if da_dong == "0" %}selected{% endif %}>Chưa đóng</option>
+                        </select>
                         
-                        {% if query or selected_month or selected_year %}
+                        {% if query or selected_month or selected_year or da_dong%}
                             <a href="{% url 'invoice_history' %}" class="action-btn" title="Xóa lọc" style="background:#f5f5f5; color:#333;">
                                 <i class="fa-solid fa-rotate-right"></i>
                             </a>
@@ -128,6 +134,6 @@
     <div id="mainModal" class="modal">
         <div class="modal-content">
         </div>
-    <script src="{% static 'js/FeeManagement_modal_logic.js' %}"></script>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
 </body>
 </html>

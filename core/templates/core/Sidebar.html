@@ -29,8 +29,8 @@
     {% endif %} 
     
     {% if user.is_superuser or user.vaitro.id_vaitro == 1 %}
-    {% comment %}
     <ul id="menu-accountmanage">
+    {% comment %}
       <li>
         <a href="/hrmanage"
           ><i class="fa-solid fa-people-roof"></i
@@ -43,21 +43,23 @@
           ><span>Quản lý nhân khẩu</span></a
         >
       </li>
+      {% endcomment %}
       <li>
         <a href="/accountmanage"
           ><i class="fa-solid fa-user-gear"></i
           ><span>Quản lý tài khoản</span></a
         >
       </li>
+      {% comment %}
       <li>
         <a href="/demomanage/biendongnhankhau"
           ><i class="fa-solid fa-people-arrows"></i
           ><span>Biến động nhân khẩu</span></a
         >
       </li>
+    {% endcomment %}
     </ul>
     <!-- prettier-ignore -->
-    {% endcomment %}
     {% endif %} 
     
 
@@ -75,14 +77,12 @@
           ><span>Quản lý kỳ thu</span></a
         >
       </li>
-      {% comment %}
       <li>
         <a href="/statistics_view"
           ><i class="fa-solid fa-magnifying-glass"></i
           ><span>Tra cứu và Thống kê</span></a
         >
       </li>
-      {% endcomment %}
       <li>
         <a href="/invoice_history"
           ><i class="fa-solid fa-clock-rotate-left"></i
