@@ -49,13 +49,20 @@ def login_view(request):
                             password=password_request)
         print(username_request + "\n" + password_request)
         if user is not None:
+            if not user.is_active or user.is_deleted:
+                return render(
+                    request,
+                    "core/login.html",
+                    {"error": "Tài khoản của bạn đã bị vô hiệu hóa"},
+                )
+
             login(request, user)
             if request.user.is_superuser:
                 return redirect("home")
 
             id_vaitro = request.user.vaitro.id_vaitro
             if id_vaitro is not None:
-                if id_vaitro == 1 or id_vaitro == 2:
+                if id_vaitro == 1:
                     return redirect("admin_home")
                 if id_vaitro == 3:
                     return redirect("accountant_home")

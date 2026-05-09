@@ -46,12 +46,17 @@ def accountmanage(request):
 @login_required(login_url="login")
 @role_required([1])
 def delete_account(request, id_taikhoan):
-    exists = TaiKhoan.objects.filter(id_taikhoan=id_taikhoan).exists()
-    if exists:
-        account = get_object_or_404(TaiKhoan, id_taikhoan=id_taikhoan)
+    account = get_object_or_404(TaiKhoan, id_taikhoan=id_taikhoan)
+    if request.method == "POST":
         account.is_deleted = True
-        account.save()
-    return render(request, "account/DeleteAccount.html")
+        account.updated_at = timezone.now()
+        account.updated_by = str(request.user)
+        account.save(
+            update_fields=["is_deleted", "updated_at", "updated_by"])
+        messages.success(request, "Tài khoản đã được xóa thành công!")
+        return redirect("accountmanage")
+
+    return render(request, "account/DeleteAccount.html", {"account": account})
 
 
 @login_required(login_url="login")
