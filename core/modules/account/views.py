@@ -1,115 +1,145 @@
-from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.utils import timezone
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
+from django.db.models import Q
+from core.decorators import role_required
+from django.contrib import messages
+
+from core.forms import TaiKhoanEditForm, TaiKhoanForm
 
 from .models import TaiKhoan, VaiTro
 
 
 @login_required(login_url="login")
+@role_required([1])
 def accountmanage(request):
-    tai_khoan_list = TaiKhoan.objects.all()
+    tai_khoan_list = TaiKhoan.objects.filter(
+        is_deleted=False).order_by("-id_taikhoan")
+
     query = request.GET.get("search_id", "")
-    user = request.user
-    print(user.is_authenticated)
-    if user.is_authenticated:
-        id_vaitro = request.user.vaitro.id_vaitro
-        if id_vaitro is not None:
-            if id_vaitro == 1:
-                if query:
-                    try:
-                        for a in tai_khoan_list:
-                            if a.id_taikhoan == int(query):
-                                tai_khoan_list = [a]
-                    except ValueError:
-                        tai_khoan_list = TaiKhoan.objects.all()
+    status = request.GET.get('status')
+    role = request.GET.get('role')
 
-                context = {
-                    "tai_khoan_list": tai_khoan_list,
-                    "query": query,
-                }
+    if status in ['0', '1']:
+        tai_khoan_list = tai_khoan_list.filter(is_active=(status == '1'))
+    if role in ['1', '2', '3']:
+        tai_khoan_list = tai_khoan_list.filter(vaitro__id_vaitro=role)
 
-                return render(request, "core/accountmanage.html", context)
-    return render(request, "core/message.html", {"error": "Bạn không có quyền truy cập trang này"})
+    if query:
+        tai_khoan_list = tai_khoan_list.filter(
+            (Q(username__icontains=query) | Q(
+                id_taikhoan__icontains=query))
+        )
 
+    context = {
+        "tai_khoan_list": tai_khoan_list,
+        "query": query,
+        "status": status,
+        "role": role,
+    }
 
-@login_required(login_url="login")
-def accountmanage_delete(request, id_taikhoan):
-    exists = TaiKhoan.objects.filter(id_taikhoan=id_taikhoan).exists()
-    if exists:
-        account = get_object_or_404(TaiKhoan, id_taikhoan=id_taikhoan)
-        account.is_deleted = True
-    return render(request, "core/accountmanage_delete.html")
+    return render(request, "account/AccountManage.html", context)
 
 
 @login_required(login_url="login")
-def accountmanage_addaccount(request):
+@role_required([1])
+def delete_account(request, id_taikhoan):
+    account = get_object_or_404(TaiKhoan, id_taikhoan=id_taikhoan)
     if request.method == "POST":
-        username = request.POST.get("username")
-        password1 = request.POST.get("password1")
-        password2 = request.POST.get("password2")
-        vaitro_string = request.POST.get("vaitro")
-        match vaitro_string:
-            case "admin":
-                vaitro = get_object_or_404(VaiTro, id_vaitro=1)
-        match vaitro_string:
-            case "user":
-                vaitro = get_object_or_404(VaiTro, id_vaitro=2)
-        match vaitro_string:
-            case "ketoan":
-                vaitro = get_object_or_404(VaiTro, id_vaitro=3)
+        account.is_deleted = True
+        account.updated_at = timezone.now()
+        account.updated_by = str(request.user)
+        account.save(
+            update_fields=["is_deleted", "updated_at", "updated_by"])
+        messages.success(request, "Tài khoản đã được xóa thành công!")
+        return redirect("accountmanage")
+
+    return render(request, "account/DeleteAccount.html", {"account": account})
+
+
+@login_required(login_url="login")
+@role_required([1])
+def add_account(request):
+    if request.method == "POST":
+        form = TaiKhoanForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            password1 = form.cleaned_data["password1"]
+            password2 = form.cleaned_data["password2"]
+            vaitro = form.cleaned_data["vaitro"]
+            vaitro_obj = get_object_or_404(VaiTro, id_vaitro=vaitro)
 
         if not username or not password1 or not password2:
-            return render(request, "core/accountmanage_addaccount.html", {"error": "Vui lòng nhập đầy đủ thông tin."})
+            messages.error(request, "Vui lòng nhập đầy đủ thông tin!")
+            return redirect("accountmanage")
 
         if password1 != password2:
-            return render(request, "core/accountmanage_addaccount.html", {"error": "Mật khẩu không khớp"})
+            messages.error(request, "Mật khẩu không khớp")
+            return redirect("accountmanage")
 
         if TaiKhoan.objects.filter(username=username).exists():
-            return render(request, "core/accountmanage_addaccount.html", {"error": "Tên đăng nhập đã tồn tại "})
+            messages.error(request, "Tên tài khoản này đã tồn tại!")
+            return redirect("accountmanage")
 
         TaiKhoan.objects.create(
             username=username,
             password=make_password(password1),
-            vaitro=vaitro,
+            vaitro=vaitro_obj,
             is_active=True,
             is_staff=False,
+            create_by=request.user.username if request.user.is_authenticated else "Unknown",
+            create_at=timezone.now(),
         )
+        messages.success(request, "Thêm tài khoản thành công!")
+        return redirect("accountmanage")
 
-    return render(request, "core/accountmanage_addaccount.html", {"error": "Tạo tài khoản thành công "})
-
-
-@login_required(login_url="login")
-def view_taikhoan(request, id_taikhoan):
-    user = authenticate(request, username="admin", password="2005")
-    login(request, user)
-
-    taikhoan = get_object_or_404(TaiKhoan, id_taikhoan=id_taikhoan)
-    return render(request, "core/accountmanage_view.html", {"taikhoan": taikhoan})
+    form = TaiKhoanForm()
+    return render(request, "account/AccountAdd.html", {"form": form})
 
 
 @login_required(login_url="login")
-def edit_taikhoan(request, id_taikhoan):
+@role_required([1])
+def view_account(request, pk):
+    taikhoan = get_object_or_404(TaiKhoan, id_taikhoan=pk)
+    return render(request, "account/AccDetailModal.html", {"taikhoan": taikhoan})
+
+
+@login_required(login_url="login")
+@role_required([1])
+def edit_account(request, id_taikhoan):
     taikhoan = get_object_or_404(TaiKhoan, id_taikhoan=id_taikhoan)
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        password_raw = request.POST.get("password")
-        vaitro_id = request.POST.get("vaitro_id")
+        form = TaiKhoanEditForm(request.POST, instance=taikhoan)
+        username = form.data.get("username")
+        vaitro_id = form.data.get("vaitro")
         try:
             vaitro = VaiTro.objects.get(id_vaitro=vaitro_id)
-            taikhoan.vaitro = vaitro
+            taikhoan.vaitro = vaitro    
         except VaiTro.DoesNotExist:
-            return render(request, "core/message.html", {"error": "ID vai trò không tồn tại"})
-        if taikhoan.username != username:
-            if not TaiKhoan.objects.filter(username=username).exists():
-                taikhoan.username = username
-            else:
-                return render(request, "core/message.html", {"error": "username này đã tồn tại"})
+            messages.error(request, "Vai trò không tồn tại!")
+            return redirect("accountmanage")
+                    
+        if not TaiKhoan.objects.filter(username=username).exists():
+            taikhoan.username = username
+        else:
+            messages.error(request, "Tên tài khoản này đã tồn tại!")
+            return redirect("accountmanage")
+            
+        if form.is_valid():
+            taikhoan.updated_by = request.user.username
+            taikhoan.updated_at = timezone.now()
 
-        taikhoan.set_password(password_raw)
-
-        taikhoan.save()
-        return render(request, "core/message.html", {"error": "Thay đổi thông tin thành công"})
-    return render(request, "core/accountmanage_change.html", {"taikhoan": taikhoan})
+            taikhoan.save()
+            
+            messages.success(request, "Thay đổi thông tin thành công!")
+            return redirect("accountmanage")
+    
+    form = TaiKhoanEditForm(instance=taikhoan)
+    context = {
+        "form": form,
+        "taikhoan": taikhoan,
+    }
+    return render(request, "account/ChangeAccount.html", context)

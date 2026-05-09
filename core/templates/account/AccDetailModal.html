@@ -1,0 +1,109 @@
+{% load static %} {% load humanize %}
+<div class="form-container detail-container">
+  <h2 class="modal-title">
+    THÔNG TIN TÀI KHOẢN <span class="title-icon">🔍</span>
+  </h2>
+
+  <div
+    class="summary-details"
+    style="background: var(--gray-bg); padding: 25px; border-radius: 12px"
+  >
+    <div
+      class="detail-item"
+      style="
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #dee2e6;
+      "
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-hashtag" style="width: 25px"></i> ID Tài
+        khoản:</span
+      >
+      <span class="invoice-id">#{{ taikhoan.id_taikhoan }}</span>
+    </div>
+    <div
+      class="detail-item"
+      style="
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #dee2e6;
+      "
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-user" style="width: 25px"></i> Tên đăng
+        nhập:</span
+      >
+      <span>{{ taikhoan.username }}</span>
+    </div>
+    <div
+      class="detail-item"
+      style="
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #dee2e6;
+      "
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-shield-halved" style="width: 25px"></i> Vai
+        trò:</span
+      >
+      <span
+        class="badge-paid"
+        style="
+          background: #e3f2fd !important;
+          color: #1976d2 !important;
+          border: 1px solid #bbdefb;
+        "
+      >
+        <!-- prettier-ignore -->
+        {% if taikhoan.vaitro %}{{ taikhoan.vaitro.display }} {% else %}
+        SuperUser{% endif %}
+      </span>
+    </div>
+   
+    <div
+      class="detail-item"
+      style="display: flex; justify-content: space-between; padding: 12px 0;border-bottom: 1px solid #dee2e6;"
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-toggle-on" style="width: 25px"></i> Tình trạng
+        hoạt động:</span
+      >
+      <span>
+        {% if taikhoan.is_active %}
+        <span style="color: green; font-weight: 600">Đang hoạt động</span>
+        {% else %}
+        <span style="color: red; font-weight: 600">Dừng hoạt động</span>
+        {% endif %}
+      </span>
+    </div>
+    <div
+      class="detail-item"
+      style="display: flex; justify-content: space-between; padding: 12px 0;border-bottom: 1px solid #dee2e6;"
+    >
+      <span style="font-weight: 600; color: #555"
+        ><i class="fa-solid fa-clock" style="width: 25px"></i> Lần đăng nhập gần
+        nhất:</span
+      >
+      <span>
+        {% if taikhoan.last_login %} 
+        {{ taikhoan.last_login|date:'d/m/Y H:i:s'}}
+        {% else %} Chưa từng đăng nhập {% endif %}
+      </span>
+    </div>
+  </div>
+
+  <div class="form-actions" style="margin-top: 40px; text-align: right">
+    <button
+        type="button"
+        class="btn btn-secondary-outline modal-close-btn"
+        style="min-width: 150px"
+      >
+        <i class="fa-solid fa-xmark"></i> Hủy
+    </button>
+  </div>
+</div>

@@ -4,14 +4,12 @@ from . import views
 
 urlpatterns = [
     path("accountmanage", views.accountmanage, name="accountmanage"),
-    path("accountmanage/addaccount", views.accountmanage_addaccount,
-         name="accountmanage_addaccount"),
-    path("accountmanage/addaccount/",
-         views.accountmanage_addaccount, name="addaccount"),
-    path("accountmanage/change/<int:id_taikhoan>/",
-         views.edit_taikhoan, name="edit_taikhoan"),
-    path("accountmanage/view/<int:id_taikhoan>/",
-         views.view_taikhoan, name="view_taikhoan"),
-    path("accountmanage/delete/<int:id_taikhoan>/",
-         views.accountmanage_delete, name="accountmanage_delete"),
+    path("account/add", views.add_account,
+         name="add_account"),
+    path("account/edit/<int:id_taikhoan>/",
+         views.edit_account, name="edit_account"),
+    path("account/detail/<int:pk>/modal/",
+         views.view_account, name="view_account"),
+    path("account/delete/<int:id_taikhoan>/",
+         views.delete_account, name="delete_account"),
 ]

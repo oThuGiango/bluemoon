@@ -91,7 +91,7 @@ def add_khoanthu(request):
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
                     return JsonResponse({"error": "Tên khoản thu này đã tồn tại!"}, status=400)
                 messages.error(request, "Tên khoản thu này đã tồn tại!")
-                return render(request, "fee/AddFeeModal.html", {"form": form})
+                return redirect("fee_management")
 
             khoan_thu = form.save(commit=False)
             # if not khoan_thu.phi_bat_buoc:

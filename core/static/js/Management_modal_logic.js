@@ -1,3 +1,11 @@
+// Ẩn message sau 5 giây
+window.addEventListener("DOMContentLoaded", function () {
+  setTimeout(function () {
+    document.querySelectorAll(".message-container").forEach(function (el) {
+      el.style.display = "none";
+    });
+  }, 5000);
+});
 document.addEventListener("DOMContentLoaded", function () {
   const tablePanel =
     document.querySelector(".main-content") ||
