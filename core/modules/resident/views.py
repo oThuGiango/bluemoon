@@ -5,8 +5,139 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from openpyxl import Workbook
 from django.utils import timezone
+from .models import BienDongNhanKhau, HoKhau, NhanKhau, CanHo
+from core.forms import HoKhauForm
+from core.decorators import role_required
+from django.db.models import Q
 
-from .models import BienDongNhanKhau, HoKhau, NhanKhau
+
+@login_required(login_url="login")
+@role_required([1])
+def hokhau_toggle_active(request, pk):
+    hokhau = get_object_or_404(HoKhau, pk=pk)
+    if request.method == 'POST':
+        hokhau.is_active = not hokhau.is_active
+        hokhau.save(update_fields=['is_active', 'updated_at'])
+        messages.success(
+            request, f'Trạng thái hộ khẩu đã được cập nhật thành {"hoạt động" if hokhau.is_active else "không hoạt động"}!')
+    return redirect('hokhau_list')
+
+
+@login_required(login_url="login")
+@role_required([1])
+def hokhau_list(request):
+    hokhau_qs = HoKhau.objects.filter(is_deleted=False).select_related(
+        'id_canho', 'id_chuho').order_by('-id_hokhau')
+
+    search_hk = request.GET.get('search_hk', '').strip()
+    resident_status = request.GET.get('resident_status', '')
+    is_active = request.GET.get('is_active', '')
+
+    if search_hk:
+        hokhau_qs = hokhau_qs.filter(
+            Q(id_canho__so_can_ho__icontains=search_hk) |
+            Q(id_chuho__username__icontains=search_hk)
+        )
+    if resident_status:
+        hokhau_qs = hokhau_qs.filter(resident_status=resident_status)
+    if is_active in ['0', '1']:
+        hokhau_qs = hokhau_qs.filter(is_active=(is_active == '1'))
+
+    # Đếm số nhân khẩu cho từng hộ khẩu
+    nhankhau_counts = {}
+    from core.modules.resident.models import NhanKhau
+    for hk in hokhau_qs:
+        nhankhau_counts[hk.id_hokhau] = NhanKhau.objects.filter(
+            id_hokhau=hk, is_deleted=False, is_active=True).count()
+
+    total_count = hokhau_qs.count()
+    return render(request, 'resident/hokhau.html', {
+        'hokhau_list': hokhau_qs,
+        'nhankhau_counts': nhankhau_counts,
+        'search_hk': search_hk,
+        'resident_status': resident_status,
+        'is_active': is_active,
+        'total_count': total_count,
+    })
+
+
+@login_required(login_url="login")
+@role_required([1])
+def hokhau_add(request):
+    if request.method == 'POST':
+        form = HoKhauForm(request.POST)
+        if form.is_valid():
+            id_canho = form.cleaned_data.get('id_canho')
+            id_chuho = form.cleaned_data.get('id_chuho')
+            # Nếu form là ModelForm thì lấy instance, nếu không thì lấy từ cleaned_data
+            if hasattr(form, 'instance') and form.instance:
+                id_canho = form.instance.id_canho or id_canho
+                id_chuho = form.instance.id_chuho or id_chuho
+            # Kiểm tra bản ghi đã tồn tại nhưng đang is_active=False
+            existing = None
+            if id_canho and id_chuho:
+                existing = HoKhau.objects.filter(
+                    id_canho=id_canho, id_chuho=id_chuho, is_deleted=False, is_active=False).first()
+            if existing:
+                existing.is_active = True
+                existing.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+                existing.save(
+                    update_fields=['is_active', 'updated_by', 'updated_at'])
+                messages.success(request, 'Đã kích hoạt lại hộ khẩu cũ!')
+                return redirect('hokhau_list')
+            else:
+                hokhau = form.save(commit=False)
+                hokhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+                hokhau.save()
+                messages.success(request, 'Thêm hộ khẩu thành công!')
+                return redirect('hokhau_list')
+    else:
+        form = HoKhauForm()
+    return render(request, 'resident/hokhau_add.html', {'form': form})
+
+
+@login_required(login_url="login")
+@role_required([1])
+def hokhau_edit(request, pk):
+    hokhau = get_object_or_404(HoKhau, pk=pk)
+    if request.method == 'POST':
+        form = HoKhauForm(request.POST, instance=hokhau)
+        if form.is_valid():
+            hokhau = form.save(commit=False)
+            hokhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+            hokhau.save()
+            messages.success(request, 'Cập nhật hộ khẩu thành công!')
+            return redirect('hokhau_list')
+    else:
+        form = HoKhauForm(instance=hokhau)
+    return render(request, 'resident/hokhau_edit.html', {'form': form, 'hokhau': hokhau})
+
+
+@login_required(login_url="login")
+@role_required([1])
+def hokhau_delete(request, pk):
+    hokhau = get_object_or_404(HoKhau, pk=pk)
+    if request.method == 'POST':
+        hokhau.is_deleted = True
+        hokhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+        hokhau.save(update_fields=['is_deleted', 'updated_by', 'updated_at'])
+        messages.success(request, 'Đã xóa hộ khẩu!')
+        return redirect('hokhau_list')
+    return render(request, 'resident/hokhau_delete.html', {'hokhau': hokhau})
+
+
+@login_required(login_url="login")
+@role_required([1, 2])
+def hokhau_detail(request, pk):
+    hokhau = get_object_or_404(HoKhau, pk=pk)
+    nhankhau_list = NhanKhau.objects.filter(
+        id_hokhau=hokhau, is_deleted=False, is_active=True)
+    nhankhau_count = nhankhau_list.count()
+    return render(request, 'resident/hokhau_detail.html', {
+        'hokhau': hokhau,
+        'nhankhau_list': nhankhau_list,
+        'nhankhau_count': nhankhau_count
+    })
 
 
 @login_required(login_url="login")
@@ -255,97 +386,3 @@ def demomanage_delete(request, id_hokhau):
         hr.is_deleted = True
         hr.save()
     return render(request, "core/hrmanage_delete.html")
-
-
-@login_required(login_url="login")
-def hrmanage(request):
-    print(2)
-    ds_ho_khau = HoKhau.objects.all()
-    query = request.GET.get("search_id", "")
-    if query:
-        try:
-            for a in ds_ho_khau:
-                if a.id_hokhau == int(query):
-                    ds_ho_khau = [a]
-        except ValueError:
-            ds_ho_khau = HoKhau.objects.all()
-
-    context = {
-        "ho_khau_list": ds_ho_khau,
-        "query": query,
-    }
-
-    return render(request, "core/hrmanage.html", context)
-
-
-@login_required(login_url="login")
-def hrmanage_delete(request, id_hokhau):
-    exists = HoKhau.objects.filter(id_hokhau=id_hokhau).exists()
-    if exists:
-        hr = get_object_or_404(HoKhau, id_hokhau=id_hokhau)
-        hr.is_deleted = True
-    return render(request, "core/hrmanage_delete.html")
-
-
-@login_required(login_url="login")
-def add_hokhau(request):
-    if request.method == "POST":
-        so_can_ho = request.POST.get("so_can_ho")
-        dien_tich = request.POST.get("dien_tich")
-
-        if so_can_ho:
-            try:
-                dien_tich_value = float(dien_tich) if dien_tich else None
-                HoKhau.objects.create(
-                    so_can_ho=so_can_ho, dien_tich=dien_tich_value)
-                messages.success(
-                    request, f"Hộ khẩu căn {so_can_ho} đã được thêm thành công!")
-            except ValueError:
-                messages.error(request, "Giá trị diện tích không hợp lệ!")
-        else:
-            messages.error(request, "Vui lòng nhập số căn hộ!")
-
-        return redirect("add_hokhau")
-
-    return render(request, "core/add_hokhau.html")
-
-
-@login_required(login_url="login")
-def hokhau_detail(request, id_hokhau):
-    print(3)
-    hokhau = HoKhau.objects.get(id_hokhau=id_hokhau)
-    print(hokhau.id_hokhau)
-    thanh_vien = NhanKhau.objects.filter(
-        id_hokhau_id=id_hokhau, is_deleted=False)
-
-    return render(request, "core/hokhau_detail.html", {"hokhau": hokhau, "thanh_vien": thanh_vien})
-
-
-@login_required(login_url="login")
-def edit_hokhau(request, id_hokhau):
-    hokhau = get_object_or_404(HoKhau, id_hokhau=id_hokhau)
-
-    if request.method == "POST":
-        so_can_ho = request.POST.get("so_can_ho")
-        dien_tich = request.POST.get("dien_tich")
-
-        if not so_can_ho:
-            messages.error(request, "Số căn hộ không được để trống!")
-        else:
-            try:
-                hokhau.so_can_ho = so_can_ho
-                hokhau.dien_tich = float(dien_tich) if dien_tich else None
-                hokhau.save()
-                messages.success(
-                    request, "Cập nhật thông tin hộ khẩu thành công!")
-                return redirect("hrmanage")
-            except ValueError:
-                messages.error(request, "Diện tích phải là số hợp lệ!")
-
-    return render(request, "core/hokhau_edit.html", {"hokhau": hokhau})
-
-
-@login_required(login_url="login")
-def HoKhaus_list(request):
-    ho_khaus = HoKhau.objects.all()
-    return render(request, "core/HoKhaus_list.html", {"HoKhaus": ho_khaus})

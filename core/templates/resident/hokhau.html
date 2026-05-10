@@ -3,7 +3,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Quản lý tài khoản - Chung cư BlueMoon</title>
+    <title>Quản lý hộ khẩu - BlueMoon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
@@ -20,12 +20,10 @@
     {% include 'core/Sidebar.html' %}
     <main>
       {% include 'core/layout_header.html' %}
-
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel">
-          <!-- prettier-ignore -->
-          {% if messages %}
-          {% for message in messages %}
+        <!-- prettier-ignore -->
+          {% if messages %} {% for message in messages %} 
           {% if message.tags == 'success' %}
           <div
             class="message-container success"
@@ -50,23 +48,20 @@
           >
             <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
           </div>
-          <!-- prettier-ignore -->
-          {% endif %}
-          {% endfor %}
-          {% endif %}
+          {% endif %} {% endfor %} {% endif %}
 
           <div class="income-controls-top">
             <form
               method="GET"
-              action="{% url 'accountmanage' %}"
+              action="{% url 'hokhau_list' %}"
               class="filter-group"
             >
               <div class="search-box-container">
                 <input
                   type="text"
-                  name="search_id"
-                  placeholder="Nhập ID hoặc Username..."
-                  value="{{ query|default:'' }}"
+                  name="search_hk"
+                  placeholder="Nhập số căn hộ hoặc tên chủ hộ..."
+                  value="{{ search_hk|default:'' }}"
                 />
                 <i class="fa-solid fa-search"></i>
               </div>
@@ -77,41 +72,55 @@
               >
                 <i class="fa-solid fa-filter"></i> Tìm kiếm
               </button>
-
               <select
-                name="status"
+                name="is_active"
                 class="filter-select"
                 onchange="this.form.submit()"
               >
                 <option value="">-- Trạng thái --</option>
-                <option value="1" {% if status == '1' %}selected{% endif %}>
-                  Đang hoạt động
-                </option>
-                <option value="0" {% if status == '0' %}selected{% endif %}>
-                  Dừng hoạt động
-                </option>
+                <option value="1" {% if is_active == '1' %}selected{% endif %}>Hoạt động</option>
+                <option value="0" {% if is_active == '0' %}selected{% endif %}>Không hoạt động</option>
               </select>
-
               <select
-                name="role"
+                name="resident_status"
                 class="filter-select"
                 onchange="this.form.submit()"
               >
-                <option value="">-- Vai trò --</option>
-                <option value="1" {% if role == "1" %}selected{% endif %}>
-                  BQL
+              <!-- prettier-ignore -->
+                <option value="">-- Tình trạng cư trú --</option>
+                <option
+                  value="thuong_tru"
+                  {% if resident_status == 'thuong_tru' %}selected
+                  {% endif%}
+                >
+                  Thường trú
                 </option>
-                <option value="0" {% if role == "2" %}selected{% endif %}>
-                  Cư dân
+                <option
+                  value="tam_tru"
+                  {% if resident_status == 'tam_tru' %}selected
+                  {% endif %}
+                >
+                  Tạm trú
                 </option>
-                <option value="0" {% if role == "3" %}selected{% endif %}>
-                  Kế toán
+                <option
+                  value="de_trong"
+                  {% if resident_status == 'de_trong' %}selected
+                  {% endif %}
+                >
+                  Để trống
+                </option>
+                <option
+                  value="khac"
+                  {% if resident_status == 'khac' %}selected
+                  {% endif %}
+                >
+                  Khác
                 </option>
               </select>
-
-              {% if query or status or role%}
+              
+              {% if search_hk or resident_status or is_active %}
               <a
-                href="{% url 'accountmanage' %}"
+                href="{% url 'hokhau_list' %}"
                 class="action-btn"
                 title="Xóa lọc"
                 style="background: #f5f5f5; color: #333"
@@ -124,16 +133,16 @@
 
           <div class="income-actions-bottom income-actions-top-left">
             <button
-              data-url="{% url 'add_account' %}"
+              data-url="{% url 'hokhau_add' %}"
               class="btn btn-create-new btn-create-compact modal-trigger"
             >
-              <i class="fa-solid fa-user-plus"></i> Thêm tài khoản mới
+              <i class="fa-solid fa-plus"></i> Thêm hộ khẩu mới
             </button>
           </div>
 
           <h2 class="table-title"
            style="border-bottom: none; margin-bottom: 8px"
-           >DANH SÁCH TÀI KHOẢN HỆ THỐNG</h2>
+           >DANH SÁCH HỘ KHẨU</h2>
 
             <div
               style="width: 100%; border-bottom: 2px solid #f0f0f0; margin: 0 0 20px; padding-bottom: 10px;"
@@ -141,53 +150,52 @@
               <p
                 style="margin: 0; width: 100%; text-align: right; color: #555; font-size: 1rem;"
               >
-                Tổng số Tài Khoản: {{ total_count|default:"0" }}
+                Tổng số: {{ total_count|default:"0" }} 
               </p>
             </div>
-
           <div class="table-responsive">
             <table class="data-table">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Tên đăng nhập</th>
-                  <th>Vai trò</th>
-                  <th style="text-align: center">Trạng thái</th>
+                  <th>Căn hộ</th>
+                  <th>Chủ hộ</th>
+                  <th>Tình trạng cư trú</th>
+                  <th>Số nhân khẩu</th>
+                  <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
-                {% for tk in tai_khoan_list %}
+                {% for hk in hokhau_list %}
                 <tr>
-                  <td data-label="ID">#{{ tk.id_taikhoan }}</td>
-                  <td data-label="Username">{{ tk.username }}</td>
-                  <td data-label="Vai trò">
-                    <!-- prettier-ignore -->
-                    <span
-                      class="status 
-                      {% if tk.vaitro.id_vaitro == 1 %}status-active
-                      {% elif tk.vaitro.id_vaitro == 2 %}status-normal
-                      {% elif tk.vaitro.id_vaitro == 3 %}status-primary
-                      {% endif %}"
-                    >
-                      {% if tk.vaitro %}{{ tk.vaitro.display }} 
-                      {% else %} SuperUser{% endif %}
+                  <td data-label="#">{{ hk.id_hokhau }}</td>
+                  <td data-label="Căn hộ">
+                    {% if hk.id_canho %}{{ hk.id_canho.so_can_ho }}{% endif %}
+                  </td>
+                  <td data-label="Chủ hộ">
+                    {% if hk.id_chuho %}{{ hk.id_chuho.username }}{% endif %}
+                  </td>
+                  <td data-label="Tình trạng cư trú">
+                  <!-- prettier-ignore -->
+                    <span class="status
+                      {% if hk.resident_status == 'thuong_tru' %}status-primary
+                      {% elif hk.resident_status == 'tam_tru' %}status-normal
+                      {% elif hk.resident_status == 'de_trong' %}status-inactive
+                      {% endif %}">
+                      {{ hk.get_resident_status_display }}
                     </span>
                   </td>
-                  <td data-label="Trạng thái" style="text-align: center">
-                    <form
-                      method="POST"
-                      action="{% url 'deactivate_account' pk=tk.id_taikhoan %}"
-                      style="display: inline"
-                    >
+                  <td data-label="Số nhân khẩu">
+                    {{ nhankhau_counts.hk.id_hokhau|default_if_none:0|default:0 }}
+                  </td>
+                  <td data-label="Trạng thái">
+                    <form method="post" action="{% url 'hokhau_toggle_active' hk.id_hokhau %}" style="display:inline;">
                       {% csrf_token %}
-                      <label
-                        class="switch"
-                        title="{% if tk.is_active %}Nhấn để vô hiệu hóa{% else %}Nhấn để kích hoạt{% endif %}"
-                      >
+                      <label class="switch">
                         <input
                           type="checkbox"
-                          {% if tk.is_active %}
+                          {% if hk.is_active %}
                           checked
                           {% endif %}
                           onchange="this.form.submit()"
@@ -198,21 +206,21 @@
                   </td>
                   <td data-label="Thao tác">
                     <button
-                      data-url="{% url 'view_account' pk=tk.id_taikhoan %}"
-                      class="action-btn view-detail modal-trigger"
+                      data-url="{% url 'hokhau_detail' hk.id_hokhau %}"
+                      class="action-btn modal-trigger"
                       title="Chi tiết"
                     >
                       <i class="fa-solid fa-eye"></i>
                     </button>
                     <button
-                      data-url="{% url 'edit_account' tk.id_taikhoan %}"
+                      data-url="{% url 'hokhau_edit' hk.id_hokhau %}"
                       class="action-btn modal-trigger"
                       title="Chỉnh sửa"
                     >
                       <i class="fa-solid fa-pen"></i>
                     </button>
                     <button
-                      data-url="{% url 'delete_account' tk.id_taikhoan %}"
+                      data-url="{% url 'hokhau_delete' hk.id_hokhau %}"
                       class="action-btn modal-trigger"
                       title="Xóa"
                       style="color: #e74c3c"
@@ -223,8 +231,8 @@
                 </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="4" style="text-align: center">
-                    Không có tài khoản nào.
+                  <td colspan="6" style="text-align: center">
+                    Không có hộ khẩu nào.
                   </td>
                 </tr>
                 {% endfor %}

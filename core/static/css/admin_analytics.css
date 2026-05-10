@@ -188,24 +188,7 @@
     min-width: unset;
   }
 }
-/* Badge cho hóa đơn chưa thanh toán */
-.badge-unpaid {
-  background: #fff1f0 !important; /* Màu nền đỏ nhạt */
-  color: #f5222d !important; /* Màu chữ đỏ */
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.85em;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border: 1px solid #ffa39e;
-}
 
-/* Hiệu ứng khi di chuột qua */
-.badge-unpaid:hover {
-  background: #ffccc7 !important;
-}
 /* Style cho các ô Select lọc */
 .filter-select {
   padding: 10px 15px;
@@ -240,19 +223,6 @@
   color: var(--orange);
 }
 
-/* Badge chưa thanh toán (đã cập nhật) */
-.badge-unpaid {
-  background: #fff1f0 !important;
-  color: #f5222d !important;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.85em;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border: 1px solid #ffa39e;
-}
 .history-panel {
   width: 100% !important;
   max-width: none !important;
@@ -271,8 +241,8 @@
 
 /* Đồng bộ hóa các Badge trạng thái */
 .badge-paid {
-  background: #e6f7d9 !important;
-  color: #52c41a !important;
+  background: #ecfdf3;
+  color: #027a48;
   padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.85em;
@@ -280,12 +250,25 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border: 1px solid #b7eb8f;
+  border: 1px solid #abefc6;
+}
+
+.badge-overdue {
+  background: #fef3f2;
+  color: #b42318;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.85em;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #fecdca;
 }
 
 .badge-unpaid {
-  background: #fff1f0 !important;
-  color: #f5222d !important;
+  background: #fffaeb;
+  color: #b54708;
   padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.85em;
@@ -293,7 +276,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border: 1px solid #ffa39e;
+  border: 1px solid #fedf89;
 }
 
 /* Đồng bộ hóa bộ lọc (Filter) */
@@ -329,7 +312,7 @@
 }
 
 .amount-positive {
-  color: #2f73d3; 
+  color: #2f73d3;
   font-weight: 700;
   font-family: "Montserrat", sans-serif;
 }

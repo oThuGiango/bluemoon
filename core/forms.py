@@ -1,10 +1,8 @@
+
 from django import forms
 
-from core.modules.account.models import TaiKhoan
+from .models import KhoanThu, DotThuPhi, Building, CanHo, HoKhau, TaiKhoan
 
-from .models import KhoanThu
-from .models import DotThuPhi
-from .models import VaiTro
 
 from datetime import datetime
 
@@ -17,13 +15,57 @@ class TaiKhoanForm(forms.Form):
         widget=forms.PasswordInput, required=True, label="Xác nhận mật khẩu")
     vaitro = forms.ChoiceField(
         choices=[(1, 'Ban Quản lý'), (2, 'Cư dân'), (3, 'Kế toán')],
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'id': 'vaitro-taikhoan'}),
         required=True,
         label='Vai trò'
     )
+    id_canho = forms.ChoiceField(
+        required=False,
+        label='Căn hộ (chỉ áp dụng cho Chủ hộ)',
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'id': 'canho-taikhoan'}),
+        choices=[],
+    )
+
+    resident_status = forms.ChoiceField(
+        required=False,
+        label='Tình trạng cư trú',
+        choices=[],
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'id': 'resident-status'}),
+    )
+
+    def __init__(self, *args, available_canho=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['resident_status'].choices = [
+            ('', '-- Chọn tình trạng --')] + list(getattr(HoKhau, 'RESIDENT_STT_CHOICES', []))
+        if available_canho:
+            self.fields['id_canho'].choices = [
+                ("", "-- Chọn căn hộ --")
+            ] + [
+                (c.id_canho, c.so_can_ho)
+                for c in available_canho
+            ]
 
 
 class TaiKhoanEditForm(forms.ModelForm):
+    id_canho = forms.ChoiceField(
+        required=False,
+        label='Căn hộ',
+        choices=[],
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'canho-taikhoan'
+        })
+    )
+    resident_status = forms.ChoiceField(
+        required=False,
+        label='Tình trạng cư trú',
+        choices=[],
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'id': 'resident-status'}),
+    )
 
     class Meta:
         model = TaiKhoan
@@ -32,9 +74,62 @@ class TaiKhoanEditForm(forms.ModelForm):
             'username': 'Tên tài khoản',
             'vaitro': 'Vai trò',
         }
+
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập tên tài khoản'}),
-            'vaitro': forms.Select(attrs={'class': 'form-control', 'required': 'required'}),
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nhập tên tài khoản'
+            }),
+
+            'vaitro': forms.Select(attrs={
+                'class': 'form-control',
+                'required': True,
+                'id': 'vaitro-taikhoan'
+            }),
+        }
+
+    def __init__(self, *args, available_canho=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['resident_status'].choices = [
+            ('', '-- Chọn tình trạng --')] + list(getattr(HoKhau, 'RESIDENT_STT_CHOICES', []))
+        # Dynamic dropdown căn hộ
+        if available_canho:
+            self.fields['id_canho'].choices = [
+                ("", "-- Chọn căn hộ --")
+            ] + [
+                (c.id_canho, c.so_can_ho)
+                for c in available_canho
+            ]
+
+        hokhau = HoKhau.objects.filter(
+            id_chuho=self.instance,
+            is_deleted=False,
+            is_active=True
+        ).first()
+
+        if hokhau and hokhau.id_canho:
+            self.fields['id_canho'].initial = hokhau.id_canho.id_canho
+        if hokhau and hokhau.resident_status:
+            self.fields['resident_status'].initial = hokhau.resident_status
+
+
+class CanHoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['building'].queryset = Building.objects.filter(
+            is_active=True, is_deleted=False).order_by("name")
+
+    class Meta:
+        model = CanHo
+        fields = [
+            'so_can_ho', 'dien_tich', 'floor', 'building', 'apartment_type'
+        ]
+        widgets = {
+            'so_can_ho': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập số căn hộ'}),
+            'dien_tich': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Nhập diện tích (m²)'}),
+            'floor': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Nhập tầng'}),
+            'building': forms.Select(attrs={'class': 'form-control'}),
+            'apartment_type': forms.Select(choices=CanHo.APARTMENT_TYPE_CHOICES),
         }
 
 
@@ -104,4 +199,35 @@ class DotThuPhiForm(forms.ModelForm):
             'ngay_batdau': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'ngay_ketthuc': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'trang_thai': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+
+class HoKhauForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hiển thị số căn hộ thay vì object
+        # Lấy các id_canho chưa có hộ khẩu active
+        used_canho_ids = HoKhau.objects.filter(
+            is_deleted=False, is_active=True).values_list('id_canho', flat=True)
+        self.fields['id_canho'].queryset = CanHo.objects.filter(
+            is_deleted=False, is_active=True).exclude(id_canho__in=used_canho_ids).order_by('so_can_ho')
+        self.fields['id_canho'].label_from_instance = lambda obj: obj.so_can_ho
+        # Lấy các chủ hộ chưa có hộ khẩu active
+        used_chuho_ids = HoKhau.objects.filter(
+            is_deleted=False, is_active=True).values_list('id_chuho', flat=True)
+        self.fields['id_chuho'].queryset = TaiKhoan.objects.filter(
+            vaitro__id_vaitro=2, is_deleted=False, is_active=True).exclude(id_taikhoan__in=used_chuho_ids).order_by('username')
+
+    class Meta:
+        model = HoKhau
+        fields = ['id_canho', 'id_chuho', 'resident_status']
+        labels = {
+            'id_canho': 'Căn hộ',
+            'id_chuho': 'Chủ hộ',
+            'resident_status': 'Tình trạng cư trú',
+        }
+        widgets = {
+            'id_canho': forms.Select(attrs={'class': 'form-control'}),
+            'id_chuho': forms.Select(attrs={'class': 'form-control'}),
+            'resident_status': forms.Select(attrs={'class': 'form-control'}),
         }

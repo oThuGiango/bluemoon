@@ -12,4 +12,6 @@ urlpatterns = [
          views.view_account, name="view_account"),
     path("account/delete/<int:id_taikhoan>/",
          views.delete_account, name="delete_account"),
+    path("account/deactivate/<int:pk>/",
+         views.deactivate_account, name="deactivate_account"),
 ]

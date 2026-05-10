@@ -192,24 +192,41 @@
 /* Status Badges */
 .status {
   padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 0.9em;
+  border-radius: 999px;
+  font-size: 0.88em;
   font-weight: 600;
   white-space: nowrap;
-  background-color: #d3f4fd;
-  color: #3344ae;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
+
+/* ACTIVE */
 .status-active {
-  background-color: #eaffda;
-  color: #3e8b18;
+  background: #ecfdf3;
+  color: #027a48;
+  border: 1px solid #abefc6;
 }
+
+/* INACTIVE */
 .status-inactive {
-  background-color: #fff1f0;
-  color: #ff4d4f;
+  background: #fef3f2;
+  color: #b42318;
+  border: 1px solid #fecdca;
 }
+
+/* PRIMARY */
+.status-primary {
+  background: #eff4ff;
+  color: #3538cd;
+  border: 1px solid #c7d7fe;
+}
+
+/* NORMAL / PENDING */
 .status-normal {
-  background-color: #fafbcc;
-  color: #1b1d7f;
+  background: #fffaeb;
+  color: #b54708;
+  border: 1px solid #fedf89;
 }
 
 /* Action Button */

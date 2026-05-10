@@ -1,8 +1,16 @@
 from django.urls import path
-
 from . import views
 
+
 urlpatterns = [
+    path('hokhau/', views.hokhau_list, name='hokhau_list'),
+    path('hokhau/<int:pk>/toggle-active/',
+         views.hokhau_toggle_active, name='hokhau_toggle_active'),
+    path('hokhau/add/', views.hokhau_add, name='hokhau_add'),
+    path('hokhau/<int:pk>/', views.hokhau_detail, name='hokhau_detail'),
+    path('hokhau/<int:pk>/edit/', views.hokhau_edit, name='hokhau_edit'),
+    path('hokhau/<int:pk>/delete/', views.hokhau_delete, name='hokhau_delete'),
+
     path("demomanage", views.demomanage, name="demomanage"),
     path("demomanage/adddemo", views.add_demo, name="demomanage/adddemo"),
     path("demomanage/<int:id_nhankhau>/",
@@ -19,14 +27,8 @@ urlpatterns = [
          views.export_biendong_excel, name="export_biendong_excel"),
     path("demomanage/export/", views.export_nhankhau_excel,
          name="export_nhankhau_excel"),
-    path("hrmanage/", views.hrmanage, name="hrmanage"),
-    path("hrmanage/them/", views.add_hokhau, name="add_hokhau"),
-    path("hrmanage/detail/<int:id_hokhau>/",
-         views.hokhau_detail, name="hokhau_detail"),
-    path("hrmanage/<int:id_hokhau>/edit/",
-         views.edit_hokhau, name="hokhau_edit"),
-    path("hrmanage/<int:id_hokhau>/delete/",
-         views.hrmanage_delete, name="hrmanage_delete"),
+
+
     path("hrmanage/export/", views.export_hokhau_excel,
          name="export_hokhau_excel"),
 ]

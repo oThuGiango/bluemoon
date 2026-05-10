@@ -82,14 +82,6 @@ class HoaDon(models.Model):
         related_name="hoa_dons",
         default=1,
     )
-    id_taikhoan = models.ForeignKey(
-        TaiKhoan,
-        on_delete=models.RESTRICT,
-        db_column="id_taikhoan",
-        related_name="acc_hoadon",
-        null=True,
-        blank=True,
-    )
     da_dong = models.DecimalField(
         max_digits=15, decimal_places=2, default=0)
     

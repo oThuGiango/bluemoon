@@ -9,7 +9,7 @@
 - Xem danh sách toàn bộ hộ khẩu trong chung cư (`hrmanage`).
 - Thêm một hộ khẩu mới (`add_hokhau`).
 - Xem thông tin chi tiết của một hộ khẩu, bao gồm danh sách các thành viên thuộc hộ đó (`hokhau_detail`).
-- Chỉnh sửa thông tin của hộ khẩu (số căn hộ, diện tích) (`edit_hokhau`).
+- Chỉnh sửa thông tin của hộ khẩu (`edit_hokhau`).
 
 ### 2. Quản lý Nhân khẩu
 

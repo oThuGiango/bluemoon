@@ -24,8 +24,7 @@
       <span>VI</span>
     </button>
     <div class="user-avatar" id="userMenuBtn">
-      {% if user.vaitro.id_vaitro == 1 %}AD {% elif user.vaitro.id_vaitro == 3
-      %}KT {% else %}U {% endif %}
+      {{ user.username.0|upper }}
     </div>
     <div id="userMenuContainer">{% include 'core/UserMenu.html' %}</div>
     <div class="user-menu-overlay" id="userMenuOverlay"></div>

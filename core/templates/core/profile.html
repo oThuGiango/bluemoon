@@ -68,7 +68,7 @@
                 class="status status-active"
                 style="display: inline-block; margin-top: 10px"
               >
-                {{ user.vaitro.ten_vaitro }}
+                {{ user.vaitro.display }}
               </span>
             </div>
 
@@ -123,14 +123,12 @@
                       class="fa-solid fa-shield-halved"
                       style="width: 30px"
                     ></i>
-                    Chức vụ:</span
-                  >
-                  <span 
-                    >{{ user.vaitro.ten_vaitro }} 
-                    {% if user.vaitro_id %}{{ user.vaitro_id }}
+                    Chức vụ:
+                  </span>
+                  <span>
+                    {% if user.vaitro_id %}{{ user.vaitro.display }} 
                     {% else %}SuperAdmin{% endif %}
-                  </span
-                  >
+                  </span>
                 </div>
                 <div
                   style="

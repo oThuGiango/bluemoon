@@ -82,6 +82,7 @@
                             <option value="">-- Trạng thái --</option>
                             <option value="1" {% if da_dong == "1" %}selected{% endif %}>Đã đóng</option>
                             <option value="0" {% if da_dong == "0" %}selected{% endif %}>Chưa đóng</option>
+                            <option value="-1" {% if da_dong == "-1" %}selected{% endif %}>Quá hạn</option>
                         </select>
                         
                         {% if query or selected_month or selected_year or da_dong%}
@@ -109,7 +110,7 @@
                             {% for hoadon in invoice_list %}
                             <tr>
                                 <td class="invoice-id">#{{ hoadon.id_hoadon }}</td>
-                                <td><strong>{{ hoadon.id_hokhau.so_can_ho }}</strong></td>
+                                <td><strong>{{ hoadon.id_hokhau.id_canho.so_can_ho }}</strong></td>
                                 <td>{{ hoadon.id_dotthu.ten_dotthu }}</td>
                                 <td class="amount-positive">{{ hoadon.tong_tien|floatformat:0|intcomma }}đ</td>
                                 <td>
@@ -125,6 +126,8 @@
                                 <td>
                                     {% if hoadon.ngay_nop %}
                                         <span class="badge-paid"><i class="fa-solid fa-check-circle"></i> Đã nộp</span>
+                                    {% elif hoadon.is_overdue %}
+                                        <span class="badge-overdue" style="background:#fff1f0; color:#f5222d; border:1px solid #ffa39e;"><i class="fa-solid fa-triangle-exclamation"></i> Quá hạn</span>
                                     {% else %}
                                         <span class="badge-unpaid"><i class="fa-solid fa-circle-xmark"></i> Chưa đóng</span>
                                     {% endif %}

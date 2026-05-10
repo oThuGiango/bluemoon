@@ -3,7 +3,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Quản lý tài khoản - Chung cư BlueMoon</title>
+    <title>Quản lý căn hộ - BlueMoon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
@@ -15,6 +15,7 @@
     />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
+
   </head>
   <body>
     {% include 'core/Sidebar.html' %}
@@ -24,8 +25,7 @@
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel">
           <!-- prettier-ignore -->
-          {% if messages %}
-          {% for message in messages %}
+          {% if messages %} {% for message in messages %} 
           {% if message.tags == 'success' %}
           <div
             class="message-container success"
@@ -50,22 +50,15 @@
           >
             <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
           </div>
-          <!-- prettier-ignore -->
-          {% endif %}
-          {% endfor %}
-          {% endif %}
+          {% endif %} {% endfor %} {% endif %}
 
           <div class="income-controls-top">
-            <form
-              method="GET"
-              action="{% url 'accountmanage' %}"
-              class="filter-group"
-            >
+            <form method="GET" action="{% url 'canho_list' %}" class="filter-group">
               <div class="search-box-container">
                 <input
                   type="text"
-                  name="search_id"
-                  placeholder="Nhập ID hoặc Username..."
+                  name="search_canho"
+                  placeholder="Nhập số căn hộ..."
                   value="{{ query|default:'' }}"
                 />
                 <i class="fa-solid fa-search"></i>
@@ -79,39 +72,49 @@
               </button>
 
               <select
+                name="type"
+                class="filter-select"
+                onchange="this.form.submit()"
+              >
+                <option value="">-- Phân loại --</option>
+                <option value="studio" {% if type == 'studio' %}selected{% endif %}>
+                  Studio
+                </option>
+                <option value="1pn" {% if type == '1pn' %}selected{% endif %}>
+                  1 Phòng ngủ
+                </option>
+                <option value="2pn" {% if type == '2pn' %}selected{% endif %}>
+                  2 Phòng ngủ
+                </option><option value="3pn" {% if type == '3pn' %}selected{% endif %}>
+                  3 Phòng ngủ
+                </option><option value="khac" {% if type == 'khac' %}selected{% endif %}>
+                  Khác
+                </option>
+              </select>
+
+              <select
                 name="status"
                 class="filter-select"
                 onchange="this.form.submit()"
               >
                 <option value="">-- Trạng thái --</option>
-                <option value="1" {% if status == '1' %}selected{% endif %}>
-                  Đang hoạt động
+                <option value="dang_o" {% if status == 'dang_o' %}selected{% endif %}>
+                  Đang ở
                 </option>
-                <option value="0" {% if status == '0' %}selected{% endif %}>
-                  Dừng hoạt động
+                <option value="de_trong" {% if status == 'de_trong' %}selected{% endif %}>
+                  Để trống
                 </option>
-              </select>
-
-              <select
-                name="role"
-                class="filter-select"
-                onchange="this.form.submit()"
-              >
-                <option value="">-- Vai trò --</option>
-                <option value="1" {% if role == "1" %}selected{% endif %}>
-                  BQL
+                <option value="cho_thue" {% if status == 'cho_thue' %}selected{% endif %}>
+                  Cho thuê
                 </option>
-                <option value="0" {% if role == "2" %}selected{% endif %}>
-                  Cư dân
-                </option>
-                <option value="0" {% if role == "3" %}selected{% endif %}>
-                  Kế toán
+                <option value="khac" {% if status == 'khac' %}selected{% endif %}>
+                  Khác
                 </option>
               </select>
-
-              {% if query or status or role%}
+              
+              {% if query or type or status%}
               <a
-                href="{% url 'accountmanage' %}"
+                href="{% url 'canho_list' %}"
                 class="action-btn"
                 title="Xóa lọc"
                 style="background: #f5f5f5; color: #333"
@@ -124,95 +127,78 @@
 
           <div class="income-actions-bottom income-actions-top-left">
             <button
-              data-url="{% url 'add_account' %}"
+              data-url="{% url 'canho_add' %}"
               class="btn btn-create-new btn-create-compact modal-trigger"
             >
-              <i class="fa-solid fa-user-plus"></i> Thêm tài khoản mới
+              <i class="fa-solid fa-plus"></i> Thêm căn hộ mới
             </button>
+            <a
+              href="{% url 'building_list' %}"
+              class="btn btn-secondary-outline btn-create-compact"
+              style="text-decoration: none;"
+            >
+              <i class="fa-solid fa-building"></i> Quản lý tòa nhà
+            </a>
           </div>
 
           <h2 class="table-title"
            style="border-bottom: none; margin-bottom: 8px"
-           >DANH SÁCH TÀI KHOẢN HỆ THỐNG</h2>
-
-            <div
-              style="width: 100%; border-bottom: 2px solid #f0f0f0; margin: 0 0 20px; padding-bottom: 10px;"
-            >
-              <p
-                style="margin: 0; width: 100%; text-align: right; color: #555; font-size: 1rem;"
-              >
-                Tổng số Tài Khoản: {{ total_count|default:"0" }}
-              </p>
-            </div>
-
+           >DANH SÁCH CĂN HỘ</h2>
+          <div style="width: 100%; border-bottom: 2px solid #f0f0f0; margin: 0 0 20px; padding-bottom: 10px;">
+            <p style="margin: 0; width: 100%; text-align: right; color: #555; font-size: 1rem;">
+              Tổng số Căn Hộ: {{ total_count|default:"0" }}
+            </p>
+          </div>
           <div class="table-responsive">
             <table class="data-table">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Tên đăng nhập</th>
-                  <th>Vai trò</th>
-                  <th style="text-align: center">Trạng thái</th>
+                  <th>Số căn hộ</th>
+                  <th>Diện tích (m²)</th>
+                  <th>Loại căn hộ</th>
+                  <th>Trạng thái</th>
+                  <th>Tầng</th>
+                  <th>Tòa nhà</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
-                {% for tk in tai_khoan_list %}
+                {% for c in canho_list %}
                 <tr>
-                  <td data-label="ID">#{{ tk.id_taikhoan }}</td>
-                  <td data-label="Username">{{ tk.username }}</td>
-                  <td data-label="Vai trò">
+                  <td data-label="#">{{ c.id_canho }}</td>
+                  <td data-label="Số căn hộ">
+                    {{ c.so_can_ho }}
+                  </td>
+                  <td data-label="Diện tích">{{ c.dien_tich }}</td>
+                  <td data-label="Loại căn hộ">
+                    {{ c.get_apartment_type_display }}
+                  </td>
+
+                  <td data-label="Trạng thái sử dụng">
                     <!-- prettier-ignore -->
-                    <span
-                      class="status 
-                      {% if tk.vaitro.id_vaitro == 1 %}status-active
-                      {% elif tk.vaitro.id_vaitro == 2 %}status-normal
-                      {% elif tk.vaitro.id_vaitro == 3 %}status-primary
-                      {% endif %}"
-                    >
-                      {% if tk.vaitro %}{{ tk.vaitro.display }} 
-                      {% else %} SuperUser{% endif %}
+                    <span class="status 
+                      {% if c.status == 'dang_o' %}status-primary
+                      {% elif c.status == 'de_trong' %}status-inactive
+                      {% elif c.status == 'cho_thue' %}status-normal
+                      {% endif %}
+                    ">
+                      {{ c.get_status_display }}
                     </span>
                   </td>
-                  <td data-label="Trạng thái" style="text-align: center">
-                    <form
-                      method="POST"
-                      action="{% url 'deactivate_account' pk=tk.id_taikhoan %}"
-                      style="display: inline"
-                    >
-                      {% csrf_token %}
-                      <label
-                        class="switch"
-                        title="{% if tk.is_active %}Nhấn để vô hiệu hóa{% else %}Nhấn để kích hoạt{% endif %}"
-                      >
-                        <input
-                          type="checkbox"
-                          {% if tk.is_active %}
-                          checked
-                          {% endif %}
-                          onchange="this.form.submit()"
-                        />
-                        <span class="slider round"></span>
-                      </label>
-                    </form>
+                  <td data-label="Tầng">{{ c.floor }}</td>
+                  <td data-label="Tòa nhà">{{ c.building.name }}
                   </td>
                   <td data-label="Thao tác">
                     <button
-                      data-url="{% url 'view_account' pk=tk.id_taikhoan %}"
-                      class="action-btn view-detail modal-trigger"
-                      title="Chi tiết"
-                    >
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button
-                      data-url="{% url 'edit_account' tk.id_taikhoan %}"
+                      data-url="{% url 'canho_edit' c.id_canho %}"
                       class="action-btn modal-trigger"
                       title="Chỉnh sửa"
                     >
                       <i class="fa-solid fa-pen"></i>
                     </button>
                     <button
-                      data-url="{% url 'delete_account' tk.id_taikhoan %}"
+                      data-url="{% url 'canho_delete' c.id_canho %}"
                       class="action-btn modal-trigger"
                       title="Xóa"
                       style="color: #e74c3c"
@@ -223,8 +209,8 @@
                 </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="4" style="text-align: center">
-                    Không có tài khoản nào.
+                  <td colspan="8" style="text-align: center">
+                    Không có căn hộ nào.
                   </td>
                 </tr>
                 {% endfor %}

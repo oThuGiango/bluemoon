@@ -28,43 +28,46 @@
     {% endcomment %}
     {% endif %} 
     
-    {% if user.is_superuser or user.vaitro.id_vaitro == 1 %}
     <ul id="menu-accountmanage">
-    {% comment %}
-      <li>
-        <a href="/hrmanage"
-          ><i class="fa-solid fa-people-roof"></i
-          ><span>Quản lý hộ khẩu</span></a
-        >
-      </li>
-      <li>
-        <a href="/demomanage"
-          ><i class="fa-solid fa-user-group"></i
-          ><span>Quản lý nhân khẩu</span></a
-        >
-      </li>
-      {% endcomment %}
+      {% if user.is_superuser or user.vaitro.id_vaitro == 1 %}
       <li>
         <a href="/accountmanage"
           ><i class="fa-solid fa-user-gear"></i
           ><span>Quản lý tài khoản</span></a
         >
       </li>
-      {% comment %}
+      <li>
+        <a href="{% url 'canho_list' %}"
+          ><i class="fa-solid fa-building"></i
+          ><span>Quản lý căn hộ</span></a
+        >
+      </li>
+      <li>
+        <a href="{% url 'hokhau_list' %}"
+          ><i class="fa-solid fa-people-roof"></i
+          ><span>Quản lý hộ khẩu</span></a
+        >
+      </li>
       <li>
         <a href="/demomanage/biendongnhankhau"
           ><i class="fa-solid fa-people-arrows"></i
           ><span>Biến động nhân khẩu</span></a
         >
       </li>
-    {% endcomment %}
+      {% endif %} 
+      {% if user.is_superuser or user.vaitro.id_vaitro == 1 or user.vaitro.id_vaitro == 2 %}
+      <li>
+        <a href="/demomanage"
+          ><i class="fa-solid fa-user-group"></i
+          ><span>Quản lý nhân khẩu</span></a
+        >
+      </li>
+      {% endif %} 
     </ul>
     <!-- prettier-ignore -->
-    {% endif %} 
     
-
-    {% if user.is_superuser or user.vaitro.id_vaitro == 3 %}
     <ul id="menu-account">
+      {% if user.is_superuser or user.vaitro.id_vaitro == 3 %}
       <li>
         <a href="/fee_management"
           ><i class="fa-solid fa-file-invoice"></i
@@ -77,6 +80,7 @@
           ><span>Quản lý kỳ thu</span></a
         >
       </li>
+      {% endif %}
       <li>
         <a href="/statistics_view"
           ><i class="fa-solid fa-magnifying-glass"></i
@@ -89,9 +93,8 @@
           ><span>Lịch sử hóa đơn</span></a
         >
       </li>
-      
     </ul>
-    {% endif %}
+    
   </nav>
   <input
     type="hidden"

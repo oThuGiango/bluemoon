@@ -14,11 +14,11 @@ def home(request):
         if user.is_superuser:
             return render(request, "core/homepage.html")
         if user.vaitro.id_vaitro == 1:
-            admin_home(request)
+            return redirect("admin_home")
         if user.vaitro.id_vaitro == 3:
             accountant_home(request)
 
-    return render(request, "core/mainpage.html")
+    return render(request, "core/homepage.html")
 
 
 def user_logout(request):
@@ -66,6 +66,8 @@ def login_view(request):
                     return redirect("admin_home")
                 if id_vaitro == 3:
                     return redirect("accountant_home")
+                else:
+                    return redirect("home")
         else:
             return render(
                 request,

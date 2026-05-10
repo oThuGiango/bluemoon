@@ -1,0 +1,141 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quản lý tòa nhà - BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
+  </head>
+  <body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+      {% include 'core/layout_header.html' %}
+      <section class="main-content income-management-page">
+        <div class="main-panel data-table-panel">
+            <!-- prettier-ignore -->
+          {% if messages %} {% for message in messages %} 
+          {% if message.tags == 'success' %}
+          <div
+            class="message-container success"
+            style="
+              background-color: #e6f7d9;
+              color: #52c41a;
+              border: 1px solid #b7eb8f;
+              margin: auto;
+            "
+          >
+            {{ message }}
+          </div>
+          {% elif message.tags == 'error' %}
+          <div
+            class="message-container error-alert"
+            style="
+              background-color: #fff1f0;
+              color: #ff4d4f;
+              border: 1px solid #ffa39e;
+              margin: auto;
+            "
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
+          </div>
+          {% endif %} {% endfor %} {% endif %}
+            {% comment %}
+          <div class="income-controls-top">
+            <form method="get" action="" class="filter-group">
+              <div class="search-box-container">
+                <input
+                  type="text"
+                  name="search_building"
+                  placeholder="Nhập tên tòa nhà..."
+                  value="{{ query|default:'' }}"
+                />
+                <i class="fa-solid fa-search"></i>
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="min-width: 120px"
+              >
+                <i class="fa-solid fa-filter"></i> Tìm kiếm
+              </button>
+              {% if query %}
+              <a
+                href="{% url 'building_list' %}"
+                class="action-btn"
+                title="Xóa lọc"
+                style="background: #f5f5f5; color: #333"
+              >
+                <i class="fa-solid fa-rotate-right"></i>
+              </a>
+              {% endif %}
+            </form>
+          </div> 
+          {% endcomment %}
+
+          <div class="income-actions-bottom income-actions-top-left">
+            <button
+              data-url="{% url 'building_add' %}"
+              class="btn btn-create-new btn-create-compact modal-trigger"
+            >
+              <i class="fa-solid fa-plus"></i> Thêm tòa nhà
+            </button>
+          </div>
+
+          <h2 class="table-title">DANH SÁCH TÒA NHÀ</h2>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tên tòa nhà</th>
+                  <th>Số tầng tối đa</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for b in buildings %}
+                <tr>
+                  <td data-label="#">{{ b.id }}</td>
+                  <td data-label="Tên tòa nhà">{{ b.name }} </td>
+                  <td data-label="Số tầng tối đa">{{ b.max_floor }}</td>
+                  <td data-label="Hành động">
+                    <button
+                      data-url="{% url 'building_edit' b.id %}"
+                      class="action-btn modal-trigger"
+                      title="Chỉnh sửa"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    
+                    
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" style="text-align: center">
+                    Không có tòa nhà nào.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div id="mainModal" class="modal">
+      <div class="modal-content"></div>
+    </div>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
+  </body>
+</html>

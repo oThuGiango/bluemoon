@@ -56,7 +56,7 @@
                         <td style="padding: 10px; text-align: center;">
                             <input type="checkbox" name="new_hokhau_ids" value="{{ hokhau.id_hokhau }}">
                         </td>
-                        <td style="padding: 10px;"><strong>{{ hokhau.so_can_ho }}</strong></td>
+                        <td style="padding: 10px;"><strong>{{ hokhau.id_canho.so_can_ho }}</strong></td>
                         <td style="padding: 10px; text-align: right;">
                             <span class="unit-price" data-price="{{ dot_thu.id_khoanthu.don_gia }}">
                                 {{ dot_thu.id_khoanthu.don_gia|floatformat:0|intcomma }}đ
@@ -107,7 +107,7 @@
                             <input type="checkbox" name="invoice_ids" value="{{ hoadon.id_hoadon }}" 
                                    {% if hoadon.ngay_nop %} disabled checked {% endif %}>
                         </td>
-                        <td style="padding: 12px;"><strong>{{ hoadon.id_hokhau.so_can_ho }}</strong></td>
+                        <td style="padding: 12px;"><strong>{{ hoadon.id_hokhau.id_canho.so_can_ho }}</strong></td>
                         <td style="padding: 12px; color: #666;">{{ hoadon.ngay_nop|date:"d/m/Y"|default:"Chưa nộp" }}</td>
                         <td style="padding: 12px; text-align: right; font-weight: 600;">{{ hoadon.tong_tien|floatformat:0|intcomma }}đ</td>
                         <td style="padding: 12px; text-align: center;">

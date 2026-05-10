@@ -1,12 +1,12 @@
-// Ẩn message sau 5 giây
-window.addEventListener("DOMContentLoaded", function () {
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Ẩn message
   setTimeout(function () {
     document.querySelectorAll(".message-container").forEach(function (el) {
       el.style.display = "none";
     });
-  }, 5000);
-});
-document.addEventListener("DOMContentLoaded", function () {
+  }, 4000);
+
   const tablePanel =
     document.querySelector(".main-content") ||
     document.querySelector(".history-panel");
@@ -117,26 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
       confirmDeleteBtn.addEventListener("click", function () {
         const form = modalContent.querySelector("form");
         if (!form) return;
-        const url = form.action;
-        const csrfToken = form.querySelector(
-          "[name=csrfmiddlewaretoken]",
-        ).value;
-        fetch(url, {
-          method: "POST",
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-            "X-CSRFToken": csrfToken,
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.status === "success") {
-              alert(data.message);
-              closeModal();
-              window.location.reload();
-            }
-          })
-          .catch((err) => alert("Lỗi khi xóa: " + err));
+        form.submit();
       });
     }
 
@@ -330,4 +311,24 @@ document.addEventListener("DOMContentLoaded", function () {
   modal.addEventListener("click", (e) => {
     if (e.target === modal) closeModal();
   });
+
+  // Enable/disable dropdown căn hộ theo vai trò khi tạo tài khoản (Account Add)
+  function toggleCanhoDropdownAccountAdd() {
+    var vaitroField = document.getElementById("vaitro-taikhoan");
+    var canhoDropdown = document.getElementById("canho-taikhoan");
+    if (vaitroField && canhoDropdown) {
+      if (vaitroField.value == "2") {
+        canhoDropdown.disabled = false;
+      } else {
+        canhoDropdown.disabled = true;
+        canhoDropdown.value = "";
+      }
+    }
+  }
+
+  var vaitroField = document.getElementById("vaitro-taikhoan");
+  if (vaitroField) {
+    vaitroField.addEventListener("change", toggleCanhoDropdownAccountAdd);
+    toggleCanhoDropdownAccountAdd();
+  }
 });
