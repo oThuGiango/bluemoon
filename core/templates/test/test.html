@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="utf-8" />
@@ -10,15 +10,18 @@
     <link rel="stylesheet" href="accountmanage.css" />
   </head>
   <body>
-
-
     <header class="topbar">
-      <button id="btnOpen" class="icon-btn" aria-controls="sidebar" aria-expanded="false" aria-label="Mở menu">
+      <button
+        id="btnOpen"
+        class="icon-btn"
+        aria-controls="sidebar"
+        aria-expanded="false"
+        aria-label="Mở menu"
+      >
         ☰ Menu
       </button>
       <h1>BLUEMOON - Dashboard</h1>
     </header>
-
 
     <main class="main-section">
       <div class="container-wide" style="width: 80%; max-width: 980px">
@@ -109,28 +112,27 @@
       </div>
     </main>
 
+    <div id="overlay" class="overlay" tabindex="-1" hidden></div>
 
+    <aside id="sidebar" class="sidebar" role="navigation" aria-hidden="true">
+      <div class="sidebar-header">
+        <h2>Menu</h2>
+        <button id="btnClose" class="close-btn" aria-label="Đóng menu">
+          ✕
+        </button>
+      </div>
 
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/hrmanage">Quản lý hộ khẩu</a>
+        <a href="/nhankhau">Quản lý nhân khẩu</a>
+        <a href="/accountmanage">Quản lý tài khoản</a>
+      </nav>
 
-<div id="overlay" class="overlay" tabindex="-1" hidden></div>
-
-<aside id="sidebar" class="sidebar" role="navigation" aria-hidden="true">
-  <div class="sidebar-header">
-    <h2>Menu</h2>
-    <button id="btnClose" class="close-btn" aria-label="Đóng menu">✕</button>
-  </div>
-
-  <nav class="nav">
-    <a href="/">Home</a>
-    <a href="/hrmanage">Quản lý hộ khẩu</a>
-    <a href="/demomanage">Quản lý nhân khẩu</a>
-    <a href="/accountmanage">Quản lý tài khoản</a>
-  </nav>
-
-  <div class="sidebar-footer">
-    <small>&copy; BlueMoon Apartment 2026.</small>
-  </div>
-</aside>
-<script src="sidebar.js"></script>
+      <div class="sidebar-footer">
+        <small>&copy; BlueMoon Apartment 2026.</small>
+      </div>
+    </aside>
+    <script src="sidebar.js"></script>
   </body>
 </html>

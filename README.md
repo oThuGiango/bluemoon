@@ -13,7 +13,7 @@
 
 ### 2. Quản lý Nhân khẩu
 
-- Xem danh sách toàn bộ nhân khẩu trong chung cư (`demomanage`).
+- Xem danh sách toàn bộ nhân khẩu trong chung cư (`nhankhau`).
 - Thêm một nhân khẩu mới và liên kết họ vào một hộ khẩu (`add_demo`).
 - Xem hồ sơ chi tiết của một nhân khẩu (`nhan_khau_profile`).
 - Chỉnh sửa thông tin chi tiết của nhân khẩu (`edit_nhan_khau`).

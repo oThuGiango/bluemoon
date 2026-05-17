@@ -1,62 +1,72 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/main.css' %}" />
-<div class="detail-container">
-  <h2
-    class="form-title"
-    style="text-align: center; color: var(--primary); margin-bottom: 25px"
-  >
+<div class="form-container" style="max-width: 600px; width: 95%; margin: 0 auto">
+  <h2 class="form-title" style="text-align: center; color: var(--primary); margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;">
     CHI TIẾT HỘ KHẨU <span class="title-icon">📄</span>
   </h2>
-  <div class="detail-group">
-    <b>ID:</b> {{ hokhau.id_hokhau }}<br />
-    <b>Căn hộ:</b> {% if hokhau.id_canho %}{{ hokhau.id_canho.so_can_ho }}{%
-    endif %}<br />
-    <b>Chủ hộ:</b> {% if hokhau.id_chuho %}{{ hokhau.id_chuho.username }}{%
-    endif %}<br />
-    <b>Tình trạng cư trú:</b> {{ hokhau.get_resident_status_display }}<br />
-    <b>Đang hoạt động:</b> {% if hokhau.is_active %}Có{% else %}Không{% endif
-    %}<br />
-    <b>Cập nhật lần cuối:</b> {{ hokhau.updated_at|date:'d/m/Y H:i' }} bởi {{
-    hokhau.updated_by }}
-  </div>
-  <div class="form-actions" style="margin-top: 30px">
-    <a
-      href="{% url 'hokhau_list' %}"
-      class="btn btn-secondary-outline"
-      style="min-width: 150px"
-    >
-      <i class="fa-solid fa-arrow-left"></i> Quay lại
-    </a>
-    <a href="{% url 'hokhau_edit' hokhau.id_hokhau %}" class="btn btn-primary">
-      <i class="fa-solid fa-pen"></i> Chỉnh sửa
-    </a>
-    <a href="{% url 'hokhau_delete' hokhau.id_hokhau %}" class="btn btn-danger">
-      <i class="fa-solid fa-trash"></i> Xóa
-    </a>
+  <div class="detail-grid" style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px;">
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Căn hộ:</span>
+      <span style="font-weight: 500; color: var(--primary)">{% if hokhau.id_canho %}{{ hokhau.id_canho.so_can_ho }}{% endif %}</span>
+    </div>
+    {% if hokhau.id_canho %}
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Diện tích:</span>
+      <span style="font-weight: 500; color: #333">{{ hokhau.id_canho.dien_tich }} m²</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Loại căn hộ:</span>
+      <span style="font-weight: 500; color: #333">{{ hokhau.id_canho.get_apartment_type_display }}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Vị trí:</span>
+      <span style="font-weight: 500; color: #333">Tầng {{ hokhau.id_canho.floor }}, Tòa {{ hokhau.id_canho.building.name }} </span>
+    </div>
+    {% endif %}
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Chủ hộ:</span>
+      <span style="font-weight: 500; color: #333">{% if hokhau.id_chuho %}{{ hokhau.id_chuho.username }}{% endif %}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Tình trạng cư trú:</span>
+      <span style="font-weight: 500; color: #333">{{ hokhau.get_resident_status_display }}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Đang hoạt động:</span>
+      <span style="font-weight: 500; color: #333">{% if hokhau.is_active %}Đang hoạt động
+      {% else %}Không hoạt động{% endif %}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Cập nhật lần cuối:</span>
+      <span style="font-weight: 500; color: #333">{{ hokhau.updated_at|date:'d/m/Y H:i' }} bởi {{ hokhau.updated_by }}</span>
+    </div>
   </div>
 
-  <div class="detail-group" style="margin-top: 40px">
-    <h3 style="color: var(--primary)">
-      Danh sách nhân khẩu ({{ nhankhau_count }})
-    </h3>
+
+  <div class="detail-group" style="margin-top: 10px">
+    <h3 style="color: var(--primary); margin-bottom: 12px;">Danh sách nhân khẩu ({{ nhankhau_count }})</h3>
     {% if nhankhau_list %}
     <div class="table-responsive">
-      <table class="data-table">
+      <table class="data-table" style="width:100%; margin-top: 5px; border-collapse: separate; border-spacing: 0 6px;">
         <thead>
-          <tr>
-            <th>Họ tên</th>
-            <th>Ngày sinh</th>
-            <th>CCCD</th>
-            <th>Quan hệ với chủ hộ</th>
+          <tr style="background: #f8f9fa;">
+            <th style="padding: 8px 4px; text-align:left;">Họ tên</th>
+            <th style="padding: 8px 4px; text-align:left;">Giới tính</th>
+            <th style="padding: 8px 4px; text-align:left;">Ngày sinh</th>
+            <th style="padding: 8px 4px; text-align:left;">CCCD</th>
+            <th style="padding: 8px 4px; text-align:left;">Quan hệ với chủ hộ</th>
           </tr>
         </thead>
         <tbody>
           {% for nk in nhankhau_list %}
-          <tr>
-            <td>{{ nk.ho_ten }}</td>
-            <td>{{ nk.ngay_sinh|date:'d/m/Y' }}</td>
-            <td>{{ nk.cccd }}</td>
-            <td>{{ nk.quan_he_chu_ho }}</td>
+          <tr style="background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.03);">
+            <td style="padding: 10px 6px;">{{ nk.ho_ten }}</td>
+            <td style="padding: 10px 6px;">
+              {% if nk.gioi_tinh == 'M' %}Nam{% elif nk.gioi_tinh == 'F' %}Nữ{% else %}Khác{% endif %}
+            </td>
+            <td style="padding: 10px 6px;">{{ nk.ngay_sinh|date:'d/m/Y' }}</td>
+            <td style="padding: 10px 6px;">{{ nk.cccd }}</td>
+            <td style="padding: 10px 6px;">{{ nk.quan_he_chu_ho }}</td>
           </tr>
           {% endfor %}
         </tbody>

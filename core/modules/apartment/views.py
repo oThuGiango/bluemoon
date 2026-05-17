@@ -1,4 +1,5 @@
 from core.forms import CanHoForm
+from django.db import models
 from django.contrib import messages
 from core.decorators import role_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -79,23 +80,47 @@ def building_detail(request, id):
 @login_required(login_url="login")
 @role_required([1])
 def canho_list(request):
-    canho_list = CanHo.objects.filter(
-        is_deleted=False).order_by("-id_canho")
 
+    building_list = Building.objects.filter(is_active=True, is_deleted=False)
     query = request.GET.get("search_canho", "")
     status = request.GET.get('status')
     apartment_type = request.GET.get('type')
+    building = request.GET.get('building')
+    floor = request.GET.get('floor')
 
+    canho_list = CanHo.objects.filter(is_deleted=False).order_by("-id_canho")
     if apartment_type:
         canho_list = canho_list.filter(apartment_type=apartment_type)
     if status:
         canho_list = canho_list.filter(status=status)
-
+    if building:
+        canho_list = canho_list.filter(building_id=building)
+    if floor:
+        canho_list = canho_list.filter(floor=floor)
     if query:
         canho_list = canho_list.filter(so_can_ho__icontains=query)
+
+    max_floor = Building.objects.filter(is_active=True, is_deleted=False).aggregate(
+        models.Max('max_floor'))['max_floor__max']
+    if building:
+        try:
+            selected_building = Building.objects.get(id=building)
+            max_floor = selected_building.max_floor
+        except Building.DoesNotExist:
+            pass
+
     total_count = canho_list.count()
-    context = {"canho_list": canho_list,
-               "query": query, "status": status, "type": apartment_type, "total_count": total_count}
+    context = {
+        "canho_list": canho_list,
+        "query": query,
+        "status": status,
+        "type": apartment_type,
+        "building_list": building_list,
+        "building": building,
+        "floor": floor,
+        "max_floor": list(range(1, max_floor + 1)) if max_floor else [],
+        "total_count": total_count,
+    }
     return render(request, "apartment/canho.html", context)
 
 
@@ -131,7 +156,15 @@ def canho_edit(request, id_canho):
             messages.success(request, "Cập nhật thông tin căn hộ thành công!")
             return redirect("canho_list")
         else:
-            messages.error(request, "Vui lòng kiểm tra lại các trường!")
+            # Lấy tất cả lỗi của form (bao gồm cả lỗi trường và lỗi chung)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(
+                        request, f"{form.fields[field].label if field in form.fields else field}: {error}")
+            # Nếu có lỗi chung (non_field_errors)
+            for error in form.non_field_errors():
+                messages.error(request, error)
+            return redirect('canho_list')
     else:
         form = CanHoForm(instance=canho)
     return render(request, "apartment/canho_edit.html", {"form": form, "canho": canho})

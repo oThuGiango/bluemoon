@@ -111,8 +111,37 @@
                   Khác
                 </option>
               </select>
+
+              <select
+                name="building"
+                class="filter-select"
+                onchange="this.form.submit()"
+                style="min-width: 140px;"
+              >
+                <option value="">-- Tòa nhà --</option>
+                {% for b in building_list %}
+                  <option value="{{ b.id }}" {% if building == b.id|stringformat:'s' %}selected{% endif %}>{{ b.name }}</option>
+                {% endfor %}
+              </select>
+
+              <select
+                name="floor"
+                class="filter-select"
+                onchange="this.form.submit()"
+                style="min-width: 100px;"
+              >
+                <option value="">-- Tầng --</option>
+                {% for f in max_floor %}
+                  <option
+                    value="{{ f }}"
+                    {% if floor == f|stringformat:'s' %}selected{% endif %}
+                  >
+                    Tầng {{ f }}
+                  </option>
+                {% endfor %}
+              </select>
               
-              {% if query or type or status%}
+              {% if query or type or status or building or floor%}
               <a
                 href="{% url 'canho_list' %}"
                 class="action-btn"
@@ -160,7 +189,7 @@
                   <th>Trạng thái</th>
                   <th>Tầng</th>
                   <th>Tòa nhà</th>
-                  <th>Thao tác</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -197,14 +226,7 @@
                     >
                       <i class="fa-solid fa-pen"></i>
                     </button>
-                    <button
-                      data-url="{% url 'canho_delete' c.id_canho %}"
-                      class="action-btn modal-trigger"
-                      title="Xóa"
-                      style="color: #e74c3c"
-                    >
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
+                   
                   </td>
                 </tr>
                 {% empty %}

@@ -1,14 +1,83 @@
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db import transaction
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from openpyxl import Workbook
-from django.utils import timezone
-from .models import BienDongNhanKhau, HoKhau, NhanKhau, CanHo
-from core.forms import HoKhauForm
-from core.decorators import role_required
 from django.db.models import Q
+from core.decorators import role_required
+from core.forms import HoKhauForm
+from core.modules.account.models import TaiKhoan
+from .models import BienDongNhanKhau, HoKhau, NhanKhau, CanHo
+from django.utils import timezone
+from openpyxl import Workbook
+from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponse
+from django.db import transaction
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.urls import reverse
+from django import forms
+
+
+class NhanKhauForm(forms.ModelForm):
+    class Meta:
+        model = NhanKhau
+        fields = ['ho_ten', 'gioi_tinh', 'ngay_sinh', 'cccd',
+                  'quan_he_chu_ho', 'id_hokhau', 'is_active']
+
+
+@login_required(login_url="login")
+@role_required([1])
+def nhankhau_list(request):
+    search = request.GET.get('search', '').strip()
+    qs = NhanKhau.objects.filter(is_deleted=False)
+    if search:
+        qs = qs.filter(ho_ten__icontains=search)
+    return render(request, 'resident/nhankhau/list.html', {'nhankhau_list': qs, 'search': search})
+
+
+@login_required(login_url="login")
+@role_required([1])
+def nhankhau_detail(request, pk):
+    nk = get_object_or_404(NhanKhau, pk=pk, is_deleted=False)
+    return render(request, 'resident/nhankhau/detail.html', {'nk': nk})
+
+
+@login_required(login_url="login")
+@role_required([1])
+def nhankhau_add(request):
+    if request.method == 'POST':
+        form = NhanKhauForm(request.POST)
+        if form.is_valid():
+            nk = form.save(commit=False)
+            nk.updated_by = request.user.username
+            nk.save()
+            return redirect('nhankhau_list')
+    else:
+        form = NhanKhauForm()
+    return render(request, 'resident/nhankhau/form.html', {'form': form, 'action': 'add'})
+
+
+@login_required(login_url="login")
+@role_required([1])
+def nhankhau_edit(request, pk):
+    nk = get_object_or_404(NhanKhau, pk=pk, is_deleted=False)
+    if request.method == 'POST':
+        form = NhanKhauForm(request.POST, instance=nk)
+        if form.is_valid():
+            nk = form.save(commit=False)
+            nk.updated_by = request.user.username
+            nk.save()
+            return redirect('nhankhau_detail', pk=nk.pk)
+    else:
+        form = NhanKhauForm(instance=nk)
+    return render(request, 'resident/nhankhau/form.html', {'form': form, 'action': 'edit', 'nk': nk})
+
+
+@login_required(login_url="login")
+@role_required([1])
+def nhankhau_delete(request, pk):
+    nk = get_object_or_404(NhanKhau, pk=pk, is_deleted=False)
+    if request.method == 'POST':
+        nk.is_deleted = True
+        nk.save()
+        return redirect('nhankhau_list')
+    return render(request, 'resident/nhankhau/confirm_delete.html', {'nk': nk})
 
 
 @login_required(login_url="login")
@@ -64,8 +133,17 @@ def hokhau_list(request):
 @login_required(login_url="login")
 @role_required([1])
 def hokhau_add(request):
+    # Lấy danh sách căn hộ chưa có hộ khẩu active
+    canho_with_active_hokhau = HoKhau.objects.filter(
+        is_deleted=False, is_active=True, id_canho__isnull=False).values_list('id_canho', flat=True)
+    available_canho = CanHo.objects.filter(is_deleted=False).exclude(id_canho__in=canho_with_active_hokhau)
+    # Lấy danh sách chủ hộ chưa có hộ khẩu active
+    chuho_with_active_hokhau = HoKhau.objects.filter(
+        is_deleted=False, is_active=True, id_chuho__isnull=False).values_list('id_chuho', flat=True)
+    available_chuho = TaiKhoan.objects.filter(vaitro__id_vaitro=2, is_deleted=False, is_active=True).exclude(id_taikhoan__in=chuho_with_active_hokhau)
+
     if request.method == 'POST':
-        form = HoKhauForm(request.POST)
+        form = HoKhauForm(request.POST, available_canho=available_canho, available_chuho=available_chuho)
         if form.is_valid():
             id_canho = form.cleaned_data.get('id_canho')
             id_chuho = form.cleaned_data.get('id_chuho')
@@ -92,7 +170,7 @@ def hokhau_add(request):
                 messages.success(request, 'Thêm hộ khẩu thành công!')
                 return redirect('hokhau_list')
     else:
-        form = HoKhauForm()
+        form = HoKhauForm(available_canho=available_canho, available_chuho=available_chuho)
     return render(request, 'resident/hokhau_add.html', {'form': form})
 
 
@@ -100,8 +178,23 @@ def hokhau_add(request):
 @role_required([1])
 def hokhau_edit(request, pk):
     hokhau = get_object_or_404(HoKhau, pk=pk)
+    # Lấy danh sách căn hộ chưa có hộ khẩu active, cộng thêm căn hộ hiện tại
+    canho_with_active_hokhau = HoKhau.objects.filter(
+        is_deleted=False, is_active=True, id_canho__isnull=False).values_list('id_canho', flat=True)
+    available_canho = CanHo.objects.filter(is_deleted=False).exclude(id_canho__in=canho_with_active_hokhau)
+    if hokhau.id_canho:
+        available_canho = available_canho | CanHo.objects.filter(id_canho=hokhau.id_canho.id_canho)
+    # Lấy danh sách chủ hộ chưa có hộ khẩu active, cộng thêm chủ hộ hiện tại
+    chuho_with_active_hokhau = HoKhau.objects.filter(
+        is_deleted=False, is_active=True, id_chuho__isnull=False).values_list('id_chuho', flat=True)
+    available_chuho = TaiKhoan.objects.filter(vaitro__id_vaitro=2, is_deleted=False, is_active=True).exclude(id_taikhoan__in=chuho_with_active_hokhau)
+    if hokhau.id_chuho:
+        available_chuho = available_chuho | TaiKhoan.objects.filter(id_taikhoan=hokhau.id_chuho.id_taikhoan)
+
     if request.method == 'POST':
-        form = HoKhauForm(request.POST, instance=hokhau)
+        post = request.POST.copy()
+        post['id_chuho'] = str(hokhau.id_chuho.pk)
+        form = HoKhauForm(post, instance=hokhau, available_canho=available_canho, available_chuho=available_chuho,disabled_chuho=True)
         if form.is_valid():
             hokhau = form.save(commit=False)
             hokhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
@@ -109,7 +202,7 @@ def hokhau_edit(request, pk):
             messages.success(request, 'Cập nhật hộ khẩu thành công!')
             return redirect('hokhau_list')
     else:
-        form = HoKhauForm(instance=hokhau)
+        form = HoKhauForm(instance=hokhau, available_canho=available_canho, available_chuho=available_chuho,disabled_chuho=True)
     return render(request, 'resident/hokhau_edit.html', {'form': form, 'hokhau': hokhau})
 
 
@@ -141,42 +234,14 @@ def hokhau_detail(request, pk):
 
 
 @login_required(login_url="login")
-def edit_nhan_khau(request, id_nhankhau):
-    nk = get_object_or_404(NhanKhau, id_nhankhau=id_nhankhau)
-    if request.method == "POST":
-        nk.ho_ten = request.POST.get("ho_ten")
-        nk.ngay_sinh = request.POST.get("ngay_sinh") or None
-        nk.cccd = request.POST.get("cccd") or None
-        nk.quan_he_chu_ho = request.POST.get("quan_he_chu_ho") or None
-        ho_khau_id = request.POST.get("ho_khau_id")
-
-        if ho_khau_id:
-            nk.id_hokhau_id = ho_khau_id
-
-        nk.save()
-        return redirect("nhan_khau_profile", id_nhankhau=nk.id_nhankhau)
-
-    return render(request, "core/demomanage_edit.html", {"nhan_khau": nk})
-
-
-@login_required(login_url="login")
+@role_required([1, 2])
 def nhan_khau_profile(request, id_nhankhau):
     nhan_khau = get_object_or_404(NhanKhau, id_nhankhau=id_nhankhau)
     return render(request, "core/nhan_khau_profile.html", {"nhan_khau": nhan_khau})
 
 
 @login_required(login_url="login")
-def nhan_khau_delete(request, id_nhankhau):
-    exists = NhanKhau.objects.filter(id_nhankhau=id_nhankhau).exists()
-    if exists:
-        nhan_khau = get_object_or_404(NhanKhau, id_nhankhau=id_nhankhau)
-        nhan_khau.is_deleted = True
-        nhan_khau.save()
-
-    return render(request, "core/demomanage_delete.html")
-
-
-@login_required(login_url="login")
+@role_required([1, 2])
 def export_biendong_excel(request):
     biendongs = BienDongNhanKhau.objects.select_related(
         "id_nhankhau").order_by("-ngay_batdau")
@@ -213,6 +278,7 @@ def export_biendong_excel(request):
 
 
 @login_required(login_url="login")
+@role_required([1, 2])
 def export_nhankhau_excel(request):
     nhankhau = NhanKhau.objects.filter(is_deleted=False)
 
@@ -248,6 +314,7 @@ def export_nhankhau_excel(request):
 
 
 @login_required(login_url="login")
+@role_required([1, 2])
 def export_hokhau_excel(request):
     hokhau = HoKhau.objects.filter(is_deleted=False)
 
@@ -277,68 +344,7 @@ def export_hokhau_excel(request):
 
 
 @login_required(login_url="login")
-def add_demo(request):
-    if request.method == "POST":
-        ho_ten = request.POST.get("ho_ten")
-        ngay_sinh = request.POST.get("ngay_sinh")
-        cccd = request.POST.get("cccd")
-        quan_he_chu_ho = request.POST.get("quan_he_chu_ho")
-        ho_khau_id = request.POST.get("ho_khau_id")
-        loai_bien_dong_query = request.POST.get("loai_dang_ky_cu_tru")
-        try:
-            if HoKhau.objects.filter(id_hokhau=ho_khau_id).exists():
-                nhan_khau = NhanKhau.objects.create(
-                    ho_ten=ho_ten,
-                    ngay_sinh=ngay_sinh or None,
-                    cccd=cccd or None,
-                    quan_he_chu_ho=quan_he_chu_ho or None,
-                    id_hokhau_id=int(ho_khau_id),
-                )
-                BienDongNhanKhau.objects.create(
-                    loai_biendong=loai_bien_dong_query,
-                    ngay_batdau=timezone.now().date(),
-                    id_nhankhau=nhan_khau,
-                    ly_do="Dang ky nhan khau moi",
-                )
-
-        except HoKhau.DoesNotExist:
-            pass
-
-        return redirect("demomanage/adddemo")
-
-    return render(request, "core/demomanage_add.html")
-
-
-@login_required(login_url="login")
-def demomanage(request):
-    nhan_khau_list = NhanKhau.objects.filter(is_deleted=False)
-    query = request.GET.get("search_id", "")
-    if query:
-        try:
-            for a in nhan_khau_list:
-                if a.id_nhankhau == int(query):
-                    nhan_khau_list = [a]
-        except ValueError:
-            nhan_khau_list = NhanKhau.objects.all()
-
-    data = []
-    for nk in nhan_khau_list:
-        bien_dong = (
-            BienDongNhanKhau.objects.filter(
-                id_nhankhau=nk).order_by("-ngay_batdau").first()
-        )
-
-        trang_thai = bien_dong.loai_biendong if bien_dong else "Chưa xác định"
-
-        data.append({"nhan_khau": nk, "trang_thai": trang_thai})
-    context = {
-        "data": data,
-        "query": query,
-    }
-    return render(request, "core/demomanage.html", context)
-
-
-@login_required(login_url="login")
+@role_required([1, 2])
 def biendong_list(request):
     biendongs = BienDongNhanKhau.objects.select_related(
         "id_nhankhau").order_by("-ngay_batdau")
@@ -351,6 +357,7 @@ def biendong_list(request):
 
 
 @login_required(login_url="login")
+@role_required([1, 2])
 def dang_ky_bdbk(request, id_nhankhau):
     nhan_khau = get_object_or_404(NhanKhau, id_nhankhau=id_nhankhau)
 
@@ -376,13 +383,3 @@ def dang_ky_bdbk(request, id_nhankhau):
         "core/dangkybdnk.html",
         {"nhan_khau": nhan_khau},
     )
-
-
-@login_required(login_url="login")
-def demomanage_delete(request, id_hokhau):
-    exists = HoKhau.objects.filter(id_hokhau=id_hokhau).exists()
-    if exists:
-        hr = get_object_or_404(HoKhau, id_hokhau=id_hokhau)
-        hr.is_deleted = True
-        hr.save()
-    return render(request, "core/hrmanage_delete.html")

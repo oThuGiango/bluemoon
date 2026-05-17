@@ -5,9 +5,11 @@
     class="form-title"
     style="text-align: center; color: var(--primary); margin-bottom: 25px"
   >
-    CHỈNH SỬA HỘ KHẨU <span class="title-icon">✏️</span>
+    {% if action == 'add' %}THÊM NHÂN KHẨU MỚI
+    {% else %}CHỈNH SỬA NHÂN KHẨU{% endif %}
+    <span class="title-icon">👤</span>
   </h2>
-  <form method="POST" action="{% url 'hokhau_edit' hokhau.id_hokhau %}">
+  <form method="POST">
     {% csrf_token %} {% for field in form.visible_fields %}
     <div class="form-group">
       <label for="{{ field.id_for_label }}" class="form-label">
@@ -27,15 +29,15 @@
     </div>
     {% endfor %}
     <div class="form-actions" style="margin-top: 30px">
-      <button
-        type="button"
-        class="btn btn-secondary-outline modal-close-btn"
-        style="min-width: 150px"
+      <a
+        href="{% url 'nhankhau_list' %}"
+        class="btn btn-secondary-outline"
+        style="min-width: 120px; margin-right: 8px"
       >
-        <i class="fa-solid fa-xmark"></i> Hủy
-      </button>
+        <i class="fa-solid fa-arrow-left"></i> Quay lại
+      </a>
       <button type="submit" class="btn btn-primary">
-        <i class="fa-solid fa-plus"></i> Cập nhật
+        <i class="fa-solid fa-save"></i> Lưu
       </button>
     </div>
   </form>

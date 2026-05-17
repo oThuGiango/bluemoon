@@ -203,20 +203,19 @@ class DotThuPhiForm(forms.ModelForm):
 
 
 class HoKhauForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, available_canho=None, available_chuho=None,disabled_chuho=False, **kwargs):
         super().__init__(*args, **kwargs)
-        # Hiển thị số căn hộ thay vì object
-        # Lấy các id_canho chưa có hộ khẩu active
-        used_canho_ids = HoKhau.objects.filter(
-            is_deleted=False, is_active=True).values_list('id_canho', flat=True)
-        self.fields['id_canho'].queryset = CanHo.objects.filter(
-            is_deleted=False, is_active=True).exclude(id_canho__in=used_canho_ids).order_by('so_can_ho')
-        self.fields['id_canho'].label_from_instance = lambda obj: obj.so_can_ho
-        # Lấy các chủ hộ chưa có hộ khẩu active
-        used_chuho_ids = HoKhau.objects.filter(
-            is_deleted=False, is_active=True).values_list('id_chuho', flat=True)
-        self.fields['id_chuho'].queryset = TaiKhoan.objects.filter(
-            vaitro__id_vaitro=2, is_deleted=False, is_active=True).exclude(id_taikhoan__in=used_chuho_ids).order_by('username')
+        if available_canho is not None:
+            self.fields['id_canho'].queryset = available_canho
+        if available_chuho is not None:
+            self.fields['id_chuho'].queryset = available_chuho
+        if disabled_chuho:
+            self.fields['id_chuho'].widget.attrs['disabled'] = 'true'
+        if self.instance and self.instance.pk:
+            if self.instance.id_canho:
+                self.fields['id_canho'].initial = self.instance.id_canho.pk
+            if self.instance.id_chuho:
+                self.fields['id_chuho'].initial = self.instance.id_chuho.pk
 
     class Meta:
         model = HoKhau
@@ -228,6 +227,6 @@ class HoKhauForm(forms.ModelForm):
         }
         widgets = {
             'id_canho': forms.Select(attrs={'class': 'form-control'}),
-            'id_chuho': forms.Select(attrs={'class': 'form-control'}),
+            'id_chuho': forms.Select(attrs={'class': 'form-control',}),
             'resident_status': forms.Select(attrs={'class': 'form-control'}),
         }

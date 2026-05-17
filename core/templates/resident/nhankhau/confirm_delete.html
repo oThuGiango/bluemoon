@@ -1,0 +1,31 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}" />
+<div class="form-container" style="max-width: 500px; margin: 40px auto">
+  <h2
+    class="form-title"
+    style="text-align: center; color: #d32f2f; margin-bottom: 25px"
+  >
+    XÁC NHẬN XÓA NHÂN KHẨU
+  </h2>
+  <div style="margin-bottom: 20px; text-align: center">
+    <p>
+      Bạn có chắc chắn muốn xóa nhân khẩu <b>{{ nk.ho_ten }}</b> (ID: {{
+      nk.id_nhankhau }}) không?
+    </p>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions" style="text-align: center">
+      <a
+        href="{% url 'nhankhau_detail' nk.id_nhankhau %}"
+        class="btn btn-secondary-outline"
+        style="min-width: 120px; margin-right: 8px"
+      >
+        <i class="fa-solid fa-arrow-left"></i> Hủy
+      </a>
+      <button type="submit" class="btn btn-danger" style="min-width: 120px">
+        <i class="fa-solid fa-trash"></i> Xóa
+      </button>
+    </div>
+  </form>
+</div>

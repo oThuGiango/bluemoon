@@ -1,28 +1,95 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/main.css' %}" />
-<div class="confirm-container">
-  <h2
-    class="form-title"
-    style="text-align: center; color: var(--danger); margin-bottom: 25px"
-  >
-    XÓA HỘ KHẨU <span class="title-icon">🗑️</span>
-  </h2>
-  <form method="POST" action="">
-    {% csrf_token %}
-    <p>
-      Bạn có chắc chắn muốn xóa hộ khẩu <b>#{{ hokhau.id_hokhau }}</b> không?
-    </p>
-    <div class="form-actions" style="margin-top: 30px">
-      <a
-        href="{% url 'hokhau_list' %}"
-        class="btn btn-secondary-outline"
-        style="min-width: 150px"
+<form method="post" action="{% url 'hokhau_delete' hokhau.id_hokhau %}" id="deleteHokhauForm">
+  {% csrf_token %}
+  <div class="form-container" style="margin: 0 auto">
+    <h2
+      class="form-title"
+      style="border-bottom: 2px solid #fce8e6; padding-bottom: 10px"
+    >
+      <i
+        class="fa-solid fa-triangle-exclamation"
+        style="color: #d93025; font-size: 1.2rem; margin-right: 8px"
+      ></i>
+      Xác nhận xóa hộ khẩu
+    </h2>
+
+    <div style="text-align: center">
+      <p style="font-size: 1.1rem; color: #3c4043; margin-bottom: 12px">
+        Bạn có chắc chắn muốn xóa hộ khẩu:<br />
+      </p>
+      <p style="color: #d93025; font-size: 1rem; font-weight: 600">
+        #{{ hokhau.id_hokhau }}
+      </p>
+      <div
+        style="
+          background-color: #fef7f7;
+          border-radius: 8px;
+          padding: 12px 10px;
+          margin-top: 12px;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+        "
       >
-        <i class="fa-solid fa-xmark"></i> Hủy
-      </a>
-      <button type="submit" class="btn btn-danger">
-        <i class="fa-solid fa-trash"></i> Xóa
+        <i
+          class="fa-solid fa-circle-info"
+          style="color: #d93025; font-size: 1rem; margin-right: 8px"
+        ></i>
+        <span
+          style="
+            font-size: 0.8rem;
+            text-align: left;
+            display: block;
+            width: 100%;
+          "
+        >
+          Hành động này không thể hoàn tác và có thể ảnh hưởng đến các dữ liệu
+          liên quan.
+        </span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary-outline" id="cancelDeleteBtn" style="padding: 10px 22px;">
+          <i class="fa-solid fa-xmark"></i> Hủy bỏ
+      </button>
+      <button
+        type="submit"
+        class="btn btn-danger-filled"
+        id="confirmDeleteBtn"
+        style="
+          background-color: #d93025;
+          color: white;
+          border: none;
+          padding: 10px 26px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: background 0.3s;
+        "
+      >
+        <i class="fa-solid fa-trash-can"></i> Xác nhận xóa
       </button>
     </div>
-  </form>
-</div>
+  </div>
+</form>
+
+<style>
+  #confirmDeleteBtn:hover {
+    background-color: #b22a1f !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  .form-container {
+    animation: slideDown 0.3s ease-out;
+  }
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+</style>

@@ -20,7 +20,8 @@ class Building(models.Model):
 class CanHo(models.Model):
     id_canho = models.AutoField(primary_key=True)
     so_can_ho = models.CharField(max_length=20, verbose_name="Số căn hộ")
-    dien_tich = models.FloatField(null=True, blank=True, verbose_name="Diện tích")
+    dien_tich = models.FloatField(
+        null=True, blank=True, verbose_name="Diện tích")
     floor = models.IntegerField(null=True, blank=True, verbose_name="Tầng")
     building = models.ForeignKey(
         Building,
@@ -55,7 +56,14 @@ class CanHo(models.Model):
 
     class Meta:
         db_table = "canho"
-        
+        constraints = [
+            models.UniqueConstraint(
+                fields=["so_can_ho"], name="unique_so_can_ho")
+        ]
+
+    def __str__(self):
+        return self.so_can_ho
+
     def save(self, *args, **kwargs):
         if self.building and self.floor is not None:
             if self.floor > self.building.max_floor:

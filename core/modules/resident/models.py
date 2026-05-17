@@ -56,11 +56,25 @@ class HoKhau(models.Model):
 
     class Meta:
         db_table = "hokhau"
+        constraints = [
+            UniqueConstraint(
+                fields=["id_canho", "id_chuho"],
+                condition=Q(is_deleted=False),
+                name="unique_canho_chuho_not_deleted"
+            )
+        ]
 
 
 class NhanKhau(models.Model):
     id_nhankhau = models.AutoField(primary_key=True)
     ho_ten = models.CharField(max_length=100)
+    GENDER_CHOICES = [
+        ("M", "Nam"),
+        ("F", "Nữ"),
+        ("O", "Khác"),
+    ]
+    gioi_tinh = models.CharField(
+        max_length=1, choices=GENDER_CHOICES, default="O")
     ngay_sinh = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -110,6 +124,12 @@ class NhanKhau(models.Model):
 
     def __str__(self):
         return self.ho_ten
+
+    def save(self, *args, **kwargs):
+        # Tự động set is_chu_ho nếu quan hệ là chủ hộ
+        self.is_chu_ho = self.quan_he_chu_ho == 'chu_ho'
+
+        super().save(*args, **kwargs)
 
 
 class BienDongNhanKhau(models.Model):

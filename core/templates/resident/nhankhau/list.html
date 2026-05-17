@@ -1,0 +1,121 @@
+{% load static %} {% load humanize %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quản lý nhân khẩu - BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
+  </head>
+  <body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+      {% include 'core/layout_header.html' %}
+      <section class="main-content income-management-page">
+        <div class="main-panel data-table-panel">
+          <div class="income-controls-top">
+            <form method="GET" action="" class="filter-group">
+              <div class="search-box-container">
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Tìm kiếm theo họ tên..."
+                  value="{{ search|default:'' }}"
+                />
+                <i class="fa-solid fa-search"></i>
+              </div>
+              <a
+                href="{% url 'nhankhau_add' %}"
+                class="btn btn-create-new btn-create-compact"
+                style="margin-left: 10px"
+              >
+                <i class="fa-solid fa-plus"></i> Thêm nhân khẩu
+              </a>
+            </form>
+          </div>
+          <h2
+            class="table-title"
+            style="border-bottom: none; margin-bottom: 8px"
+          >
+            DANH SÁCH NHÂN KHẨU
+          </h2>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Họ tên</th>
+                  <th>Giới tính</th>
+                  <th>Ngày sinh</th>
+                  <th>CCCD</th>
+                  <th>Quan hệ chủ hộ</th>
+                  <th>Hộ khẩu</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for nk in nhankhau_list %}
+                <tr>
+                  <td>{{ nk.id_nhankhau }}</td>
+                  <td>{{ nk.ho_ten }}</td>
+                  <td>
+                    {% if nk.gioi_tinh == 'M' %}Nam{% elif nk.gioi_tinh == 'F'
+                    %}Nữ{% else %}Khác{% endif %}
+                  </td>
+                  <td>{{ nk.ngay_sinh|date:'d/m/Y' }}</td>
+                  <td>{{ nk.cccd }}</td>
+                  <td>{{ nk.get_quan_he_chu_ho_display }}</td>
+                  <td>
+                    {% if nk.id_hokhau %}<a
+                      href="{% url 'hokhau_detail' nk.id_hokhau.id_hokhau %}"
+                      >{{ nk.id_hokhau.id_hokhau }}</a
+                    >{% endif %}
+                  </td>
+                  <td>
+                    {% if nk.is_active %}<span
+                      style="color: #27ae60; font-weight: bold"
+                      >✓</span
+                    >{% else %}<span style="color: #999">○</span>{% endif %}
+                  </td>
+                  <td>
+                    <a
+                      href="{% url 'nhankhau_detail' nk.id_nhankhau %}"
+                      class="action-btn"
+                      title="Chi tiết"
+                      ><i class="fa-solid fa-eye"></i
+                    ></a>
+                    <a
+                      href="{% url 'nhankhau_edit' nk.id_nhankhau %}"
+                      class="action-btn"
+                      title="Chỉnh sửa"
+                      ><i class="fa-solid fa-pen"></i
+                    ></a>
+                    <a
+                      href="{% url 'nhankhau_delete' nk.id_nhankhau %}"
+                      class="action-btn"
+                      title="Xóa"
+                      ><i class="fa-solid fa-trash" style="color: #e74c3c"></i
+                    ></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="9" style="text-align: center">
+                    Không có nhân khẩu nào.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

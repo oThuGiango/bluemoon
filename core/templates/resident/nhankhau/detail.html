@@ -1,0 +1,176 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}" />
+<div
+  class="form-container"
+  style="max-width: 600px; width: 95%; margin: 0 auto"
+>
+  <h2
+    class="form-title"
+    style="
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 25px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+    "
+  >
+    CHI TIẾT NHÂN KHẨU <span class="title-icon">👤</span>
+  </h2>
+  <div
+    class="detail-grid"
+    style="
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 25px;
+    "
+  >
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">ID:</span>
+      <span style="font-weight: 600; color: #333">{{ nk.id_nhankhau }}</span>
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Họ tên:</span>
+      <span style="font-weight: 500; color: #333">{{ nk.ho_ten }}</span>
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Giới tính:</span>
+      <span style="font-weight: 500; color: #333"
+        >{% if nk.gioi_tinh == 'M' %}Nam{% elif nk.gioi_tinh == 'F' %}Nữ{% else
+        %}Khác{% endif %}</span
+      >
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Ngày sinh:</span>
+      <span style="font-weight: 500; color: #333"
+        >{{ nk.ngay_sinh|date:'d/m/Y' }}</span
+      >
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">CCCD:</span>
+      <span style="font-weight: 500; color: #333">{{ nk.cccd }}</span>
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Quan hệ chủ hộ:</span>
+      <span style="font-weight: 500; color: #333"
+        >{{ nk.get_quan_he_chu_ho_display }}</span
+      >
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Hộ khẩu:</span>
+      <span style="font-weight: 500; color: #333"
+        >{% if nk.id_hokhau %}<a
+          href="{% url 'hokhau_detail' nk.id_hokhau.id_hokhau %}"
+          >{{ nk.id_hokhau.id_hokhau }}</a
+        >{% endif %}</span
+      >
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Trạng thái:</span>
+      <span style="font-weight: 500; color: #333"
+        >{% if nk.is_active %}Đang hoạt động{% else %}Không hoạt động{% endif
+        %}</span
+      >
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Cập nhật lần cuối:</span>
+      <span style="font-weight: 500; color: #333"
+        >{{ nk.updated_at|date:'d/m/Y H:i' }} bởi {{ nk.updated_by }}</span
+      >
+    </div>
+  </div>
+  <div
+    class="form-actions"
+    style="
+      text-align: right;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+      margin-bottom: 30px;
+    "
+  >
+    <a
+      href="{% url 'nhankhau_list' %}"
+      class="btn btn-secondary-outline"
+      style="min-width: 120px; margin-right: 8px"
+    >
+      <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </a>
+    <a
+      href="{% url 'nhankhau_edit' nk.id_nhankhau %}"
+      class="btn btn-primary"
+      style="min-width: 120px; margin-right: 8px"
+    >
+      <i class="fa-solid fa-pen"></i> Chỉnh sửa
+    </a>
+    <a
+      href="{% url 'nhankhau_delete' nk.id_nhankhau %}"
+      class="btn btn-danger"
+      style="min-width: 120px"
+    >
+      <i class="fa-solid fa-trash"></i> Xóa
+    </a>
+  </div>
+</div>

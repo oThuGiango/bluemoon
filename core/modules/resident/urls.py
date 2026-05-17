@@ -1,8 +1,8 @@
-from django.urls import path
 from . import views
-
+from django.urls import path
 
 urlpatterns = [
+    # Hộ khẩu
     path('hokhau/', views.hokhau_list, name='hokhau_list'),
     path('hokhau/<int:pk>/toggle-active/',
          views.hokhau_toggle_active, name='hokhau_toggle_active'),
@@ -11,21 +11,21 @@ urlpatterns = [
     path('hokhau/<int:pk>/edit/', views.hokhau_edit, name='hokhau_edit'),
     path('hokhau/<int:pk>/delete/', views.hokhau_delete, name='hokhau_delete'),
 
-    path("demomanage", views.demomanage, name="demomanage"),
-    path("demomanage/adddemo", views.add_demo, name="demomanage/adddemo"),
-    path("demomanage/<int:id_nhankhau>/",
-         views.nhan_khau_profile, name="nhan_khau_profile"),
-    path("demomanage/delete/<int:id_nhankhau>/",
-         views.nhan_khau_delete, name="nhan_khau_delete"),
-    path("demomanage/<int:id_nhankhau>/edit/",
-         views.edit_nhan_khau, name="edit_nhan_khau"),
-    path("demomanage/dangkybiendongnhankhau/<int:id_nhankhau>/",
+    # Nhân khẩu
+    path('nhankhau/', views.nhankhau_list, name='nhankhau_list'),
+    path('nhankhau/add/', views.nhankhau_add, name='nhankhau_add'),
+    path('nhankhau/<int:pk>/', views.nhankhau_detail, name='nhankhau_detail'),
+    path('nhankhau/<int:pk>/edit/', views.nhankhau_edit, name='nhankhau_edit'),
+    path('nhankhau/<int:pk>/delete/',
+         views.nhankhau_delete, name='nhankhau_delete'),
+
+    path("nhankhau/dangkybiendongnhankhau/<int:id_nhankhau>/",
          views.dang_ky_bdbk, name="dang_ky_bdnk"),
-    path("demomanage/biendongnhankhau",
+    path("nhankhau/biendongnhankhau",
          views.biendong_list, name="biendong_list"),
-    path("demomanage/biendong/export/",
+    path("nhankhau/biendong/export/",
          views.export_biendong_excel, name="export_biendong_excel"),
-    path("demomanage/export/", views.export_nhankhau_excel,
+    path("nhankhau/export/", views.export_nhankhau_excel,
          name="export_nhankhau_excel"),
 
 
