@@ -168,6 +168,7 @@ class BienDongNhanKhau(models.Model):
         related_name="nhan_khau",
         default=1,
     )
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         managed = True

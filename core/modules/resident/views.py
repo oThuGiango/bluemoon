@@ -26,7 +26,7 @@ def get_user_hokhau_active(user):
 @role_required([1, 2])
 def nhankhau_list(request):
     search = request.GET.get('search', '').strip()
-    loai_biendong = request.GET.get('loai_biendong', '').strip()
+    loai_biendong = request.GET.get('status', '').strip()
     user_hokhau = get_user_hokhau_active(request.user)
     qs = NhanKhau.objects.filter(
         is_deleted=False, id_hokhau__is_active=True, id_hokhau__is_deleted=False)
@@ -37,10 +37,12 @@ def nhankhau_list(request):
             Q(ho_ten__icontains=search) |
             Q(cccd__icontains=search) |
             Q(so_dien_thoai__icontains=search) |
-            Q(email__icontains=search)
+            Q(email__icontains=search) |
+            Q(id_hokhau__id_canho__so_can_ho__icontains=search)
         )
     latest_bd_subquery = BienDongNhanKhau.objects.filter(
-        id_nhankhau=OuterRef('pk')
+        id_nhankhau=OuterRef('pk'),
+        is_deleted=False
     ).order_by('-ngay_batdau')
     qs = qs.annotate(
         latest_bd_ngay=Subquery(latest_bd_subquery.values(
@@ -67,7 +69,9 @@ def nhankhau_list(request):
     return render(request, 'resident/nhankhau/list.html', {
         'nhankhau_list': qs,
         'search': search,
-        'loai_biendong': loai_biendong
+        'loai_biendong': loai_biendong,
+        'query': search,
+        'status': loai_biendong
     })
 
 
@@ -80,7 +84,9 @@ def nhankhau_detail(request, pk):
     if user_hokhau is not None and nk.id_hokhau not in user_hokhau:
         messages.error(request, 'Bạn không có quyền xem nhân khẩu này!')
         return redirect('nhankhau_list')
-    return render(request, 'resident/nhankhau/detail.html', {'nk': nk})
+    biendong_list = BienDongNhanKhau.objects.filter(
+        id_nhankhau=nk, is_deleted=False).order_by('-ngay_batdau')
+    return render(request, 'resident/nhankhau/detail.html', {'nk': nk, 'biendong_list': biendong_list})
 
 
 @login_required(login_url="login")
@@ -131,6 +137,7 @@ def nhankhau_edit(request, pk):
     if user_hokhau is not None and nk.id_hokhau not in user_hokhau:
         messages.error(request, 'Bạn không có quyền sửa nhân khẩu này!')
         return redirect('nhankhau_list')
+    
     if request.method == 'POST':
         # Nếu trường id_hokhau bị disabled thì sẽ không có trong POST, nên gán lại từ instance
         post = request.POST.copy()
@@ -141,7 +148,8 @@ def nhankhau_edit(request, pk):
             nk = form.save(commit=False)
             nk.updated_by = request.user.username
             nk.save()
-            return redirect('nhankhau_detail', pk=nk.pk)
+            messages.success(request, 'Cập nhật nhân khẩu thành công!')
+            return redirect('nhankhau_list')
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -167,7 +175,9 @@ def nhankhau_delete(request, pk):
         return redirect('nhankhau_list')
     if request.method == 'POST':
         nk.is_deleted = True
+        nk.updated_by = request.user.username
         nk.save()
+        messages.success(request, 'Đã xóa nhân khẩu!')
         return redirect('nhankhau_list')
     return render(request, 'resident/nhankhau/confirm_delete.html', {'nk': nk})
 
@@ -178,7 +188,8 @@ def hokhau_toggle_active(request, pk):
     hokhau = get_object_or_404(HoKhau, pk=pk)
     if request.method == 'POST':
         hokhau.is_active = not hokhau.is_active
-        hokhau.save(update_fields=['is_active', 'updated_at'])
+        hokhau.updated_by = request.user.username 
+        hokhau.save(update_fields=['is_active', 'updated_at', 'updated_by'])
         messages.success(
             request, f'Trạng thái hộ khẩu đã được cập nhật thành {"hoạt động" if hokhau.is_active else "không hoạt động"}!')
     return redirect('hokhau_list')
@@ -468,7 +479,7 @@ def export_hokhau_excel(request):
 @login_required(login_url="login")
 @role_required([1, 2])
 def biendong_list(request):
-    biendongs = BienDongNhanKhau.objects.select_related(
+    biendongs = BienDongNhanKhau.objects.filter(is_deleted=False).select_related(
         "id_nhankhau").order_by("-ngay_batdau")
 
     return render(

@@ -273,9 +273,8 @@ class NhanKhauForm(forms.ModelForm):
 
 
 """
-nhan khau
 bdnk
-deactive hokhau -> bdnk
+deactive/update hokhau -> bdnk
 tai san
 thong bao
 ticket

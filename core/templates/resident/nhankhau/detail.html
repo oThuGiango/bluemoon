@@ -25,17 +25,7 @@
       margin-bottom: 25px;
     "
   >
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 8px;
-      "
-    >
-      <span style="font-weight: bold; color: #666">ID:</span>
-      <span style="font-weight: 600; color: #333">{{ nk.id_nhankhau }}</span>
-    </div>
+    
     <div
       style="
         display: flex;
@@ -57,8 +47,9 @@
     >
       <span style="font-weight: bold; color: #666">Giới tính:</span>
       <span style="font-weight: 500; color: #333"
-        >{% if nk.gioi_tinh == 'M' %}Nam{% elif nk.gioi_tinh == 'F' %}Nữ{% else
-        %}Khác{% endif %}</span
+        >{% if nk.gioi_tinh == 'M' %}Nam
+        {% elif nk.gioi_tinh == 'F' %}Nữ
+        {% else %}Khác{% endif %}</span
       >
     </div>
     <div
@@ -93,41 +84,40 @@
         padding-bottom: 8px;
       "
     >
-      <span style="font-weight: bold; color: #666">Quan hệ chủ hộ:</span>
+      <span style="font-weight: bold; color: #666">Quan hệ với chủ hộ:</span>
       <span style="font-weight: 500; color: #333"
         >{{ nk.get_quan_he_chu_ho_display }}</span
       >
     </div>
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 8px;
-      "
-    >
-      <span style="font-weight: bold; color: #666">Hộ khẩu:</span>
-      <span style="font-weight: 500; color: #333"
-        >{% if nk.id_hokhau %}<a
-          href="{% url 'hokhau_detail' nk.id_hokhau.id_hokhau %}"
-          >{{ nk.id_hokhau.id_hokhau }}</a
-        >{% endif %}</span
-      >
+    
+    {% if nk.id_hokhau and nk.id_hokhau.id_canho %}
+    <div style="border-bottom: 1px solid #eee; padding-bottom: 8px;">
+      <span style="font-weight: bold; color: #666">Căn hộ:</span>
+      <table style="width: 100%; max-width: 350px; margin: 8px 0 0 0; border-collapse: collapse; background: #fafbfc; font-size: 15px;">
+        <tr>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #666; width: 90px;">Số</td>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #222; font-weight: 500;">{{ nk.id_hokhau.id_canho.so_can_ho }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #666;">Diện tích</td>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #222; font-weight: 500;">{{ nk.id_hokhau.id_canho.dien_tich }} m²</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #666;">Loại</td>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #222; font-weight: 500;">{{ nk.id_hokhau.id_canho.apartment_type|default:'-' }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #666;">Tầng</td>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #222; font-weight: 500;">{{ nk.id_hokhau.id_canho.floor|default:'-' }}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #666;">Tòa</td>
+          <td style="padding: 6px 8px; border: 1px solid #e0e0e0; color: #222; font-weight: 500;">{{ nk.id_hokhau.id_canho.building|default:'-' }}</td>
+        </tr>
+      </table>
     </div>
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 8px;
-      "
-    >
-      <span style="font-weight: bold; color: #666">Trạng thái:</span>
-      <span style="font-weight: 500; color: #333"
-        >{% if nk.is_active %}Đang hoạt động{% else %}Không hoạt động{% endif
-        %}</span
-      >
-    </div>
+    {% endif %}
+    
     <div
       style="
         display: flex;
@@ -142,35 +132,30 @@
       >
     </div>
   </div>
-  <div
-    class="form-actions"
-    style="
-      text-align: right;
-      border-top: 1px solid #eee;
-      padding-top: 20px;
-      margin-bottom: 30px;
-    "
-  >
-    <a
-      href="{% url 'nhankhau_list' %}"
-      class="btn btn-secondary-outline"
-      style="min-width: 120px; margin-right: 8px"
-    >
-      <i class="fa-solid fa-arrow-left"></i> Quay lại
-    </a>
-    <a
-      href="{% url 'nhankhau_edit' nk.id_nhankhau %}"
-      class="btn btn-primary"
-      style="min-width: 120px; margin-right: 8px"
-    >
-      <i class="fa-solid fa-pen"></i> Chỉnh sửa
-    </a>
-    <a
-      href="{% url 'nhankhau_delete' nk.id_nhankhau %}"
-      class="btn btn-danger"
-      style="min-width: 120px"
-    >
-      <i class="fa-solid fa-trash"></i> Xóa
-    </a>
+  <h3 style="margin-top: 30px; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 8px;">Lịch sử biến động nhân khẩu</h3>
+  <div style="overflow-x: auto; margin-bottom: 30px;">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: #f8f8f8;">
+          <th style="padding: 8px; border: 1px solid #eee;">Loại biến động</th>
+          <th style="padding: 8px; border: 1px solid #eee;">Ngày bắt đầu</th>
+          <th style="padding: 8px; border: 1px solid #eee;">Ngày kết thúc</th>
+          <th style="padding: 8px; border: 1px solid #eee;">Lý do</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bd in biendong_list %}
+        <tr>
+          <td style="padding: 8px; border: 1px solid #eee;">{{ bd.get_loai_biendong_display }}</td>
+          <td style="padding: 8px; border: 1px solid #eee;">{{ bd.ngay_batdau|date:'d/m/Y' }}</td>
+          <td style="padding: 8px; border: 1px solid #eee;">{{ bd.ngay_ketthuc|date:'d/m/Y' }}</td>
+          <td style="padding: 8px; border: 1px solid #eee;">{{ bd.ly_do|default:'-' }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="text-align:center; color:#888;">Không có biến động nào</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+  
 </div>

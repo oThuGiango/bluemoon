@@ -22,6 +22,15 @@
 
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel">
+          <div style="display: flex; justify-content: flex-end; width:100%">
+            <a
+              href="{% url 'export_biendong_excel' %}"
+              class="btn-excel"
+            >
+              <i class="fa-solid fa-file-excel"></i> Xuất Excel
+            </a>
+          </div>
+
           <h2 class="table-title">LỊCH SỬ BIẾN ĐỘNG NHÂN KHẨU</h2>
 
           <div class="table-responsive">
@@ -88,25 +97,7 @@
                 {% endfor %}
               </tbody>
             </table>
-          </div>
 
-          <div class="income-actions-bottom">
-            <a
-              href="{% url 'nhankhau' %}"
-              class="btn btn-secondary-outline"
-              style="text-decoration: none"
-            >
-              <i class="fa-solid fa-arrow-left"></i> Quay lại quản lý nhân khẩu
-            </a>
-          </div>
-          <div class="income-actions-bottom">
-            <a
-              href="{% url 'export_biendong_excel' %}"
-              class="btn btn-secondary-outline"
-              style="text-decoration: none"
-            >
-              <i></i> 📥 Xuất Excel
-            </a>
           </div>
         </div>
       </section>
