@@ -3,6 +3,7 @@ from django.db.models import Q, UniqueConstraint
 from core.modules.apartment.models import CanHo
 from core.modules.base.models import LoaiBienDong
 from core.modules.account.models import TaiKhoan
+from django.core.validators import RegexValidator
 
 
 class HoKhau(models.Model):
@@ -64,6 +65,9 @@ class HoKhau(models.Model):
             )
         ]
 
+    def __str__(self):
+        return self.id_canho.so_can_ho
+
 
 class NhanKhau(models.Model):
     id_nhankhau = models.AutoField(primary_key=True)
@@ -78,7 +82,23 @@ class NhanKhau(models.Model):
     ngay_sinh = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
-    cccd = models.CharField(max_length=12, unique=True, null=True, blank=True)
+
+    cccd = models.CharField(
+        max_length=12,
+        unique=True,
+        null=True,
+        blank=True,
+        validators=[RegexValidator(
+            regex=r'^\d{12}$', message='CCCD phải gồm 12 chữ số.')]
+    )
+    so_dien_thoai = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True,
+        validators=[RegexValidator(
+            regex=r'^0\d{9}$', message='Số điện thoại phải bắt đầu bằng 0 và gồm 10 chữ số.')]
+    )
+    email = models.EmailField(max_length=254, null=True, blank=True)
     QUAN_HE_CHOICES = [
         ("chu_ho", "Chủ hộ"),
         ("vo_chong", "Vợ/chồng"),

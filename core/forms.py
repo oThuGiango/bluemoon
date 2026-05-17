@@ -1,6 +1,8 @@
 
 from django import forms
 
+from core.modules.resident.models import NhanKhau
+
 from .models import KhoanThu, DotThuPhi, Building, CanHo, HoKhau, TaiKhoan
 
 
@@ -203,7 +205,7 @@ class DotThuPhiForm(forms.ModelForm):
 
 
 class HoKhauForm(forms.ModelForm):
-    def __init__(self, *args, available_canho=None, available_chuho=None,disabled_chuho=False, **kwargs):
+    def __init__(self, *args, available_canho=None, available_chuho=None, disabled_chuho=False, **kwargs):
         super().__init__(*args, **kwargs)
         if available_canho is not None:
             self.fields['id_canho'].queryset = available_canho
@@ -227,6 +229,54 @@ class HoKhauForm(forms.ModelForm):
         }
         widgets = {
             'id_canho': forms.Select(attrs={'class': 'form-control'}),
-            'id_chuho': forms.Select(attrs={'class': 'form-control',}),
+            'id_chuho': forms.Select(attrs={'class': 'form-control', }),
             'resident_status': forms.Select(attrs={'class': 'form-control'}),
         }
+
+
+class NhanKhauForm(forms.ModelForm):
+    def __init__(self, *args, hokhau_avai=None, disabled_hokhau=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['quan_he_chu_ho'].required = True
+        if hokhau_avai is not None:
+            self.fields['id_hokhau'].queryset = hokhau_avai
+        if self.instance and self.instance.pk and self.instance.id_hokhau:
+            self.fields['id_hokhau'].initial = self.instance.id_hokhau.pk
+        if disabled_hokhau:
+            self.fields['id_hokhau'].widget.attrs['disabled'] = 'true'
+
+    class Meta:
+        model = NhanKhau
+        fields = ['id_hokhau', 'ho_ten', 'gioi_tinh', 'ngay_sinh', 'cccd',
+                  'so_dien_thoai', 'email',
+                  'quan_he_chu_ho']
+        labels = {
+            'ho_ten': 'Họ tên',
+            'gioi_tinh': 'Giới tính',
+            'ngay_sinh': 'Ngày sinh',
+            'cccd': 'CCCD/CMND',
+            'so_dien_thoai': 'Số điện thoại',
+            'email': 'Email',
+            'quan_he_chu_ho': 'Quan hệ với chủ hộ',
+            'id_hokhau': 'Hộ khẩu',
+        }
+        widgets = {
+            'id_hokhau': forms.Select(attrs={'class': 'form-control'}),
+            'ho_ten': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập họ tên'}),
+            'gioi_tinh': forms.Select(attrs={'class': 'form-control'}),
+            'ngay_sinh': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'cccd': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập số CCCD/CMND'}),
+            'so_dien_thoai': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập số điện thoại'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Nhập email'}),
+            'quan_he_chu_ho': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+
+"""
+nhan khau
+bdnk
+deactive hokhau -> bdnk
+tai san
+thong bao
+ticket
+"""

@@ -9,6 +9,10 @@
       href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
   </head>
@@ -16,28 +20,117 @@
     {% include 'core/Sidebar.html' %}
     <main>
       {% include 'core/layout_header.html' %}
+
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel">
+          <!-- prettier-ignore -->
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'success' %}
+          <div
+            class="message-container success"
+            style="
+              background-color: #e6f7d9;
+              color: #52c41a;
+              border: 1px solid #b7eb8f;
+              margin: auto;
+            "
+          >
+            {{ message }}
+          </div>
+          {% elif message.tags == 'error' %}
+          <div
+            class="message-container error-alert"
+            style="
+              background-color: #fff1f0;
+              color: #ff4d4f;
+              border: 1px solid #ffa39e;
+              margin: auto;
+            "
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
+          </div>
+          <!-- prettier-ignore -->
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+
           <div class="income-controls-top">
-            <form method="GET" action="" class="filter-group">
+            <form
+              method="GET"
+              action="{% url 'nhankhau_list' %}"
+              class="filter-group"
+            >
               <div class="search-box-container">
                 <input
                   type="text"
                   name="search"
-                  placeholder="Tìm kiếm theo họ tên..."
-                  value="{{ search|default:'' }}"
+                  placeholder="Tìm kiếm theo họ tên, CCCD, SDT, Email..."
+                  value="{{ query|default:'' }}"
                 />
                 <i class="fa-solid fa-search"></i>
               </div>
-              <a
-                href="{% url 'nhankhau_add' %}"
-                class="btn btn-create-new btn-create-compact"
-                style="margin-left: 10px"
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="min-width: 120px"
               >
-                <i class="fa-solid fa-plus"></i> Thêm nhân khẩu
+                <i class="fa-solid fa-filter"></i> Tìm kiếm
+              </button>
+
+              <select
+                name="status"
+                class="filter-select"
+                onchange="this.form.submit()"
+              >
+              <!-- prettier-ignore -->
+                <option value="">-- Trạng thái --</option>
+                <option
+                  value="thuong_tru"
+                  {% if status == 'thuong_tru' %}
+                  selected{% endif %}
+                >
+                  Thường trú
+                </option>
+                <option
+                  value="tam_tru"
+                  {% if status == 'tam_tru' %}
+                  selected{% endif %}
+                >
+                  Tạm trú
+                </option>
+                <option
+                  value="tam_vang"
+                  {% if status == 'tam_vang' %}
+                  selected{% endif %}
+                >
+                  Tạm vắng
+                </option>
+                
+              </select>
+
+              {% if query or status %}
+              <a
+                href="{% url 'accountmanage' %}"
+                class="action-btn"
+                title="Xóa lọc"
+                style="background: #f5f5f5; color: #333"
+              >
+                <i class="fa-solid fa-rotate-right"></i>
               </a>
+              {% endif %}
             </form>
           </div>
+
+          <div class="income-actions-bottom income-actions-top-left">
+            <button
+              data-url="{% url 'nhankhau_add' %}"
+              class="btn btn-create-new btn-create-compact modal-trigger"
+            >
+              <i class="fa-solid fa-user-plus"></i> Thêm tài khoản mới
+            </button>
+          </div>
+
           <h2
             class="table-title"
             style="border-bottom: none; margin-bottom: 8px"
@@ -50,12 +143,10 @@
                 <tr>
                   <th>ID</th>
                   <th>Họ tên</th>
-                  <th>Giới tính</th>
-                  <th>Ngày sinh</th>
                   <th>CCCD</th>
                   <th>Quan hệ chủ hộ</th>
-                  <th>Hộ khẩu</th>
-                  <th>Trạng thái</th>
+                  <th>Căn hộ</th>
+                  <th>Tình trạng</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -64,44 +155,42 @@
                 <tr>
                   <td>{{ nk.id_nhankhau }}</td>
                   <td>{{ nk.ho_ten }}</td>
-                  <td>
-                    {% if nk.gioi_tinh == 'M' %}Nam{% elif nk.gioi_tinh == 'F'
-                    %}Nữ{% else %}Khác{% endif %}
-                  </td>
-                  <td>{{ nk.ngay_sinh|date:'d/m/Y' }}</td>
+                  
                   <td>{{ nk.cccd }}</td>
                   <td>{{ nk.get_quan_he_chu_ho_display }}</td>
                   <td>
-                    {% if nk.id_hokhau %}<a
-                      href="{% url 'hokhau_detail' nk.id_hokhau.id_hokhau %}"
-                      >{{ nk.id_hokhau.id_hokhau }}</a
-                    >{% endif %}
+                    {% if nk.id_hokhau %}{{ nk.id_hokhau.id_canho.so_can_ho }}
+                    {% endif %}
                   </td>
                   <td>
-                    {% if nk.is_active %}<span
-                      style="color: #27ae60; font-weight: bold"
-                      >✓</span
-                    >{% else %}<span style="color: #999">○</span>{% endif %}
+                    {% if nk.latest_bd_loai_display %}
+                      {{ nk.latest_bd_loai_display }}
+                    {% else %}-{% endif %}
                   </td>
+                 
                   <td>
-                    <a
-                      href="{% url 'nhankhau_detail' nk.id_nhankhau %}"
-                      class="action-btn"
+                    <button
+                      data-url="{% url 'nhankhau_detail' nk.id_nhankhau %}"
+                      class="action-btn view-detail modal-trigger"
                       title="Chi tiết"
-                      ><i class="fa-solid fa-eye"></i
-                    ></a>
-                    <a
-                      href="{% url 'nhankhau_edit' nk.id_nhankhau %}"
-                      class="action-btn"
+                    >
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button
+                      data-url="{% url 'nhankhau_edit' nk.id_nhankhau %}"
+                      class="action-btn modal-trigger"
                       title="Chỉnh sửa"
-                      ><i class="fa-solid fa-pen"></i
-                    ></a>
-                    <a
-                      href="{% url 'nhankhau_delete' nk.id_nhankhau %}"
-                      class="action-btn"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      data-url="{% url 'nhankhau_delete' nk.id_nhankhau %}"
+                      class="action-btn modal-trigger"
                       title="Xóa"
-                      ><i class="fa-solid fa-trash" style="color: #e74c3c"></i
-                    ></a>
+                      style="color: #e74c3c"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
                   </td>
                 </tr>
                 {% empty %}
@@ -117,5 +206,9 @@
         </div>
       </section>
     </main>
+    <div id="mainModal" class="modal">
+      <div class="modal-content"></div>
+    </div>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
   </body>
 </html>

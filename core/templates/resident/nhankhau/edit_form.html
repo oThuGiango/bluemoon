@@ -9,7 +9,7 @@
     {% else %}CHỈNH SỬA NHÂN KHẨU{% endif %}
     <span class="title-icon">👤</span>
   </h2>
-  <form method="POST" action="{% url 'nhankhau_add' %}">
+  <form method="POST" action="{% url 'nhankhau_edit' %}">
     {% csrf_token %} {% for field in form.visible_fields %}
     <div class="form-group">
       <label for="{{ field.id_for_label }}" class="form-label">

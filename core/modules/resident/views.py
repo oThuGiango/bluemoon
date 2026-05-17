@@ -1,78 +1,170 @@
-from django.db.models import Q
-from core.decorators import role_required
-from core.forms import HoKhauForm
-from core.modules.account.models import TaiKhoan
-from .models import BienDongNhanKhau, HoKhau, NhanKhau, CanHo
-from django.utils import timezone
-from openpyxl import Workbook
-from django.shortcuts import get_object_or_404, redirect, render
-from django.http import HttpResponse
-from django.db import transaction
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.urls import reverse
+from django.db.models import Q, OuterRef, Subquery, DateField, Case, When, Value, CharField
 from django import forms
+from django.urls import reverse
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from openpyxl import Workbook
+from django.utils import timezone
+from .models import BienDongNhanKhau, HoKhau, NhanKhau, CanHo
+from core.modules.account.models import TaiKhoan
+from core.forms import HoKhauForm, NhanKhauForm
+from core.decorators import role_required
+from core.modules.base.models import LoaiBienDong
 
 
-class NhanKhauForm(forms.ModelForm):
-    class Meta:
-        model = NhanKhau
-        fields = ['ho_ten', 'gioi_tinh', 'ngay_sinh', 'cccd',
-                  'quan_he_chu_ho', 'id_hokhau', 'is_active']
+def get_user_hokhau_active(user):
+    """Trả về queryset hộ khẩu active mà user là chủ hộ (nếu là cư dân), ngược lại trả về None."""
+    if hasattr(user, 'vaitro') and getattr(user.vaitro, 'id_vaitro', None) == 2:
+        return HoKhau.objects.filter(is_active=True, is_deleted=False, id_chuho=user)
+    return None
 
 
 @login_required(login_url="login")
-@role_required([1])
+@role_required([1, 2])
 def nhankhau_list(request):
     search = request.GET.get('search', '').strip()
-    qs = NhanKhau.objects.filter(is_deleted=False)
+    loai_biendong = request.GET.get('loai_biendong', '').strip()
+    user_hokhau = get_user_hokhau_active(request.user)
+    qs = NhanKhau.objects.filter(
+        is_deleted=False, id_hokhau__is_active=True, id_hokhau__is_deleted=False)
+    if user_hokhau is not None:
+        qs = qs.filter(id_hokhau__in=user_hokhau)
     if search:
-        qs = qs.filter(ho_ten__icontains=search)
-    return render(request, 'resident/nhankhau/list.html', {'nhankhau_list': qs, 'search': search})
+        qs = qs.filter(
+            Q(ho_ten__icontains=search) |
+            Q(cccd__icontains=search) |
+            Q(so_dien_thoai__icontains=search) |
+            Q(email__icontains=search)
+        )
+    latest_bd_subquery = BienDongNhanKhau.objects.filter(
+        id_nhankhau=OuterRef('pk')
+    ).order_by('-ngay_batdau')
+    qs = qs.annotate(
+        latest_bd_ngay=Subquery(latest_bd_subquery.values(
+            'ngay_batdau')[:1], output_field=DateField()),
+        latest_bd_loai=Subquery(latest_bd_subquery.values('loai_biendong')[:1])
+    )
+    if loai_biendong:
+        qs = qs.filter(latest_bd_loai=loai_biendong)
+    qs = qs.order_by('-latest_bd_ngay')
+
+    choices_dict = dict(LoaiBienDong.choices)
+
+    qs = qs.annotate(
+        latest_bd_loai_display=Case(
+            *[
+                When(latest_bd_loai=k, then=Value(v))
+                for k, v in choices_dict.items()
+            ],
+            default=Value('-'),
+            output_field=CharField()
+        )
+    )
+
+    return render(request, 'resident/nhankhau/list.html', {
+        'nhankhau_list': qs,
+        'search': search,
+        'loai_biendong': loai_biendong
+    })
 
 
 @login_required(login_url="login")
-@role_required([1])
+@role_required([1, 2])
 def nhankhau_detail(request, pk):
     nk = get_object_or_404(NhanKhau, pk=pk, is_deleted=False)
+    user_hokhau = get_user_hokhau_active(request.user)
+    # Nếu là cư dân chỉ cho xem nhân khẩu thuộc hộ khẩu của mình
+    if user_hokhau is not None and nk.id_hokhau not in user_hokhau:
+        messages.error(request, 'Bạn không có quyền xem nhân khẩu này!')
+        return redirect('nhankhau_list')
     return render(request, 'resident/nhankhau/detail.html', {'nk': nk})
 
 
 @login_required(login_url="login")
-@role_required([1])
+@role_required([1, 2])
 def nhankhau_add(request):
+    user_hokhau = get_user_hokhau_active(request.user)
+    hokhau_avai = user_hokhau if user_hokhau is not None else HoKhau.objects.filter(
+        is_active=True, is_deleted=False)
     if request.method == 'POST':
-        form = NhanKhauForm(request.POST)
+        form = NhanKhauForm(request.POST, hokhau_avai=hokhau_avai)
         if form.is_valid():
             nk = form.save(commit=False)
             nk.updated_by = request.user.username
             nk.save()
+            loai_bd = (
+                nk.id_hokhau.resident_status if nk.id_hokhau and nk.id_hokhau.resident_status else 'tam_vang')
+            BienDongNhanKhau.objects.create(
+                loai_biendong=loai_bd,
+                ngay_batdau=timezone.now().date(),
+                ly_do="Đăng ký mới",
+                id_nhankhau=nk,
+                updated_by=request.user.username
+            )
+            messages.success(request, 'Đăng ký nhân khẩu thành công!')
+            return redirect('nhankhau_list')
+        else:
+            # Lấy tất cả lỗi của form (bao gồm cả lỗi trường và lỗi chung)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(
+                        request, f"{form.fields[field].label if field in form.fields else field}: {error}")
+            # Nếu có lỗi chung (non_field_errors)
+            for error in form.non_field_errors():
+                messages.error(request, error)
             return redirect('nhankhau_list')
     else:
-        form = NhanKhauForm()
+        form = NhanKhauForm(hokhau_avai=hokhau_avai)
     return render(request, 'resident/nhankhau/form.html', {'form': form, 'action': 'add'})
 
 
 @login_required(login_url="login")
-@role_required([1])
+@role_required([1, 2])
 def nhankhau_edit(request, pk):
     nk = get_object_or_404(NhanKhau, pk=pk, is_deleted=False)
+    user_hokhau = get_user_hokhau_active(request.user)
+    hokhau_avai = user_hokhau if user_hokhau is not None else HoKhau.objects.filter(
+        is_active=True, is_deleted=False)
+    if user_hokhau is not None and nk.id_hokhau not in user_hokhau:
+        messages.error(request, 'Bạn không có quyền sửa nhân khẩu này!')
+        return redirect('nhankhau_list')
     if request.method == 'POST':
-        form = NhanKhauForm(request.POST, instance=nk)
+        # Nếu trường id_hokhau bị disabled thì sẽ không có trong POST, nên gán lại từ instance
+        post = request.POST.copy()
+        post['id_hokhau'] = str(nk.id_hokhau.pk) if nk.id_hokhau else ''
+        form = NhanKhauForm(post, instance=nk,
+                            hokhau_avai=hokhau_avai, disabled_hokhau=True)
         if form.is_valid():
             nk = form.save(commit=False)
             nk.updated_by = request.user.username
             nk.save()
             return redirect('nhankhau_detail', pk=nk.pk)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(
+                        request, f"{form.fields[field].label if field in form.fields else field}: {error}")
+            for error in form.non_field_errors():
+                messages.error(request, error)
+            return redirect('nhankhau_list')
     else:
-        form = NhanKhauForm(instance=nk)
-    return render(request, 'resident/nhankhau/form.html', {'form': form, 'action': 'edit', 'nk': nk})
+        form = NhanKhauForm(
+            instance=nk, hokhau_avai=hokhau_avai, disabled_hokhau=True)
+    return render(request, 'resident/nhankhau/edit_form.html', {'form': form, 'action': 'edit', 'nk': nk})
 
 
 @login_required(login_url="login")
-@role_required([1])
+@role_required([1, 2])
 def nhankhau_delete(request, pk):
     nk = get_object_or_404(NhanKhau, pk=pk, is_deleted=False)
+    user_hokhau = get_user_hokhau_active(request.user)
+    # Nếu là cư dân chỉ cho xóa nhân khẩu thuộc hộ khẩu của mình
+    if user_hokhau is not None and nk.id_hokhau not in user_hokhau:
+        messages.error(request, 'Bạn không có quyền xóa nhân khẩu này!')
+        return redirect('nhankhau_list')
     if request.method == 'POST':
         nk.is_deleted = True
         nk.save()
@@ -136,14 +228,17 @@ def hokhau_add(request):
     # Lấy danh sách căn hộ chưa có hộ khẩu active
     canho_with_active_hokhau = HoKhau.objects.filter(
         is_deleted=False, is_active=True, id_canho__isnull=False).values_list('id_canho', flat=True)
-    available_canho = CanHo.objects.filter(is_deleted=False).exclude(id_canho__in=canho_with_active_hokhau)
+    available_canho = CanHo.objects.filter(is_deleted=False).exclude(
+        id_canho__in=canho_with_active_hokhau)
     # Lấy danh sách chủ hộ chưa có hộ khẩu active
     chuho_with_active_hokhau = HoKhau.objects.filter(
         is_deleted=False, is_active=True, id_chuho__isnull=False).values_list('id_chuho', flat=True)
-    available_chuho = TaiKhoan.objects.filter(vaitro__id_vaitro=2, is_deleted=False, is_active=True).exclude(id_taikhoan__in=chuho_with_active_hokhau)
+    available_chuho = TaiKhoan.objects.filter(vaitro__id_vaitro=2, is_deleted=False, is_active=True).exclude(
+        id_taikhoan__in=chuho_with_active_hokhau)
 
     if request.method == 'POST':
-        form = HoKhauForm(request.POST, available_canho=available_canho, available_chuho=available_chuho)
+        form = HoKhauForm(
+            request.POST, available_canho=available_canho, available_chuho=available_chuho)
         if form.is_valid():
             id_canho = form.cleaned_data.get('id_canho')
             id_chuho = form.cleaned_data.get('id_chuho')
@@ -169,8 +264,19 @@ def hokhau_add(request):
                 hokhau.save()
                 messages.success(request, 'Thêm hộ khẩu thành công!')
                 return redirect('hokhau_list')
+        else:
+            # Lấy tất cả lỗi của form (bao gồm cả lỗi trường và lỗi chung)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(
+                        request, f"{form.fields[field].label if field in form.fields else field}: {error}")
+            # Nếu có lỗi chung (non_field_errors)
+            for error in form.non_field_errors():
+                messages.error(request, error)
+            return redirect('hokhau_list')
     else:
-        form = HoKhauForm(available_canho=available_canho, available_chuho=available_chuho)
+        form = HoKhauForm(available_canho=available_canho,
+                          available_chuho=available_chuho)
     return render(request, 'resident/hokhau_add.html', {'form': form})
 
 
@@ -181,28 +287,44 @@ def hokhau_edit(request, pk):
     # Lấy danh sách căn hộ chưa có hộ khẩu active, cộng thêm căn hộ hiện tại
     canho_with_active_hokhau = HoKhau.objects.filter(
         is_deleted=False, is_active=True, id_canho__isnull=False).values_list('id_canho', flat=True)
-    available_canho = CanHo.objects.filter(is_deleted=False).exclude(id_canho__in=canho_with_active_hokhau)
+    available_canho = CanHo.objects.filter(is_deleted=False).exclude(
+        id_canho__in=canho_with_active_hokhau)
     if hokhau.id_canho:
-        available_canho = available_canho | CanHo.objects.filter(id_canho=hokhau.id_canho.id_canho)
+        available_canho = available_canho | CanHo.objects.filter(
+            id_canho=hokhau.id_canho.id_canho)
     # Lấy danh sách chủ hộ chưa có hộ khẩu active, cộng thêm chủ hộ hiện tại
     chuho_with_active_hokhau = HoKhau.objects.filter(
         is_deleted=False, is_active=True, id_chuho__isnull=False).values_list('id_chuho', flat=True)
-    available_chuho = TaiKhoan.objects.filter(vaitro__id_vaitro=2, is_deleted=False, is_active=True).exclude(id_taikhoan__in=chuho_with_active_hokhau)
+    available_chuho = TaiKhoan.objects.filter(vaitro__id_vaitro=2, is_deleted=False, is_active=True).exclude(
+        id_taikhoan__in=chuho_with_active_hokhau)
     if hokhau.id_chuho:
-        available_chuho = available_chuho | TaiKhoan.objects.filter(id_taikhoan=hokhau.id_chuho.id_taikhoan)
+        available_chuho = available_chuho | TaiKhoan.objects.filter(
+            id_taikhoan=hokhau.id_chuho.id_taikhoan)
 
     if request.method == 'POST':
         post = request.POST.copy()
         post['id_chuho'] = str(hokhau.id_chuho.pk)
-        form = HoKhauForm(post, instance=hokhau, available_canho=available_canho, available_chuho=available_chuho,disabled_chuho=True)
+        form = HoKhauForm(post, instance=hokhau, available_canho=available_canho,
+                          available_chuho=available_chuho, disabled_chuho=True)
         if form.is_valid():
             hokhau = form.save(commit=False)
             hokhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
             hokhau.save()
             messages.success(request, 'Cập nhật hộ khẩu thành công!')
             return redirect('hokhau_list')
+        else:
+            # Lấy tất cả lỗi của form (bao gồm cả lỗi trường và lỗi chung)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(
+                        request, f"{form.fields[field].label if field in form.fields else field}: {error}")
+            # Nếu có lỗi chung (non_field_errors)
+            for error in form.non_field_errors():
+                messages.error(request, error)
+            return redirect('hokhau_list')
     else:
-        form = HoKhauForm(instance=hokhau, available_canho=available_canho, available_chuho=available_chuho,disabled_chuho=True)
+        form = HoKhauForm(instance=hokhau, available_canho=available_canho,
+                          available_chuho=available_chuho, disabled_chuho=True)
     return render(request, 'resident/hokhau_edit.html', {'form': form, 'hokhau': hokhau})
 
 
