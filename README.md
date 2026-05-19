@@ -6,25 +6,25 @@
 
 ### 1. Quản lý Hộ cư dân
 
-- Xem danh sách toàn bộ hộ khẩu trong chung cư (`hrmanage`).
-- Thêm một hộ khẩu mới (`add_hokhau`).
-- Xem thông tin chi tiết của một hộ khẩu, bao gồm danh sách các thành viên thuộc hộ đó (`hokhau_detail`).
-- Chỉnh sửa thông tin của hộ khẩu (`edit_hokhau`).
+- Xem danh sách toàn bộ hộ khẩu trong chung cư.
+- Thêm một hộ khẩu mới.
+- Xem thông tin chi tiết của một hộ khẩu, bao gồm danh sách các thành viên thuộc hộ đó.
+- Chỉnh sửa thông tin của hộ khẩu.
 
 ### 2. Quản lý Nhân khẩu
 
-- Xem danh sách toàn bộ nhân khẩu trong chung cư (`nhankhau`).
-- Thêm một nhân khẩu mới và liên kết họ vào một hộ khẩu (`add_demo`).
-- Xem hồ sơ chi tiết của một nhân khẩu (`nhan_khau_profile`).
-- Chỉnh sửa thông tin chi tiết của nhân khẩu (`edit_nhan_khau`).
-- Xóa nhân khẩu ra khỏi hệ thống (`nhan_khau_delete`).
+- Xem danh sách toàn bộ nhân khẩu trong chung cư.
+- Thêm một nhân khẩu mới và liên kết họ vào một hộ khẩu.
+- Xem hồ sơ chi tiết của một nhân khẩu.
+- Chỉnh sửa thông tin chi tiết của nhân khẩu.
+- Xóa nhân khẩu ra khỏi hệ thống.
 
 ### 3. Quản lý Tài khoản
 
-- Xem danh sách các tài khoản trong hệ thống (`accountmanage`).
-- Thêm một tài khoản mới (username, password) và gán vai trò cho họ (`add_account`).
-- Xem thông tin chi tiết của một tài khoản (`view_account`).
-- Chỉnh sửa thông tin tài khoản (cập nhật username, password, vai trò) (`edit_account`).
+- Xem danh sách các tài khoản trong hệ thống.
+- Thêm một tài khoản mới (username, password) và gán vai trò cho họ.
+- Xem thông tin chi tiết của một tài khoản.
+- Chỉnh sửa thông tin tài khoản (cập nhật username, password, vai trò).
 
 ### 4. Chức năng chung
 

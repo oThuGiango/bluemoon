@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
   // Ẩn message
   setTimeout(function () {
@@ -95,13 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btnAdd.addEventListener("click", handleSaveNewResidents);
     }
 
-    // 5. Nút Xác nhận đóng tiền (Thanh toán)
-    const btnPay = document.querySelector("#btnConfirmPayment");
-    if (btnPay) {
-      btnPay.addEventListener("click", handleConfirmPayment);
-    }
-
-    // 6. Chọn tất cả hóa đơn trong bảng chờ thu
+    // 5. Chọn tất cả hóa đơn trong bảng chờ thu
     const selectAll = document.querySelector("#selectAllInvoices");
     if (selectAll) {
       selectAll.addEventListener("change", function () {
@@ -111,7 +104,18 @@ document.addEventListener("DOMContentLoaded", function () {
         checkboxes.forEach((cb) => (cb.checked = this.checked));
       });
     }
-
+    // 6. Chọn tất cả hộ dân mới khi thêm vào đợt thu (selectAllNewResidents)
+    const selectAllNewResidents = document.getElementById(
+      "selectAllNewResidents",
+    );
+    if (selectAllNewResidents) {
+      selectAllNewResidents.addEventListener("change", function () {
+        const checkboxes = document.querySelectorAll(
+          'input[name="new_hokhau_ids"]',
+        );
+        checkboxes.forEach((cb) => (cb.checked = this.checked));
+      });
+    }
     const confirmDeleteBtn = modalContent.querySelector("#confirmDeleteBtn");
     if (confirmDeleteBtn) {
       confirmDeleteBtn.addEventListener("click", function () {
@@ -238,41 +242,133 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Xử lý xác nhận thanh toán (Cập nhật ngày nộp)
-  function handleConfirmPayment() {
-    const selectedIds = Array.from(
+  // Hàm mở modal xác nhận thanh toán
+  function showConfirmPaymentModal() {
+    const checked = Array.from(
       document.querySelectorAll(
         'input[name="invoice_ids"]:checked:not(:disabled)',
       ),
-    ).map((cb) => cb.value);
-    if (selectedIds.length === 0) {
-      alert("Vui lòng chọn ít nhất một hóa đơn cần thanh toán!");
+    );
+    if (checked.length === 0) {
+      alert("Vui lòng chọn ít nhất một hóa đơn chưa đóng để xác nhận!");
       return;
     }
+    // Lấy thông tin hóa đơn đã chọn
+    const invoiceData = [];
+    console.log("Checked invoices:", checked);
+    checked.forEach((cb) => {
+      const row = cb.closest("tr");
+      invoiceData.push({
+        id: cb.value,
+        so_can_ho: row.querySelector("td:nth-child(2)").innerText.trim(),
+        tong_tien: row
+          .querySelector("td:nth-child(4)")
+          .innerText.replace(/[^\d]/g, ""),
+      });
+    });
+    // Render danh sách vào modal
+    let html = `<table style="width:100%;margin-bottom:10px;">
+      <thead><tr><th style='text-align:left'>Căn hộ</th><th style='text-align:right'>Tổng tiền</th><th style='text-align:right'>Số tiền đã đóng</th></tr></thead><tbody>`;
+    invoiceData.forEach((inv) => {
+      html += `<tr>
+        <td style='padding:6px 4px;'>${inv.so_can_ho}</td>
+        <td style='padding:6px 4px;text-align:right;'>${Number(inv.tong_tien).toLocaleString()}đ</td>
+        <td style='padding:6px 4px;text-align:right;'>
+          <input type='text' class='input-format-currency' data-raw='${inv.tong_tien}' name='so_tien_da_dong_${inv.id}' value='${Number(inv.tong_tien).toLocaleString()}' min='0' style='width:110px;padding:4px 6px;text-align:right;border:1px solid #ccc;border-radius:4px;'>
+          <input type='hidden' name='invoice_ids' value='${inv.id}'>
+        </td>
+      </tr>`;
+    });
+    html += "</tbody></table>";
+    document.getElementById("confirmPaymentList").innerHTML = html;
+    document.getElementById("confirmPaymentModal").style.display = "flex";
 
-    if (confirm(`Xác nhận thanh toán cho ${selectedIds.length} hộ đã chọn?`)) {
-      const formData = new FormData();
-      selectedIds.forEach((id) => formData.append("invoice_ids[]", id));
-      formData.append(
-        "csrfmiddlewaretoken",
-        document.querySelector("[name=csrfmiddlewaretoken]").value,
-      );
+    // Xử lý format số: khi focus thì bỏ dấu phẩy, khi blur thì format lại
+    document.querySelectorAll(".input-format-currency").forEach((input) => {
+      // Khi focus: bỏ dấu phẩy
+      input.addEventListener("focus", function () {
+        this.value = this.value.replace(/[^\d]/g, "");
+      });
+      // Khi blur: format lại
+      input.addEventListener("blur", function () {
+        let raw = this.value.replace(/[^\d]/g, "");
+        if (raw.length === 0) raw = "0";
+        this.value = Number(raw).toLocaleString();
+        this.dataset.raw = raw;
+      });
+     
+    });
+  }
 
-      fetch("/update_payment_status/", {
-        method: "POST",
-        body: formData,
-        headers: { "X-Requested-With": "XMLHttpRequest" },
+  // Gán sự kiện mở modal cho nút xác nhận
+  const btnConfirmPayment = document.getElementById("btnConfirmPayment");
+  if (btnConfirmPayment) {
+    btnConfirmPayment.onclick = showConfirmPaymentModal;
+  }
+
+  // Đóng modal
+  const closeConfirmPaymentModal = document.getElementById(
+    "closeConfirmPaymentModal",
+  );
+  if (closeConfirmPaymentModal) {
+    closeConfirmPaymentModal.onclick = function () {
+      document.getElementById("confirmPaymentModal").style.display = "none";
+    };
+  }
+  const btnCancelConfirmPayment = document.getElementById(
+    "btnCancelConfirmPayment",
+  );
+  if (btnCancelConfirmPayment) {
+    btnCancelConfirmPayment.onclick = function (e) {
+      e.preventDefault();
+      document.getElementById("confirmPaymentModal").style.display = "none";
+    };
+  }
+
+  // Hàm xử lý xác nhận thanh toán thực sự (submit trong modal)
+  const confirmPaymentForm = document.getElementById("confirmPaymentForm");
+  if (confirmPaymentForm) {
+    confirmPaymentForm.onsubmit = handleConfirmPayment;
+  }
+
+  function handleConfirmPayment(e) {
+    e.preventDefault();
+    // Lấy danh sách invoice_ids và số tiền đã đóng từ modal
+    const form = e.target;
+    const data = Array.from(
+      form.querySelectorAll('input[name^="so_tien_da_dong_"]'),
+    ).map((input) => ({
+      id: input.name.replace("so_tien_da_dong_", ""),
+      so_tien_da_dong: input.value.replace(/[^\d.]/g, ""), // loại bỏ dấu phẩy
+    }));
+    const csrfToken = document.querySelector(
+      "[name=csrfmiddlewaretoken]",
+    ).value;
+
+    fetch("/update_payment_status/", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        "X-CSRFToken": csrfToken,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          alert("Đã cập nhật ngày nộp tiền thành công!");
+          // Tải lại trang chính để cập nhật số liệu tổng quan
+          window.location.reload();
+        } else {
+          alert("Lỗi: " + data.message);
+        }
       })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.status === "success") {
-            alert("Đã cập nhật ngày nộp tiền thành công!");
-            // Tải lại trang chính để cập nhật số liệu tổng quan
-            window.location.reload();
-          } else {
-            alert("Lỗi: " + data.message);
-          }
-        });
-    }
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Đã xảy ra lỗi khi cập nhật ngày nộp tiền!");
+      });
+    document.getElementById("confirmPaymentModal").style.display = "none";
   }
 
   // Hàm nạp Modal từ Server

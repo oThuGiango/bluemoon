@@ -2,7 +2,7 @@ import json
 
 from core.decorators import role_required
 from .models import DotThuPhi, HoaDon, KhoanThu, HoaDonChiTiet
-from core.modules.resident.models import HoKhau
+from core.modules.resident.models import HoKhau, GuiXe
 from core.forms import DotThuPhiForm, KhoanThuForm
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl import Workbook
@@ -31,8 +31,24 @@ def calculate_invoice(tat_ca_ho_khau, khoanthu_objs):
         dien_tich = float(canho.dien_tich or 0) if canho else 0
         so_can_ho = canho.so_can_ho if canho else ""
         for kt in khoanthu_objs:
+            # Tính phí theo diện tích
             if kt.don_vi_tinh == "dientich":
                 so_luong = dien_tich
+                so_tien = float(kt.don_gia) * so_luong
+            # Tính phí gửi xe máy
+            elif kt.don_vi_tinh == "xe_may":
+                so_luong = GuiXe.objects.filter(
+                    hokhau=hokhau, loai_xe="xe_may", is_deleted=False).count()
+                so_tien = float(kt.don_gia) * so_luong
+            # Tính phí gửi ô tô
+            elif kt.don_vi_tinh == "oto":
+                so_luong = GuiXe.objects.filter(
+                    hokhau=hokhau, loai_xe="o_to", is_deleted=False).count()
+                so_tien = float(kt.don_gia) * so_luong
+            # Tính phí gửi xe đạp
+            elif kt.don_vi_tinh == "xe_dap":
+                so_luong = GuiXe.objects.filter(
+                    hokhau=hokhau, loai_xe="xe_dap", is_deleted=False).count()
                 so_tien = float(kt.don_gia) * so_luong
             else:
                 so_luong = 1
@@ -228,22 +244,30 @@ def fee_collection_period_detail(request, pk):
 @login_required(login_url="login")
 @role_required([3])
 def update_payment_status(request):
-    invoice_ids = request.POST.getlist("invoice_ids[]")
+    # Nhận dữ liệu dạng JSON (list dict: id, so_tien_da_dong)
+    try:
+        data = json.loads(request.body)
+    except Exception:
+        return JsonResponse({"status": "error", "message": "Dữ liệu gửi lên không hợp lệ"}, status=400)
 
-    if not invoice_ids:
-        return JsonResponse({"status": "error", "message": "Không có hóa đơn nào được chọn"}, status=400)
+    if not data or not isinstance(data, list):
+        return JsonResponse({"status": "error", "message": "Không có dữ liệu hóa đơn"}, status=400)
 
     try:
-        # Lấy các hóa đơn cần cập nhật
+        # Map id -> số tiền đã đóng
+        id_to_paid = {str(item['id']): float(item['so_tien_da_dong'])
+                      for item in data if 'id' in item and 'so_tien_da_dong' in item}
         invoices = HoaDon.objects.filter(
-            id_hoadon__in=invoice_ids, ngay_nop__isnull=True, is_deleted=False)
+            id_hoadon__in=id_to_paid.keys(), ngay_nop__isnull=True, is_deleted=False)
         for invoice in invoices:
             invoice.ngay_nop = timezone.now()
-            invoice.da_dong = invoice.tong_tien
+            invoice.da_dong = id_to_paid.get(
+                str(invoice.id_hoadon), invoice.tong_tien)
+            invoice.updated_at = timezone.now()
             if request.user.is_authenticated:
                 invoice.updated_by = str(request.user)
             invoice.save(update_fields=["ngay_nop",
-                         "da_dong", "updated_by"])
+                         "da_dong", "updated_at", "updated_by"])
         return JsonResponse({"status": "success", "message": "Cập nhật trạng thái thành công"})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)

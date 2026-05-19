@@ -14,4 +14,5 @@ urlpatterns = [
          views.delete_account, name="delete_account"),
     path("account/deactivate/<int:pk>/",
          views.deactivate_account, name="deactivate_account"),
+    path("account/change-password/", views.change_password, name="change_password"),
 ]

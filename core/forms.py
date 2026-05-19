@@ -1,4 +1,5 @@
 
+from core.modules.noti.models import ThongBao
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -345,9 +346,33 @@ class GuiXeForm(forms.ModelForm):
         }
 
 
-"""
-thu tiền ko fix cứng đã đóng, thu tiền gửi xe
+class ThongBaoForm(forms.ModelForm):
+    class Meta:
+        model = ThongBao
+        fields = ['title', 'content', 'doi_tuong']
+        labels = {
+            'title': 'Tiêu đề',
+            'content': 'Nội dung',
+            'doi_tuong': 'Đối tượng nhận',
+        }
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập tiêu đề'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Nhập nội dung'}),
+            'doi_tuong': forms.Select(attrs={'class': 'form-control'}),
+        }
 
-thong bao
+
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput, label="Mật khẩu hiện tại", required=True)
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput, label="Mật khẩu mới", required=True)
+    new_password2 = forms.CharField(
+        widget=forms.PasswordInput, label="Xác nhận mật khẩu mới", required=True)
+
+
+
+"""
+swagger
 ticket
 """

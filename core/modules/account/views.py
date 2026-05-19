@@ -2,12 +2,13 @@ from django.utils import timezone
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db.models import Q
 from core.decorators import role_required
 from django.contrib import messages
 
-from core.forms import TaiKhoanEditForm, TaiKhoanForm
+from core.forms import ChangePasswordForm, TaiKhoanEditForm, TaiKhoanForm
 
 from .models import TaiKhoan, VaiTro
 from core.modules.resident.models import CanHo,  HoKhau
@@ -256,3 +257,42 @@ def deactivate_account(request, pk):
                 request, f"Tài khoản '{taikhoan.username}' đã được vô hiệu hóa!")
         return redirect("accountmanage")
     return redirect("accountmanage")
+
+
+@login_required(login_url="login")
+def change_password(request):
+    if request.method == "POST":
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            old_password = form.cleaned_data["old_password"]
+            new_password1 = form.cleaned_data["new_password1"]
+            new_password2 = form.cleaned_data["new_password2"]
+            user = request.user
+            if not user.check_password(old_password):
+                messages.error(request, "Mật khẩu cũ không đúng!")
+                return redirect("profile")
+            elif new_password1 != new_password2:
+                messages.error(request, "Mật khẩu mới không khớp!")
+                return redirect("profile")
+            else:
+                user.set_password(new_password1)
+                user.updated_at = timezone.now()
+                user.updated_by = str(request.user)
+                user.save()
+                update_session_auth_hash(request, user)
+                messages.success(
+                    request, "Đổi mật khẩu thành công!")
+                return redirect("profile")
+        else:
+            # Lấy tất cả lỗi của form (bao gồm cả lỗi trường và lỗi chung)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(
+                        request, f"{form.fields[field].label if field in form.fields else field}: {error}")
+            # Nếu có lỗi chung (non_field_errors)
+            for error in form.non_field_errors():
+                messages.error(request, error)
+            return redirect('profile')
+    else:
+        form = ChangePasswordForm()
+    return render(request, "account/PasswordChange.html", {"form": form})

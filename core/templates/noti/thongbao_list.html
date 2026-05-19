@@ -1,0 +1,170 @@
+{% load static %}
+{% load humanize %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Thông báo - BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
+  </head>
+  <body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+      {% include 'core/layout_header.html' %}
+      <section class="main-content income-management-page">
+        <div class="main-panel data-table-panel">
+          {% if messages %} {% for message in messages %}
+          {% if message.tags == 'success' %}
+          <div class="message-container success" style="background-color: #e6f7d9; color: #52c41a; border: 1px solid #b7eb8f; margin: auto;">
+            {{ message }}
+          </div>
+          {% elif message.tags == 'error' %}
+          <div class="message-container error-alert" style="background-color: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; margin: auto;">
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
+          </div>
+          {% endif %} {% endfor %} {% endif %}
+
+          <div class="income-controls-top">
+            <form method="GET" action="{% url 'thongbao_list' %}" class="filter-group">
+            <div style="display: flex; align-items: flex-end; gap: 12px; width: 100%;">
+              <div class="search-box-container">
+                <input
+                  type="text"
+                  name="query"
+                  placeholder="Nhập tiêu đề, nội dung, người gửi..."
+                  value="{{ query|default:'' }}"
+                />
+                <i class="fa-solid fa-search"></i>
+              </div>
+              <div style="display: flex; flex-direction: column">
+                <label for="send_time" style="font-size: 0.8em; color: #888; margin-bottom: 4px;">Ngày gửi</label>
+                <input
+                  type="date"
+                  id="send_time"
+                  name="send_time"
+                  value="{{ send_time|default:'' }}"
+                  class="filter-select"
+                  style="width: 140px; min-height: 38px; text-align: center;"
+                  placeholder="Ngày bắt đầu"
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="min-width: 120px"
+              >
+                <i class="fa-solid fa-filter"></i> Tìm kiếm
+              </button>
+              </div>
+
+              {% if query or send_time %}
+              <a
+                href="{% url 'thongbao_list' %}"
+                class="action-btn"
+                title="Xóa lọc"
+                style="background: #f5f5f5; color: #333"
+              >
+                <i class="fa-solid fa-rotate-right"></i>
+              </a>
+              {% endif %}
+            </form>
+          </div>
+            {% if user.is_superuser or request.user.vaitro.id_vaitro == 1 or request.user.vaitro.id_vaitro == 3 %}
+          <div class="income-actions-bottom income-actions-top-left" >
+            <button
+              data-url="{% url 'thongbao_create' %}"
+              class="btn btn-create-new btn-create-compact modal-trigger"
+            >
+              <i class="fa-solid fa-plus"></i> Thêm thông báo mới
+            </button>
+          </div>{% endif %}
+
+          <h2 class="table-title" style="border-bottom: none; margin-bottom: 8px">DANH SÁCH THÔNG BÁO</h2>
+          <div style="width: 100%; border-bottom: 2px solid #f0f0f0; margin: 0 0 20px; padding-bottom: 10px;">
+            <p style="margin: 0; width: 100%; text-align: right; color: #555; font-size: 1rem;">
+              Tổng số thông báo: {{ thongbao_list|length|default:"0" }}
+            </p>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Tiêu đề</th>
+                  <th>Nội dung</th>
+                  <th>Đối tượng</th>
+                  <th>Người gửi</th>
+                  <th>Ngày gửi</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for tb in thongbao_list %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ tb.title }}</td>
+                  <td>{{ tb.content|truncatechars:50 }}</td>
+                  <td>
+                    {% if tb.doi_tuong == 'all' %}<span class="status status-primary">Tất cả</span>{% endif %}
+                    {% if tb.doi_tuong == 'ketoan' %}<span class="status status-active">Kế toán</span>{% endif %}
+                    {% if tb.doi_tuong == 'cudan' %}<span class="status status-normal">Cư dân</span>{% endif %}
+                  </td>
+                  <td>{{ tb.sender.username|default:'-' }}</td>
+                  <td>{{ tb.created_at|date:'d/m/Y H:i' }}</td>
+                  <td>
+                    <button
+                      data-url="{% url 'thongbao_detail' tb.pk %}"
+                      class="action-btn view-detail modal-trigger"
+                      title="Chi tiết"
+                    >
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                    {% if user.is_superuser or request.user.vaitro.id_vaitro == 1 or request.user.vaitro.id_vaitro == 3 %}
+                    <button
+                      data-url="{% url 'thongbao_update' tb.pk %}"
+                      class="action-btn modal-trigger"
+                      title="Chỉnh sửa"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      data-url="{% url 'thongbao_delete' tb.pk %}"
+                      class="action-btn modal-trigger"
+                      title="Xóa"
+                      style="color: #e74c3c"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                    {% endif %}
+                    
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" style="text-align: center">Không có thông báo nào.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div id="mainModal" class="modal">
+      <div class="modal-content"></div>
+    </div>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
+  
+  </body>
+</html>

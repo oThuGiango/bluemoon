@@ -356,7 +356,7 @@ def hokhau_edit(request, pk):
     if request.method == 'POST':
         post = request.POST.copy()
         post['id_chuho'] = str(hokhau.id_chuho.pk)
-        
+
         form = HoKhauForm(post, instance=hokhau, available_canho=available_canho,
                           available_chuho=available_chuho, disabled_chuho=True)
         if form.is_valid():
@@ -427,13 +427,6 @@ def hokhau_detail(request, pk):
         'nhankhau_list': nhankhau_list,
         'nhankhau_count': nhankhau_count
     })
-
-
-@login_required(login_url="login")
-@role_required([1, 2])
-def nhan_khau_profile(request, id_nhankhau):
-    nhan_khau = get_object_or_404(NhanKhau, id_nhankhau=id_nhankhau)
-    return render(request, "core/nhan_khau_profile.html", {"nhan_khau": nhan_khau})
 
 
 @login_required(login_url="login")
@@ -782,7 +775,7 @@ def biendong_delete(request, id_biendong):
             nhankhau.is_active = True
             nhankhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
             nhankhau.save(update_fields=['is_active', 'updated_by'])
-        
+
         biendong.is_deleted = True
         biendong.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
         biendong.save(update_fields=['is_deleted', 'updated_by', 'updated_at'])

@@ -6,4 +6,5 @@ urlpatterns = [
     path("", include("core.modules.resident.urls")),
     path("", include("core.modules.fee.urls")),
     path("", include('core.modules.apartment.urls')),
+    path("", include('core.modules.noti.urls')),
 ]

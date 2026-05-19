@@ -32,10 +32,10 @@ def profile(request):
 
     if user.is_authenticated:
         if user.is_superuser:
-            return render(request, "core/profile.html", {"user": user})
+            return render(request, "account/profile.html", {"user": user})
         id_vaitro = user.vaitro.id_vaitro
         if id_vaitro is not None:
-            return render(request, "core/profile.html", {"user": user})
+            return render(request, "account/profile.html", {"user": user})
 
     return render(request, "core/message.html", {"error": "Bạn chưa đăng nhập"})
 
