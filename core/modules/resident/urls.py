@@ -19,16 +19,17 @@ urlpatterns = [
     path('nhankhau/<int:pk>/delete/',
          views.nhankhau_delete, name='nhankhau_delete'),
 
-    path("dangkybiendongnhankhau/<int:id_nhankhau>/",
-         views.dang_ky_bdbk, name="dang_ky_bdnk"),
+    # Biến động nhân khẩu
     path("biendongnhankhau/",
          views.biendong_list, name="biendong_list"),
-    path("biendongnhankhau/export/",
-         views.export_biendong_excel, name="export_biendong_excel"),
+    path("dangkybiendongnhankhau/<int:id_nhankhau>/",
+         views.dang_ky_bdbk, name="dang_ky_bdnk"),
+
+    # Xuất Excel
+    path("hokhau/export/", views.export_hokhau_excel,
+         name="export_hokhau_excel"),
     path("nhankhau/export/", views.export_nhankhau_excel,
          name="export_nhankhau_excel"),
-
-
-    path("hrmanage/export/", views.export_hokhau_excel,
-         name="export_hokhau_excel"),
+    path("biendongnhankhau/export/",
+         views.export_biendong_excel, name="export_biendong_excel"),
 ]

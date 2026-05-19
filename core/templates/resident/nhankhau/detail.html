@@ -48,7 +48,7 @@
       <span style="font-weight: bold; color: #666">Giới tính:</span>
       <span style="font-weight: 500; color: #333"
         >{% if nk.gioi_tinh == 'M' %}Nam
-        {% elif nk.gioi_tinh == 'F' %}Nữ
+        {% elif nk.gioi_tinh == 'F' %}Nữ 
         {% else %}Khác{% endif %}</span
       >
     </div>
@@ -75,6 +75,28 @@
     >
       <span style="font-weight: bold; color: #666">CCCD:</span>
       <span style="font-weight: 500; color: #333">{{ nk.cccd }}</span>
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Số điện thoại:</span>
+      <span style="font-weight: 500; color: #333">{{ nk.so_dien_thoai|default:'-' }}</span>
+    </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+      "
+    >
+      <span style="font-weight: bold; color: #666">Email:</span>
+      <span style="font-weight: 500; color: #333">{{ nk.email|default:'-' }}</span>
     </div>
     <div
       style="

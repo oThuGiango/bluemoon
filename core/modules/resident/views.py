@@ -13,6 +13,7 @@ from core.modules.account.models import TaiKhoan
 from core.forms import HoKhauForm, NhanKhauForm
 from core.decorators import role_required
 from core.modules.base.models import LoaiBienDong
+from openpyxl.styles import PatternFill, Font, Alignment
 
 
 def get_user_hokhau_active(user):
@@ -137,7 +138,7 @@ def nhankhau_edit(request, pk):
     if user_hokhau is not None and nk.id_hokhau not in user_hokhau:
         messages.error(request, 'Bạn không có quyền sửa nhân khẩu này!')
         return redirect('nhankhau_list')
-    
+
     if request.method == 'POST':
         # Nếu trường id_hokhau bị disabled thì sẽ không có trong POST, nên gán lại từ instance
         post = request.POST.copy()
@@ -188,7 +189,7 @@ def hokhau_toggle_active(request, pk):
     hokhau = get_object_or_404(HoKhau, pk=pk)
     if request.method == 'POST':
         hokhau.is_active = not hokhau.is_active
-        hokhau.updated_by = request.user.username 
+        hokhau.updated_by = request.user.username
         hokhau.save(update_fields=['is_active', 'updated_at', 'updated_by'])
         messages.success(
             request, f'Trạng thái hộ khẩu đã được cập nhật thành {"hoạt động" if hokhau.is_active else "không hoạt động"}!')
@@ -383,20 +384,44 @@ def export_biendong_excel(request):
     ws = wb.active
     ws.title = "Biến động nhân khẩu"
 
-    ws.append([
+    header = [
         "ID Biến động",
         "Họ tên",
+        "Số căn hộ",
+        "CCCD",
+        "Quan hệ với chủ hộ",
         "Loại biến động",
         "Ngày bắt đầu",
         "Ngày kết thúc",
         "Lý do",
-    ])
+    ]
+    ws.append(header)
+
+    # Style header: fill color, bold, center, wrap text
+    header_fill = PatternFill(start_color="FFDEEAF6",
+                              end_color="FFDEEAF6", fill_type="solid")
+    header_font = Font(bold=True, color="FF222222")
+    for col in range(1, len(header) + 1):
+        cell = ws.cell(row=1, column=col)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(
+            horizontal="center", vertical="center", wrap_text=True)
+
+    # Set column widths (ID, Họ tên, Số căn hộ, CCCD, Quan hệ, Loại BD, Ngày bắt đầu, Ngày kết thúc, Lý do)
+    col_widths = [12, 20, 14, 16, 18, 18, 16, 16, 22]
+    for i, width in enumerate(col_widths, 1):
+        ws.column_dimensions[chr(64 + i)].width = width
 
     for bd in biendongs:
+        nk = bd.id_nhankhau
         ws.append([
             bd.id_biendong,
-            bd.id_nhankhau.ho_ten,
-            bd.loai_biendong,
+            nk.ho_ten if nk else "",
+            nk.id_hokhau.id_canho.so_can_ho if nk and nk.id_hokhau and nk.id_hokhau.id_canho else "",
+            nk.cccd if nk else "",
+            nk.get_quan_he_chu_ho_display() if nk and nk.quan_he_chu_ho else "",
+            bd.get_loai_biendong_display(),
             bd.ngay_batdau.strftime("%d/%m/%Y") if bd.ngay_batdau else "",
             bd.ngay_ketthuc.strftime("%d/%m/%Y") if bd.ngay_ketthuc else "",
             bd.ly_do or "",
@@ -413,29 +438,71 @@ def export_biendong_excel(request):
 @login_required(login_url="login")
 @role_required([1, 2])
 def export_nhankhau_excel(request):
-    nhankhau = NhanKhau.objects.filter(is_deleted=False)
+    nhankhau = NhanKhau.objects.filter(
+        is_deleted=False, is_active=True,
+        id_hokhau__is_active=True, id_hokhau__is_deleted=False
+    ).order_by("id_hokhau")
 
     wb = Workbook()
     ws = wb.active
     ws.title = "Danh sách nhân khẩu"
 
-    ws.append([
+    header = [
         "ID Nhân khẩu",
+        "Số căn hộ",
         "Họ tên",
+        "Giới tính",
         "Ngày sinh",
         "CCCD",
-        "Quan hệ chủ hộ",
-        "ID hộ khẩu",
-    ])
+        "Số điện thoại",
+        "Email",
+        "Quan hệ với chủ hộ",
+        "Loại biến động gần nhất",
+        "Ngày đăng ký biến động gần nhất",
+    ]
+    ws.append(header)
+
+    # Style header: fill color, bold, center
+    header_fill = PatternFill(start_color="FFDEEAF6",
+                              end_color="FFDEEAF6", fill_type="solid")
+    header_font = Font(bold=True, color="FF222222")
+    for col in range(1, len(header) + 1):
+        cell = ws.cell(row=1, column=col)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(
+            horizontal="center", vertical="center", wrap_text=True)
+
+    # Set column widths
+    col_widths = [12, 10, 20, 14, 16, 14, 22, 18, 14, 22, 22]
+    for i, width in enumerate(col_widths, 1):
+        ws.column_dimensions[chr(64 + i)].width = width
 
     for nk in nhankhau:
+        # Lấy biến động gần nhất
+        loai_bd_display = ""
+        ngay_bd = ""
+        latest_bd = BienDongNhanKhau.objects.filter(
+            id_nhankhau=nk, is_deleted=False).order_by('-ngay_batdau').first()
+
+        if latest_bd:
+            loai_bd_display = latest_bd.get_loai_biendong_display()
+            ngay_bd = latest_bd.ngay_batdau.strftime(
+                "%d/%m/%Y") if latest_bd.ngay_batdau else ""
+
+        gioi_tinh_display = nk.get_gioi_tinh_display() if nk.gioi_tinh else ""
         ws.append([
             nk.id_nhankhau,
+            nk.id_hokhau.id_canho.so_can_ho if nk.id_hokhau and nk.id_hokhau.id_canho else "",
             nk.ho_ten,
+            gioi_tinh_display,
             nk.ngay_sinh,
             nk.cccd,
-            nk.quan_he_chu_ho,
-            nk.id_nhankhau,
+            nk.so_dien_thoai,
+            nk.email,
+            nk.get_quan_he_chu_ho_display(),
+            loai_bd_display,
+            ngay_bd,
         ])
 
     response = HttpResponse(
@@ -453,19 +520,58 @@ def export_hokhau_excel(request):
 
     wb = Workbook()
     ws = wb.active
-    ws.title = "Biến động nhân khẩu"
-
-    ws.append([
+    ws.title = "Danh sách hộ khẩu"
+    header = [
         "ID Hộ Khẩu",
         "Số căn hộ",
-        "Diện tích",
-    ])
+        "Diện tích (m2)",
+        "Tài khoản Chủ hộ",
+        "Họ tên Chủ hộ",
+        "CCCD Chủ hộ",
+        "Tình trạng cư trú",
+        "Số lượng nhân khẩu",
+    ]
+    ws.append(header)
+
+    # Style header: fill color, bold, center
+    header_fill = PatternFill(start_color="FFDEEAF6",
+                              end_color="FFDEEAF6", fill_type="solid")
+    header_font = Font(bold=True, color="FF222222")
+    for col in range(1, len(header) + 1):
+        cell = ws.cell(row=1, column=col)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(
+            horizontal="center", vertical="center", wrap_text=True)
+
+    # Set column widths
+    col_widths = [12, 14, 14, 18, 20, 18, 18, 16, 14]
+    for i, width in enumerate(col_widths, 1):
+        ws.column_dimensions[chr(64 + i)].width = width
 
     for hk in hokhau:
+        # Lấy chủ hộ từ bảng nhân khẩu (active)
+        chu_ho_nk = NhanKhau.objects.filter(
+            id_hokhau=hk, is_deleted=False, is_active=True, is_chu_ho=True).first()
+        ho_ten_chu_ho = chu_ho_nk.ho_ten if chu_ho_nk else ""
+        cccd_chu_ho = chu_ho_nk.cccd if chu_ho_nk else ""
+
+        # Số lượng nhân khẩu active
+        so_luong_nk = NhanKhau.objects.filter(
+            id_hokhau=hk, is_deleted=False, is_active=True).count()
+
+        # Tình trạng cư trú
+        tinh_trang_cu_tru = hk.get_resident_status_display() if hk.resident_status else ""
+
         ws.append([
             hk.id_hokhau,
-            hk.so_can_ho,
-            hk.dien_tich,
+            hk.id_canho.so_can_ho if hk.id_canho else "",
+            hk.id_canho.dien_tich if hk.id_canho else "",
+            hk.id_chuho.username if hk.id_chuho else "",
+            ho_ten_chu_ho,
+            cccd_chu_ho,
+            tinh_trang_cu_tru,
+            so_luong_nk
         ])
 
     response = HttpResponse(
@@ -484,7 +590,7 @@ def biendong_list(request):
 
     return render(
         request,
-        "core/biendong_list.html",
+        "resident/biendongnhankhau/biendong_list.html",
         {"biendongs": biendongs},
     )
 
@@ -513,6 +619,6 @@ def dang_ky_bdbk(request, id_nhankhau):
 
     return render(
         request,
-        "core/dangkybdnk.html",
+        "resident/biendongnhankhau/dangkybdnk.html",
         {"nhan_khau": nhan_khau},
     )

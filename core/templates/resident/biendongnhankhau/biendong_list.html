@@ -22,11 +22,8 @@
 
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel">
-          <div style="display: flex; justify-content: flex-end; width:100%">
-            <a
-              href="{% url 'export_biendong_excel' %}"
-              class="btn-excel"
-            >
+          <div style="display: flex; justify-content: flex-end; width: 100%">
+            <a href="{% url 'export_biendong_excel' %}" class="btn-excel">
               <i class="fa-solid fa-file-excel"></i> Xuất Excel
             </a>
           </div>
@@ -47,40 +44,30 @@
               <tbody>
                 {% for bd in biendongs %}
                 <tr>
-                  <td data-label="Mã BD">
-                    <strong>#{{ bd.id_biendong }}</strong>
-                  </td>
+                  <td data-label="Mã BD">#{{ bd.id_biendong }}</td>
                   <td data-label="Nhân khẩu">{{ bd.id_nhankhau.ho_ten }}</td>
                   <td data-label="Loại biến động">
-                    {% if bd.loai_biendong == "tam tru" %}
-                    <span
-                      class="status status-active"
-                      style="
-                        background: #fffbe6;
-                        color: #d4b106;
-                        border: 1px solid #ffe58f;
-                      "
-                      >Tạm trú</span
-                    >
-                    {% elif bd.loai_biendong == "thuong tru" %}
+                    {% if bd.loai_biendong == "tam_tru" %}
+                    <span class="status status-normal">Tạm trú</span>
+                    {% elif bd.loai_biendong == "thuong_tru" %}
                     <span class="status status-active">Thường trú</span>
-                    {% elif bd.loai_biendong == "tam vang" %}
+                    {% elif bd.loai_biendong == "tam_vang" %}
                     <span class="status status-inactive">Tạm vắng</span>
                     {% else %}
-                    <span
-                      class="status"
-                      style="background: #f5f5f5; color: #8c8c8c"
+                    <span class="status status-normal"
                       >{{ bd.loai_label }}</span
                     >
                     {% endif %}
                   </td>
                   <td data-label="Thời gian">
-                    {{ bd.ngay_batdau|date:"d/m/Y" }} {% if bd.ngay_ketthuc %}
-                    <i
-                      class="fa-solid fa-arrow-right-long"
-                      style="font-size: 0.8rem; margin: 0 5px; color: #999"
-                    ></i>
-                    {{ bd.ngay_ketthuc|date:"d/m/Y" }} {% endif %}
+                    {{ bd.ngay_batdau|date:"d/m/Y" }} 
+                    {% if bd.ngay_ketthuc %}
+                      <i
+                        class="fa-solid fa-arrow-right-long"
+                        style="font-size: 0.8rem; margin: 0 5px; color: #999"
+                      ></i>
+                      {{ bd.ngay_ketthuc|date:"d/m/Y" }} 
+                    {% endif %}
                   </td>
                   <td data-label="Lý do">
                     <small style="color: #666"
@@ -97,7 +84,6 @@
                 {% endfor %}
               </tbody>
             </table>
-
           </div>
         </div>
       </section>
