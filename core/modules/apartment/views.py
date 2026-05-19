@@ -1,11 +1,11 @@
-from core.forms import CanHoForm
+from core.forms import CanHoForm, GuiXeForm
 from django.db import models
 from django.contrib import messages
 from core.decorators import role_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from .models import CanHo, Building
-from core.modules.resident.models import HoKhau
+from core.modules.resident.models import GuiXe, HoKhau
 
 
 @login_required(login_url="login")
@@ -188,3 +188,111 @@ def canho_detail(request, id_canho):
     canho = get_object_or_404(CanHo, id_canho=id_canho)
     hokhau_list = HoKhau.objects.filter(id_canho=canho, is_deleted=False)
     return render(request, "core/canho_detail.html", {"canho": canho, "hokhau_list": hokhau_list})
+
+
+def get_hokhau_for_user(request):
+    # vaitro=2: chỉ xem được xe của hộ khẩu mình làm chủ hộ
+    if hasattr(request.user, 'taikhoan') and getattr(request.user.taikhoan, 'vaitro', None) == 2:
+        return HoKhau.objects.filter(id_chuho=request.user.taikhoan, is_deleted=False, is_active=True)
+    return HoKhau.objects.filter(is_deleted=False, is_active=True)
+
+
+@login_required(login_url="login")
+@role_required([1, 2])
+def guixe_list(request):
+    query = request.GET.get('query', '').strip()
+    type = request.GET.get('type', '')
+    # Nếu vaitro=2 thì chỉ lấy xe của các hộ khẩu mà user là chủ hộ
+    if hasattr(request.user, 'taikhoan') and getattr(request.user.taikhoan, 'vaitro', None) == 2:
+        hokhau_qs = get_hokhau_for_user(request)
+        guixe_qs = GuiXe.objects.filter(hokhau__in=hokhau_qs, is_deleted=False)
+    else:
+        guixe_qs = GuiXe.objects.filter(is_deleted=False)
+
+    if type:
+        guixe_qs = guixe_qs.filter(loai_xe=type)
+    if query:
+        guixe_qs = guixe_qs.filter(
+            models.Q(bien_so__icontains=query) |
+            models.Q(hokhau__id_canho__so_can_ho__icontains=query)
+        )
+
+    context = {'guixe_list': guixe_qs, 'type': type, 'query': query}
+    return render(request, 'apartment/guixe/list.html', context)
+
+
+@login_required(login_url="login")
+@role_required([1, 2])
+def guixe_add(request):
+    hokhau_qs = get_hokhau_for_user(request)
+    if request.method == 'POST':
+        form = GuiXeForm(request.POST, hokhau_qs=hokhau_qs,
+                         disabled_hokhau=False)
+        if form.is_valid():
+            guixe = form.save(commit=False)
+            guixe.hokhau = form.cleaned_data['hokhau']
+            guixe.updated_by = request.user.username
+            guixe.save()
+            messages.success(request, 'Thêm phương tiện thành công!')
+            return redirect('guixe_list')
+    else:
+        form = GuiXeForm(hokhau_qs=hokhau_qs, disabled_hokhau=False)
+    context = {'form': form}
+    return render(request, 'apartment/guixe/form.html', context)
+
+
+@login_required(login_url="login")
+@role_required([1, 2])
+def guixe_update(request, pk):
+    guixe = get_object_or_404(GuiXe, pk=pk, is_deleted=False)
+    hokhau_qs = get_hokhau_for_user(request)
+    if guixe.hokhau not in hokhau_qs:
+        messages.error(request, 'Không có quyền chỉnh sửa phương tiện này.')
+        return redirect('guixe_list')
+    if request.method == 'POST':
+        post_data = request.POST.copy()
+        # Nếu trường hokhau bị disabled thì không có trong POST, cần bổ sung thủ công
+        if 'hokhau' not in post_data:
+            post_data['hokhau'] = str(guixe.hokhau.pk)
+        form = GuiXeForm(
+            post_data,
+            instance=guixe,
+            hokhau_qs=hokhau_qs,
+            disabled_hokhau=True,
+            initial_hokhau=guixe.hokhau.pk
+        )
+        if form.is_valid():
+            # Không cho đổi hộ khẩu khi edit
+            obj = form.save(commit=False)
+            obj.hokhau = guixe.hokhau
+            obj.updated_by = request.user.username
+            obj.save()
+            messages.success(request, 'Cập nhật phương tiện thành công!')
+            return redirect('guixe_list')
+    else:
+        form = GuiXeForm(
+            instance=guixe,
+            hokhau_qs=hokhau_qs,
+            disabled_hokhau=True,
+            initial_hokhau=guixe.hokhau.pk
+        )
+    context = {'form': form, 'guixe': guixe}
+    return render(request, 'apartment/guixe/form.html', context)
+
+
+@login_required(login_url="login")
+@role_required([1, 2])
+def guixe_delete(request, pk):
+    guixe = get_object_or_404(GuiXe, pk=pk, is_deleted=False)
+    hokhau_qs = get_hokhau_for_user(request)
+    if guixe.hokhau not in hokhau_qs:
+        messages.error(request, 'Không có quyền xóa phương tiện này.')
+        return redirect('guixe_list')
+    if request.method == 'POST':
+        guixe.is_deleted = True
+        guixe.updated_by = request.user.username
+        guixe.save()
+        messages.success(request, 'Đã xóa phương tiện!')
+        return redirect('guixe_list')
+    context = {'guixe': guixe}
+    return render(request, 'apartment/guixe/confirm_delete.html', context)

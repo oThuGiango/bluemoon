@@ -48,18 +48,25 @@
           ><span>Quản lý hộ khẩu</span></a
         >
       </li>
-      <li>
-        <a href="{% url 'biendong_list' %}"
-          ><i class="fa-solid fa-people-arrows"></i
-          ><span>Biến động nhân khẩu</span></a
-        >
-      </li>
+      
       {% endif %} 
       {% if user.is_superuser or user.vaitro.id_vaitro == 1 or user.vaitro.id_vaitro == 2 %}
       <li>
         <a href="/nhankhau"
           ><i class="fa-solid fa-user-group"></i
           ><span>Quản lý nhân khẩu</span></a
+        >
+      </li>
+      <li>
+        <a href="{% url 'biendong_list' %}"
+          ><i class="fa-solid fa-people-arrows"></i
+          ><span>Biến động nhân khẩu</span></a
+        >
+      </li>
+      <li>
+        <a href="{% url 'guixe_list' %}"
+          ><i class="fa-solid fa-car-side"></i
+          ><span>Quản lý phương tiện</span></a
         >
       </li>
       {% endif %} 

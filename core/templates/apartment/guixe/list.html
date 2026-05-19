@@ -1,0 +1,190 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quản lý phương tiện gửi xe - BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
+  </head>
+  <body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+      {% include 'core/layout_header.html' %}
+
+      <section class="main-content income-management-page">
+        <div class="main-panel data-table-panel">
+          {% if messages %} {% for message in messages %} 
+          {% if message.tags == 'success' %}
+          <div
+            class="message-container success"
+            style="
+              background-color: #e6f7d9;
+              color: #52c41a;
+              border: 1px solid #b7eb8f;
+              margin: auto;
+            "
+          >
+            {{ message }}
+          </div>
+          {% elif message.tags == 'error' %}
+          <div
+            class="message-container error-alert"
+            style="
+              background-color: #fff1f0;
+              color: #ff4d4f;
+              border: 1px solid #ffa39e;
+              margin: auto;
+            "
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
+          </div>
+          {% endif %} {% endfor %} {% endif %}
+
+          <div class="income-controls-top">
+            <form method="GET" action="{% url 'guixe_list' %}" class="filter-group">
+              <div class="search-box-container">
+                <input
+                  type="text"
+                  name="query"
+                  placeholder="Nhập số căn hộ, BKS..."
+                  value="{{ query|default:'' }}"
+                />
+                <i class="fa-solid fa-search"></i>
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="min-width: 120px"
+              >
+                <i class="fa-solid fa-filter"></i> Tìm kiếm
+              </button>
+
+              <select
+                name="type"
+                class="filter-select"
+                onchange="this.form.submit()"
+              >
+                <option value="">-- Loại xe --</option>
+                <option value="o_to" {% if type == 'o_to' %}selected{% endif %}>Ô tô</option>
+                <option value="xe_may" {% if type == 'xe_may' %}selected{% endif %}>Xe máy</option>
+                <option value="xe_dap" {% if type == 'xe_dap' %}selected{% endif %}>Xe đạp</option>
+              </select>
+
+              {% if query or type%}
+              <a
+                href="{% url 'guixe_list' %}"
+                class="action-btn"
+                title="Xóa lọc"
+                style="background: #f5f5f5; color: #333"
+              >
+                <i class="fa-solid fa-rotate-right"></i>
+              </a>
+              {% endif %}
+            </form>
+          </div>
+
+          <div class="income-actions-bottom income-actions-top-left">
+            <button
+              data-url="{% url 'guixe_add' %}"
+              class="btn btn-create-new btn-create-compact modal-trigger"
+            >
+              <i class="fa-solid fa-plus"></i> Thêm phương tiện mới
+            </button>
+           
+          </div>
+
+          <h2
+            class="table-title"
+            style="border-bottom: none; margin-bottom: 8px"
+          >
+            DANH SÁCH PHƯƠNG TIỆN GỬI XE
+          </h2>
+          <div
+            style="
+              width: 100%;
+              border-bottom: 2px solid #f0f0f0;
+              margin: 0 0 20px;
+              padding-bottom: 10px;
+            "
+          >
+            <p
+              style="
+                margin: 0;
+                width: 100%;
+                text-align: right;
+                color: #555;
+                font-size: 1rem;
+              "
+            >
+              Tổng số phương tiện: {{ guixe_list|length|default:"0" }}
+            </p>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Căn hộ</th>
+                  <th>Loại xe</th>
+                  <th>Biển số</th>
+                  <th>Mô tả</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for xe in guixe_list %}
+                <tr>
+                  <td data-label="Hộ khẩu">
+                    {{ xe.hokhau.id_canho.so_can_ho }}
+                  </td>
+                  <td data-label="Loại xe">{{ xe.get_loai_xe_display }}</td>
+                  <td data-label="Biển số">{{ xe.bien_so|default:'-' }}</td>
+                  <td data-label="Mô tả">{{ xe.mo_ta|default:'-' }}</td>
+                  
+                  <td data-label="Thao tác">
+                    <button
+                      data-url="{% url 'guixe_update' xe.pk %}"
+                      class="action-btn modal-trigger"
+                      title="Chỉnh sửa"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      data-url="{% url 'guixe_delete' xe.pk %}"
+                      class="action-btn modal-trigger"
+                      title="Xóa"
+                      style="color: #e74c3c"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" style="text-align: center">
+                    Không có phương tiện nào.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div id="mainModal" class="modal">
+      <div class="modal-content"></div>
+    </div>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
+  </body>
+</html>

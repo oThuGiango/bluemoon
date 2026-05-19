@@ -1,6 +1,8 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
+
+from core.modules.resident.models import GuiXe
 from .models import KhoanThu, DotThuPhi, Building, CanHo, HoKhau, TaiKhoan, BienDongNhanKhau, NhanKhau
 from datetime import datetime
 
@@ -313,9 +315,39 @@ class BienDongForm(forms.ModelForm):
         return cleaned_data
 
 
+class GuiXeForm(forms.ModelForm):
+    hokhau = forms.ModelChoiceField(
+        queryset=HoKhau.objects.none(),
+        label='Hộ khẩu',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True
+    )
+
+    def __init__(self, *args, hokhau_qs=None, disabled_hokhau=False, initial_hokhau=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if hokhau_qs is not None:
+            self.fields['hokhau'].queryset = hokhau_qs
+        if disabled_hokhau:
+            self.fields['hokhau'].widget.attrs['disabled'] = 'true'
+        if initial_hokhau is not None:
+            self.fields['hokhau'].initial = initial_hokhau
+        # Nếu instance đã có hokhau thì set initial
+        if self.instance and getattr(self.instance, 'hokhau', None):
+            self.fields['hokhau'].initial = self.instance.hokhau.pk
+
+    class Meta:
+        model = GuiXe
+        fields = ['hokhau', 'loai_xe', 'bien_so', 'mo_ta']
+        widgets = {
+            'loai_xe': forms.Select(attrs={'class': 'form-control'}),
+            'bien_so': forms.TextInput(attrs={'class': 'form-control'}),
+            'mo_ta': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+
 """
-thông kê tình trạng sử dụng căn hộ
-tai san
+thu tiền ko fix cứng đã đóng, thu tiền gửi xe
+
 thong bao
 ticket
 """

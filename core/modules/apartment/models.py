@@ -69,3 +69,4 @@ class CanHo(models.Model):
             if self.floor > self.building.max_floor:
                 self.floor = self.building.max_floor
         super().save(*args, **kwargs)
+

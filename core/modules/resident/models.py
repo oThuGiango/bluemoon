@@ -173,3 +173,40 @@ class BienDongNhanKhau(models.Model):
     class Meta:
         managed = True
         db_table = "biendongnhankhau"
+
+
+class LoaiXe(models.TextChoices):
+    XE_DAP = 'xe_dap', 'Xe đạp'
+    XE_MAY = 'xe_may', 'Xe máy'
+    O_TO = 'o_to', 'Ô tô'
+
+
+class GuiXe(models.Model):
+    hokhau = models.ForeignKey(
+        HoKhau, on_delete=models.CASCADE, related_name='guixe')
+    loai_xe = models.CharField(max_length=10, choices=LoaiXe.choices)
+    bien_so = models.CharField(max_length=20, blank=True, null=True)
+    mo_ta = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.CharField(max_length=100, null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = 'Gửi xe'
+        verbose_name_plural = 'Gửi xe'
+
+    def __str__(self):
+        return f"{self.hokhau.id_canho.so_can_ho} - {self.get_loai_xe_display()}"
+
+    def clean(self):
+        # Làm sạch biển số: chỉ giữ ký tự chữ và số, chuyển thành chữ hoa
+        if self.bien_so:
+            import re
+            cleaned = re.sub(r'[^A-Za-z0-9]', '', self.bien_so)
+            self.bien_so = cleaned.upper()
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
