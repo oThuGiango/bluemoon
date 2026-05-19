@@ -15,6 +15,9 @@ class DonViTinh(models.TextChoices):
     NAM = "nam", "Năm"
     LUOT = "luot", "Lượt"
     DIENTICH = "dientich", "Diện tích (m2)"
+    XE_MAY = "xe_may", "Xe máy"
+    OTO = "oto", "Ô tô"
+    XE_DAP = "xe_dap", "Xe đạp"
 
 
 class TrangThaiDotThu(models.TextChoices):

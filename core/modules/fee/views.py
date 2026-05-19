@@ -2,7 +2,7 @@ import json
 
 from core.decorators import role_required
 from .models import DotThuPhi, HoaDon, KhoanThu, HoaDonChiTiet
-from core.modules.resident.models import HoKhau
+from core.modules.resident.models import HoKhau, GuiXe
 from core.forms import DotThuPhiForm, KhoanThuForm
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl import Workbook
@@ -31,8 +31,24 @@ def calculate_invoice(tat_ca_ho_khau, khoanthu_objs):
         dien_tich = float(canho.dien_tich or 0) if canho else 0
         so_can_ho = canho.so_can_ho if canho else ""
         for kt in khoanthu_objs:
+            # Tính phí theo diện tích
             if kt.don_vi_tinh == "dientich":
                 so_luong = dien_tich
+                so_tien = float(kt.don_gia) * so_luong
+            # Tính phí gửi xe máy
+            elif kt.don_vi_tinh == "xe_may":
+                so_luong = GuiXe.objects.filter(
+                    hokhau=hokhau, loai_xe="xe_may", is_deleted=False).count()
+                so_tien = float(kt.don_gia) * so_luong
+            # Tính phí gửi ô tô
+            elif kt.don_vi_tinh == "oto":
+                so_luong = GuiXe.objects.filter(
+                    hokhau=hokhau, loai_xe="o_to", is_deleted=False).count()
+                so_tien = float(kt.don_gia) * so_luong
+            # Tính phí gửi xe đạp
+            elif kt.don_vi_tinh == "xe_dap":
+                so_luong = GuiXe.objects.filter(
+                    hokhau=hokhau, loai_xe="xe_dap", is_deleted=False).count()
                 so_tien = float(kt.don_gia) * so_luong
             else:
                 so_luong = 1

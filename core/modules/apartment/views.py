@@ -192,8 +192,8 @@ def canho_detail(request, id_canho):
 
 def get_hokhau_for_user(request):
     # vaitro=2: chỉ xem được xe của hộ khẩu mình làm chủ hộ
-    if hasattr(request.user, 'taikhoan') and getattr(request.user.taikhoan, 'vaitro', None) == 2:
-        return HoKhau.objects.filter(id_chuho=request.user.taikhoan, is_deleted=False, is_active=True)
+    if request.user.vaitro_id and request.user.vaitro_id == 2:
+        return HoKhau.objects.filter(id_chuho=request.user, is_deleted=False, is_active=True)
     return HoKhau.objects.filter(is_deleted=False, is_active=True)
 
 
@@ -203,7 +203,7 @@ def guixe_list(request):
     query = request.GET.get('query', '').strip()
     type = request.GET.get('type', '')
     # Nếu vaitro=2 thì chỉ lấy xe của các hộ khẩu mà user là chủ hộ
-    if hasattr(request.user, 'taikhoan') and getattr(request.user.taikhoan, 'vaitro', None) == 2:
+    if request.user.vaitro_id and request.user.vaitro_id == 2:
         hokhau_qs = get_hokhau_for_user(request)
         guixe_qs = GuiXe.objects.filter(hokhau__in=hokhau_qs, is_deleted=False)
     else:

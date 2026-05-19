@@ -4,27 +4,82 @@
       <i class="fa-solid fa-bars"></i>
     </button>
     <div class="header-title">
-      <h2>Chung cư <span style="font-color: aliceblue;">BlueMoon</span></h2>
-      <p style="font-size:0.8rem">Hệ thống quản lý hiện đại và thông minh cho tòa nhà của bạn</p>
+      <h2>Chung cư <span style="font-color: aliceblue">BlueMoon</span></h2>
+      <p style="font-size: 0.8rem">
+        Hệ thống quản lý hiện đại và thông minh cho tòa nhà của bạn
+      </p>
     </div>
   </div>
   <div class="header-right">
-    <button class="lang-btn" style="margin-right: 12px">
-      <img
-        src="https://flagcdn.com/vn.svg"
-        alt="VI"
-        width="22"
+    <div style="display: flex; align-items: center; gap: 16px">
+      <a
+        href="{% url 'thongbao_list' %}"
+        title="Thông báo"
         style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
-          border: 1px solid #d9d9d9;
-          background: #fff;
-          margin-right: 7px;
+          background: #f5f5f5;
+          color: #333;
+          box-shadow: 0 1px 2px #0001;
+          font-size: 1.25rem;
+          transition: background 0.2s;
+          border: none;
+          text-decoration: none;
         "
-      />
-      <span>VI</span>
-    </button>
-    <div class="user-avatar" id="userMenuBtn">
-      {{ user.username.0|upper }}
+      >
+        <i class="fa-solid fa-bell"></i>
+      </a>
+      <button
+        class="lang-btn"
+        style="
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          height: 40px;
+          border-radius: 20px;
+          background: #f5f5f5;
+          border: none;
+          padding: 0 16px;
+          font-weight: 500;
+        "
+      >
+        <img
+          src="https://flagcdn.com/vn.svg"
+          alt="VI"
+          width="22"
+          style="
+            border-radius: 50%;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+          "
+        />
+        <span>VI</span>
+      </button>
+      <div
+        class="user-avatar"
+        id="userMenuBtn"
+        style="
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: #8e44ad;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 1.1rem;
+          box-shadow: 0 1px 2px #0001;
+          cursor: pointer;
+        "
+      >
+        {{ user.username.0|upper }}
+      </div>
     </div>
     <div id="userMenuContainer">{% include 'core/UserMenu.html' %}</div>
     <div class="user-menu-overlay" id="userMenuOverlay"></div>
