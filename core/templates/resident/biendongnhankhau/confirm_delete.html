@@ -1,0 +1,76 @@
+{% load static %}
+<form
+  method="post"
+  action="{% url 'biendong_delete' biendong.id_biendong %}"
+  id="deleteBiendongForm"
+>
+  {% csrf_token %}
+  <div class="form-container" style="margin: 0 auto">
+    <h2
+      class="form-title"
+      style="border-bottom: 2px solid #fce8e6; padding-bottom: 10px"
+    >
+      <i
+        class="fa-solid fa-triangle-exclamation"
+        style="color: #d93025; font-size: 1.2rem; margin-right: 8px"
+      ></i>
+      Xác nhận xóa
+    </h2>
+    <div style="text-align: center">
+      <p style="font-size: 1.1rem; color: #3c4043; margin-bottom: 12px">
+        Bạn có chắc chắn muốn xóa biến động nhân khẩu:<br />
+      </p>
+      <p style="color: #d93025; font-size: 1rem;">
+        {{ biendong.id_nhankhau.ho_ten }}<br />
+        <span style="color: #444; font-size: 0.98rem; font-weight: 400"
+          >Loại: {{ biendong.get_loai_biendong_display }} | 
+          Ngày: {{ biendong.ngay_batdau|date:"d/m/Y" }}</span
+        >
+      </p>
+      <div
+        style="
+          background-color: #fef7f7;
+          border-radius: 8px;
+          padding: 12px 10px;
+          margin-top: 12px;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+        "
+      >
+        <i
+          class="fa-solid fa-circle-info"
+          style="color: #d93025; font-size: 1rem; margin-right: 8px"
+        ></i>
+        Hành động này không thể hoàn tác và có thể ảnh hưởng đến các dữ liệu
+        liên quan.
+      </div>
+      <div
+        style="
+          margin-top: 24px;
+          display: flex;
+          justify-content: center;
+          gap: 18px;
+        "
+      >
+        <button
+            type="button"
+            class="btn btn-secondary-outline"
+            id="cancelDeleteBtn"
+            style="padding: 10px 22px"
+        >
+            <i class="fa-solid fa-xmark"></i> Hủy bỏ
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          style="background: #d93025; border-color: #d93025; min-width: 120px"
+        >
+          Xóa
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</form>

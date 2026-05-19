@@ -1,4 +1,4 @@
-from django.db.models import Q, OuterRef, Subquery, DateField, Case, When, Value, CharField
+from django.db.models import Q, OuterRef, Subquery, DateField, Case, When, Value, CharField, Count
 from django import forms
 from django.urls import reverse
 from django.contrib import messages
@@ -10,7 +10,7 @@ from openpyxl import Workbook
 from django.utils import timezone
 from .models import BienDongNhanKhau, HoKhau, NhanKhau, CanHo
 from core.modules.account.models import TaiKhoan
-from core.forms import HoKhauForm, NhanKhauForm
+from core.forms import HoKhauForm, NhanKhauForm, BienDongForm
 from core.decorators import role_required
 from core.modules.base.models import LoaiBienDong
 from openpyxl.styles import PatternFill, Font, Alignment
@@ -30,7 +30,7 @@ def nhankhau_list(request):
     loai_biendong = request.GET.get('status', '').strip()
     user_hokhau = get_user_hokhau_active(request.user)
     qs = NhanKhau.objects.filter(
-        is_deleted=False, id_hokhau__is_active=True, id_hokhau__is_deleted=False)
+        is_deleted=False, id_hokhau__is_deleted=False)
     if user_hokhau is not None:
         qs = qs.filter(id_hokhau__in=user_hokhau)
     if search:
@@ -44,7 +44,7 @@ def nhankhau_list(request):
     latest_bd_subquery = BienDongNhanKhau.objects.filter(
         id_nhankhau=OuterRef('pk'),
         is_deleted=False
-    ).order_by('-ngay_batdau')
+    ).order_by('-updated_at')
     qs = qs.annotate(
         latest_bd_ngay=Subquery(latest_bd_subquery.values(
             'ngay_batdau')[:1], output_field=DateField()),
@@ -170,17 +170,32 @@ def nhankhau_edit(request, pk):
 def nhankhau_delete(request, pk):
     nk = get_object_or_404(NhanKhau, pk=pk, is_deleted=False)
     user_hokhau = get_user_hokhau_active(request.user)
+    if request.method != 'POST':
+        return render(request, 'resident/nhankhau/confirm_delete.html', {'nk': nk})
+
     # Nếu là cư dân chỉ cho xóa nhân khẩu thuộc hộ khẩu của mình
     if user_hokhau is not None and nk.id_hokhau not in user_hokhau:
         messages.error(request, 'Bạn không có quyền xóa nhân khẩu này!')
         return redirect('nhankhau_list')
-    if request.method == 'POST':
-        nk.is_deleted = True
-        nk.updated_by = request.user.username
-        nk.save()
-        messages.success(request, 'Đã xóa nhân khẩu!')
+
+    # Không cho xóa nếu là chủ hộ của hộ khẩu active
+    if nk.is_chu_ho and nk.is_active:
+        messages.error(
+            request, 'Không thể xóa nhân khẩu đang là chủ hộ!')
         return redirect('nhankhau_list')
-    return render(request, 'resident/nhankhau/confirm_delete.html', {'nk': nk})
+
+    # Không cho xóa nếu có nhiều hơn 1 biến động nhân khẩu
+    biendong_count = nk.nhan_khau.filter(is_deleted=False).count()
+    if biendong_count > 1:
+        messages.error(
+            request, 'Không thể xóa nhân khẩu có đăng ký cư trú!')
+        return redirect('nhankhau_list')
+
+    nk.is_deleted = True
+    nk.updated_by = request.user.username
+    nk.save()
+    messages.success(request, 'Đã xóa nhân khẩu!')
+    return redirect('nhankhau_list')
 
 
 @login_required(login_url="login")
@@ -191,8 +206,37 @@ def hokhau_toggle_active(request, pk):
         hokhau.is_active = not hokhau.is_active
         hokhau.updated_by = request.user.username
         hokhau.save(update_fields=['is_active', 'updated_at', 'updated_by'])
+
+        # Lấy tất cả nhân khẩu thuộc hộ khẩu này (không xóa)
+        nhankhaus = NhanKhau.objects.filter(id_hokhau=hokhau, is_deleted=False)
+        now = timezone.now().date()
+        if hokhau.is_active:
+            # Khi bật lại
+            for nk in nhankhaus:
+                nk.is_active = True
+                nk.updated_by = request.user.username
+                nk.save(update_fields=['is_active', 'updated_by'])
+                BienDongNhanKhau.objects.create(
+                    id_nhankhau=nk,
+                    loai_biendong=hokhau.resident_status if hokhau.resident_status else 'tam_vang',
+                    ngay_batdau=now,
+                    ly_do='Đăng ký lại',
+                    updated_by=request.user.username
+                )
+        else:
+            for nk in nhankhaus:
+                nk.is_active = False
+                nk.updated_by = request.user.username
+                nk.save(update_fields=['is_active', 'updated_by'])
+                BienDongNhanKhau.objects.create(
+                    id_nhankhau=nk,
+                    loai_biendong='cham_dut',
+                    ngay_batdau=now,
+                    ly_do='Hộ khẩu ngừng hoạt động',
+                    updated_by=request.user.username
+                )
         messages.success(
-            request, f'Trạng thái hộ khẩu đã được cập nhật thành {"hoạt động" if hokhau.is_active else "không hoạt động"}!')
+            request, f'Trạng thái hộ khẩu đã được cập nhật!')
     return redirect('hokhau_list')
 
 
@@ -200,7 +244,10 @@ def hokhau_toggle_active(request, pk):
 @role_required([1])
 def hokhau_list(request):
     hokhau_qs = HoKhau.objects.filter(is_deleted=False).select_related(
-        'id_canho', 'id_chuho').order_by('-id_hokhau')
+        'id_canho', 'id_chuho').annotate(
+        nhankhau_count=Count('ho_khau', filter=Q(
+            ho_khau__is_deleted=False, ho_khau__is_active=True))
+    ).order_by('-id_hokhau')
 
     search_hk = request.GET.get('search_hk', '').strip()
     resident_status = request.GET.get('resident_status', '')
@@ -216,17 +263,9 @@ def hokhau_list(request):
     if is_active in ['0', '1']:
         hokhau_qs = hokhau_qs.filter(is_active=(is_active == '1'))
 
-    # Đếm số nhân khẩu cho từng hộ khẩu
-    nhankhau_counts = {}
-    from core.modules.resident.models import NhanKhau
-    for hk in hokhau_qs:
-        nhankhau_counts[hk.id_hokhau] = NhanKhau.objects.filter(
-            id_hokhau=hk, is_deleted=False, is_active=True).count()
-
     total_count = hokhau_qs.count()
     return render(request, 'resident/hokhau.html', {
         'hokhau_list': hokhau_qs,
-        'nhankhau_counts': nhankhau_counts,
         'search_hk': search_hk,
         'resident_status': resident_status,
         'is_active': is_active,
@@ -296,6 +335,7 @@ def hokhau_add(request):
 @role_required([1])
 def hokhau_edit(request, pk):
     hokhau = get_object_or_404(HoKhau, pk=pk)
+    old_resident_status = hokhau.resident_status
     # Lấy danh sách căn hộ chưa có hộ khẩu active, cộng thêm căn hộ hiện tại
     canho_with_active_hokhau = HoKhau.objects.filter(
         is_deleted=False, is_active=True, id_canho__isnull=False).values_list('id_canho', flat=True)
@@ -316,12 +356,26 @@ def hokhau_edit(request, pk):
     if request.method == 'POST':
         post = request.POST.copy()
         post['id_chuho'] = str(hokhau.id_chuho.pk)
+        
         form = HoKhauForm(post, instance=hokhau, available_canho=available_canho,
                           available_chuho=available_chuho, disabled_chuho=True)
         if form.is_valid():
             hokhau = form.save(commit=False)
             hokhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
             hokhau.save()
+            # Nếu resident_status thay đổi thì tạo biến động mới cho tất cả nhân khẩu active thuộc hộ khẩu này
+            if old_resident_status != hokhau.resident_status:
+                nhankhaus = NhanKhau.objects.filter(
+                    id_hokhau=hokhau, is_deleted=False, is_active=True)
+                now = timezone.now().date()
+                for nk in nhankhaus:
+                    BienDongNhanKhau.objects.create(
+                        id_nhankhau=nk,
+                        loai_biendong=hokhau.resident_status,
+                        ngay_batdau=now,
+                        ly_do='Cập nhật tình trạng cư trú hộ khẩu',
+                        updated_by=request.user.username if request.user.is_authenticated else 'Unknown'
+                    )
             messages.success(request, 'Cập nhật hộ khẩu thành công!')
             return redirect('hokhau_list')
         else:
@@ -345,6 +399,14 @@ def hokhau_edit(request, pk):
 def hokhau_delete(request, pk):
     hokhau = get_object_or_404(HoKhau, pk=pk)
     if request.method == 'POST':
+        # Không cho xóa nếu còn nhân khẩu active
+        nhankhau_active_count = NhanKhau.objects.filter(
+            id_hokhau=hokhau, is_deleted=False, is_active=True).count()
+        if nhankhau_active_count > 0:
+            messages.error(
+                request, 'Không thể xóa hộ khẩu còn nhân khẩu đang hoạt động!')
+            return redirect('hokhau_list')
+
         hokhau.is_deleted = True
         hokhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
         hokhau.save(update_fields=['is_deleted', 'updated_by', 'updated_at'])
@@ -377,8 +439,13 @@ def nhan_khau_profile(request, id_nhankhau):
 @login_required(login_url="login")
 @role_required([1, 2])
 def export_biendong_excel(request):
-    biendongs = BienDongNhanKhau.objects.select_related(
-        "id_nhankhau").order_by("-ngay_batdau")
+    if hasattr(request.user, 'vaitro') and getattr(request.user.vaitro, 'id_vaitro', None) == 2:
+        biendongs = BienDongNhanKhau.objects.select_related("id_nhankhau").filter(
+            id_nhankhau__id_hokhau__id_chuho=request.user
+        ).order_by("-ngay_batdau")
+    else:
+        biendongs = BienDongNhanKhau.objects.select_related(
+            "id_nhankhau").order_by("-ngay_batdau")
 
     wb = Workbook()
     ws = wb.active
@@ -438,10 +505,17 @@ def export_biendong_excel(request):
 @login_required(login_url="login")
 @role_required([1, 2])
 def export_nhankhau_excel(request):
-    nhankhau = NhanKhau.objects.filter(
-        is_deleted=False, is_active=True,
-        id_hokhau__is_active=True, id_hokhau__is_deleted=False
-    ).order_by("id_hokhau")
+    if hasattr(request.user, 'vaitro') and getattr(request.user.vaitro, 'id_vaitro', None) == 2:
+        nhankhau = NhanKhau.objects.filter(
+            is_deleted=False, is_active=True,
+            id_hokhau__is_active=True, id_hokhau__is_deleted=False,
+            id_hokhau__id_chuho=request.user
+        ).order_by("id_hokhau")
+    else:
+        nhankhau = NhanKhau.objects.filter(
+            is_deleted=False, is_active=True,
+            id_hokhau__is_active=True, id_hokhau__is_deleted=False
+        ).order_by("id_hokhau")
 
     wb = Workbook()
     ws = wb.active
@@ -516,7 +590,11 @@ def export_nhankhau_excel(request):
 @login_required(login_url="login")
 @role_required([1, 2])
 def export_hokhau_excel(request):
-    hokhau = HoKhau.objects.filter(is_deleted=False)
+    if hasattr(request.user, 'vaitro') and getattr(request.user.vaitro, 'id_vaitro', None) == 2:
+        hokhau = HoKhau.objects.filter(
+            is_deleted=False, is_active=True, id_chuho=request.user)
+    else:
+        hokhau = HoKhau.objects.filter(is_deleted=False, is_active=True)
 
     wb = Workbook()
     ws = wb.active
@@ -585,40 +663,129 @@ def export_hokhau_excel(request):
 @login_required(login_url="login")
 @role_required([1, 2])
 def biendong_list(request):
-    biendongs = BienDongNhanKhau.objects.filter(is_deleted=False).select_related(
-        "id_nhankhau").order_by("-ngay_batdau")
+    query = request.GET.get('search', '').strip()
+    loai_biendong = request.GET.get('loai_biendong', '').strip()
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+
+    # Giới hạn vaitro=2 chỉ xem biến động nhân khẩu thuộc hộ khẩu mà mình là chủ hộ
+    if hasattr(request.user, 'vaitro') and getattr(request.user.vaitro, 'id_vaitro', None) == 2:
+        biendongs = BienDongNhanKhau.objects.filter(
+            is_deleted=False,
+            id_nhankhau__id_hokhau__id_chuho=request.user
+        ).select_related(
+            "id_nhankhau", "id_nhankhau__id_hokhau", "id_nhankhau__id_hokhau__id_canho"
+        ).order_by('-updated_at')
+    else:
+        biendongs = BienDongNhanKhau.objects.filter(is_deleted=False).select_related(
+            "id_nhankhau", "id_nhankhau__id_hokhau", "id_nhankhau__id_hokhau__id_canho"
+        ).order_by('-updated_at')
+
+    if query:
+        biendongs = biendongs.filter(
+            Q(id_nhankhau__ho_ten__icontains=query) |
+            Q(id_nhankhau__cccd__icontains=query) |
+            Q(id_nhankhau__id_hokhau__id_canho__so_can_ho__icontains=query)
+        )
+    if loai_biendong:
+        biendongs = biendongs.filter(loai_biendong=loai_biendong)
+    if date_from:
+        biendongs = biendongs.filter(ngay_batdau__gte=date_from)
+    if date_to:
+        biendongs = biendongs.filter(ngay_batdau__lte=date_to)
+    biendongs = biendongs.order_by('-updated_at')
 
     return render(
         request,
         "resident/biendongnhankhau/biendong_list.html",
-        {"biendongs": biendongs},
+        {
+            "biendongs": biendongs,
+            "query": query,
+            "loai_biendong": loai_biendong,
+            "date_from": date_from,
+            "date_to": date_to,
+            "loai_bd_choices": LoaiBienDong.choices,
+        },
     )
 
 
 @login_required(login_url="login")
 @role_required([1, 2])
-def dang_ky_bdbk(request, id_nhankhau):
+def dang_ky_bdnk(request, id_nhankhau):
     nhan_khau = get_object_or_404(NhanKhau, id_nhankhau=id_nhankhau)
+    # Phân quyền: vaitro=2 chỉ được đăng ký cho nhân khẩu thuộc hộ khẩu mình
+    if hasattr(request.user, 'vaitro') and getattr(request.user.vaitro, 'id_vaitro', None) == 2:
+        if not nhan_khau.id_hokhau or nhan_khau.id_hokhau.id_chuho != request.user:
+            messages.error(
+                request, 'Bạn không có quyền đăng ký biến động cho nhân khẩu này!')
+            return redirect('nhankhau_list')
 
     if request.method == "POST":
-        ngay_batdau = request.POST.get("ngay_batdau")
-        ngay_ketthuc = request.POST.get("ngay_ketthuc")
-        loai_bien_dong = request.POST.get("loai_bien_dong")
-        ly_do = request.POST.get("ly_do")
-
-        with transaction.atomic():
-            BienDongNhanKhau.objects.create(
-                loai_biendong=loai_bien_dong,
-                ngay_batdau=ngay_batdau or timezone.now().date(),
-                ngay_ketthuc=ngay_ketthuc or None,
-                ly_do=ly_do or None,
-                id_nhankhau=nhan_khau,
-            )
-
-        return redirect("biendong_list")
-
+        form = BienDongForm(request.POST, nhan_khau=nhan_khau)
+        if form.is_valid():
+            bien_dong = form.save(commit=False)
+            bien_dong.id_nhankhau = nhan_khau
+            bien_dong.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+            bien_dong.save()
+            # Cập nhật ngày kết thúc cho bản ghi chưa xóa liền trước nếu đang null
+            prev_bd = nhan_khau.nhan_khau.filter(is_deleted=False).exclude(
+                id_biendong=bien_dong.id_biendong).order_by('-ngay_batdau').first()
+            if prev_bd and prev_bd.ngay_ketthuc is None and prev_bd.ngay_batdau < bien_dong.ngay_batdau:
+                prev_bd.ngay_ketthuc = bien_dong.ngay_batdau
+                prev_bd.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+                prev_bd.save(update_fields=['ngay_ketthuc', 'updated_by'])
+            # Nếu loại biến động là chấm dứt cư trú thì set is_active=False cho nhân khẩu
+            if bien_dong.loai_biendong == 'cham_dut':
+                nhan_khau.is_active = False
+                nhan_khau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+                nhan_khau.save(update_fields=['is_active', 'updated_by'])
+            messages.success(
+                request, "Đăng ký biến động nhân khẩu thành công!")
+            return redirect("nhankhau_list")
+        else:
+            # Lấy tất cả lỗi của form (bao gồm cả lỗi trường và lỗi chung)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(
+                        request, f"{form.fields[field].label if field in form.fields else field}: {error}")
+            # Nếu có lỗi chung (non_field_errors)
+            for error in form.non_field_errors():
+                messages.error(request, error)
+            return redirect('nhankhau_list')
+    else:
+        form = BienDongForm(nhan_khau=nhan_khau)
     return render(
         request,
         "resident/biendongnhankhau/dangkybdnk.html",
-        {"nhan_khau": nhan_khau},
+        {"nhan_khau": nhan_khau, "form": form},
     )
+
+
+@login_required(login_url="login")
+@role_required([1, 2])
+def biendong_delete(request, id_biendong):
+    # Nếu là cư dân chỉ cho xóa biến động của nhân khẩu thuộc hộ khẩu mình
+    if hasattr(request.user, 'vaitro') and getattr(request.user.vaitro, 'id_vaitro', None) == 2:
+        biendong = get_object_or_404(
+            BienDongNhanKhau,
+            pk=id_biendong,
+            is_deleted=False,
+            id_nhankhau__id_hokhau__id_chuho=request.user
+        )
+    else:
+        biendong = get_object_or_404(
+            BienDongNhanKhau, pk=id_biendong, is_deleted=False)
+    if request.method == 'POST':
+        # Nếu biến động là chấm dứt cư trú thì cập nhật lại trạng thái nhân khẩu
+        if biendong.loai_biendong == 'cham_dut' and biendong.id_nhankhau:
+            nhankhau = biendong.id_nhankhau
+            nhankhau.is_active = True
+            nhankhau.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+            nhankhau.save(update_fields=['is_active', 'updated_by'])
+        
+        biendong.is_deleted = True
+        biendong.updated_by = request.user.username if request.user.is_authenticated else 'Unknown'
+        biendong.save(update_fields=['is_deleted', 'updated_by', 'updated_at'])
+        messages.success(request, 'Đã xóa biến động nhân khẩu!')
+        return redirect('biendong_list')
+    return render(request, 'resident/biendongnhankhau/confirm_delete.html', {'biendong': biendong})

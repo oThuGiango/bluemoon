@@ -23,13 +23,13 @@ class HoKhau(models.Model):
     RESIDENT_STT_CHOICES = [
         ("thuong_tru", "Thường trú"),
         ("tam_tru", "Tạm trú"),
-        ("de_trong", "Để trống"),
+        ("tam_vang", "Tạm vắng"),
         ("khac", "Khác"),
     ]
     resident_status = models.CharField(
         max_length=20,
         choices=RESIDENT_STT_CHOICES,
-        default="de_trong",
+        default="tam_vang",
         verbose_name="Tình trạng cư trú"
     )
     is_deleted = models.BooleanField(default=False)
@@ -45,7 +45,7 @@ class HoKhau(models.Model):
             active_hokhau = HoKhau.objects.filter(
                 id_canho=self.id_canho, is_deleted=False, is_active=True).first()
             if active_hokhau and active_hokhau.resident_status:
-                if active_hokhau.resident_status == "thuong_tru":
+                if active_hokhau.resident_status in ["thuong_tru", "tam_vang"]:
                     self.id_canho.status = "dang_o"
                 elif active_hokhau.resident_status == "tam_tru":
                     self.id_canho.status = "cho_thue"

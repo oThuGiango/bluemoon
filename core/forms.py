@@ -1,11 +1,7 @@
 
 from django import forms
-
-from core.modules.resident.models import NhanKhau
-
-from .models import KhoanThu, DotThuPhi, Building, CanHo, HoKhau, TaiKhoan
-
-
+from django.core.exceptions import ValidationError
+from .models import KhoanThu, DotThuPhi, Building, CanHo, HoKhau, TaiKhoan, BienDongNhanKhau, NhanKhau
 from datetime import datetime
 
 
@@ -272,9 +268,53 @@ class NhanKhauForm(forms.ModelForm):
         }
 
 
+class BienDongForm(forms.ModelForm):
+    class Meta:
+        model = BienDongNhanKhau
+        fields = ['loai_biendong', 'ngay_batdau', 'ngay_ketthuc', 'ly_do']
+        widgets = {
+            'ngay_batdau': forms.DateInput(attrs={'type': 'date'}),
+            'ngay_ketthuc': forms.DateInput(attrs={'type': 'date'}),
+            'ly_do': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Nhập lý do đăng ký...'}),
+        }
+        labels = {
+            'loai_biendong': 'Loại trạng thái cư trú muốn đăng ký',
+            'ngay_batdau': 'Ngày bắt đầu',
+            'ngay_ketthuc': 'Ngày kết thúc',
+            'ly_do': 'Lý do biến động',
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.nhan_khau = kwargs.pop('nhan_khau', None)
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        ngay_batdau = cleaned_data.get('ngay_batdau')
+        ngay_ketthuc = cleaned_data.get('ngay_ketthuc')
+        if ngay_batdau and ngay_ketthuc and ngay_batdau > ngay_ketthuc:
+            raise ValidationError(
+                'Ngày bắt đầu không được lớn hơn ngày kết thúc.')
+        # Kiểm tra ngày bắt đầu không nhỏ hơn ngày kết thúc của bản ghi chưa xóa liền trước
+        if self.nhan_khau:
+            prev_bd = self.nhan_khau.nhan_khau.filter(
+                is_deleted=False).order_by('-ngay_batdau').first()
+            if prev_bd:
+                if prev_bd.ngay_ketthuc:
+                    if ngay_batdau < prev_bd.ngay_ketthuc:
+                        raise ValidationError({
+                            'ngay_batdau': 'Ngày bắt đầu không được nhỏ hơn ngày kết thúc của biến động trước.'
+                        })
+                else:
+                    if ngay_batdau < prev_bd.ngay_batdau:
+                        raise ValidationError({
+                            'ngay_batdau': 'Ngày bắt đầu không được nhỏ hơn ngày bắt đầu của biến động trước.'
+                        })
+        return cleaned_data
+
+
 """
-bdnk
-deactive/update hokhau -> bdnk
+thông kê tình trạng sử dụng căn hộ
 tai san
 thong bao
 ticket

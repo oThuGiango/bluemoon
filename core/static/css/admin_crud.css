@@ -117,8 +117,8 @@
 .income-summary-box {
   background: #e3f2fd;
   border: 1px solid #90caf9;
-  padding: 20px;
-  border-radius: var(--border-radius);
+  padding: 12px;
+  border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 .income-summary-box .box-title {
@@ -213,6 +213,13 @@
   background: #fef3f2;
   color: #b42318;
   border: 1px solid #fecdca;
+}
+
+/* DISABLE */
+.status-disable {
+  background: #f3f4f6;
+  color: #757575;
+  border: 1px solid #e0e0e0;
 }
 
 /* PRIMARY */

@@ -191,6 +191,14 @@
                       <i class="fa-solid fa-pen"></i>
                     </button>
                     <button
+                      data-url="{% url 'dang_ky_bdnk' nk.id_nhankhau %}"
+                      class="action-btn modal-trigger"
+                      title="Đăng ký biến động"
+                      style="color: #2980b9"
+                    >
+                      <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    </button>
+                    <button
                       data-url="{% url 'nhankhau_delete' nk.id_nhankhau %}"
                       class="action-btn modal-trigger"
                       title="Xóa"

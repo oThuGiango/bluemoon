@@ -22,8 +22,10 @@ urlpatterns = [
     # Biến động nhân khẩu
     path("biendongnhankhau/",
          views.biendong_list, name="biendong_list"),
-    path("dangkybiendongnhankhau/<int:id_nhankhau>/",
-         views.dang_ky_bdbk, name="dang_ky_bdnk"),
+    path("biendongnhankhau/<int:id_nhankhau>/",
+         views.dang_ky_bdnk, name="dang_ky_bdnk"),
+    path("biendongnhankhau/<int:id_biendong>/delete/",
+         views.biendong_delete, name="biendong_delete"),
 
     # Xuất Excel
     path("hokhau/export/", views.export_hokhau_excel,

@@ -1,4 +1,4 @@
-{% load static %} {% load humanize %}
+{% load static %} {% load humanize %} 
 <!doctype html>
 <html lang="vi">
   <head>
@@ -104,18 +104,12 @@
                 </option>
                 <option
                   value="de_trong"
-                  {% if resident_status == 'de_trong' %}selected
+                  {% if resident_status == 'tam_vang' %}selected
                   {% endif %}
                 >
-                  Để trống
+                  Tạm vắng
                 </option>
-                <option
-                  value="khac"
-                  {% if resident_status == 'khac' %}selected
-                  {% endif %}
-                >
-                  Khác
-                </option>
+                
               </select>
               
               {% if search_hk or resident_status or is_active %}
@@ -189,13 +183,13 @@
                     <span class="status
                       {% if hk.resident_status == 'thuong_tru' %}status-primary
                       {% elif hk.resident_status == 'tam_tru' %}status-normal
-                      {% elif hk.resident_status == 'de_trong' %}status-inactive
+                      {% elif hk.resident_status == 'tam_vang' %}status-inactive
                       {% endif %}">
                       {{ hk.get_resident_status_display }}
                     </span>
                   </td>
                   <td data-label="Số nhân khẩu">
-                    {{ nhankhau_counts.hk.id_hokhau|default_if_none:0|default:0 }}
+                    {{ hk.nhankhau_count }}
                   </td>
                   <td data-label="Trạng thái">
                     <form method="post" action="{% url 'hokhau_toggle_active' hk.id_hokhau %}" style="display:inline;">

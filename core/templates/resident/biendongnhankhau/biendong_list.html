@@ -14,6 +14,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
   </head>
   <body>
     {% include 'core/Sidebar.html' %}
@@ -22,6 +23,138 @@
 
       <section class="main-content income-management-page">
         <div class="main-panel data-table-panel">
+          <!-- prettier-ignore -->
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'success' %}
+          <div
+            class="message-container success"
+            style="
+              background-color: #e6f7d9;
+              color: #52c41a;
+              border: 1px solid #b7eb8f;
+              margin: auto;
+            "
+          >
+            {{ message }}
+          </div>
+          {% elif message.tags == 'error' %}
+          <div
+            class="message-container error-alert"
+            style="
+              background-color: #fff1f0;
+              color: #ff4d4f;
+              border: 1px solid #ffa39e;
+              margin: auto;
+            "
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
+          </div>
+          <!-- prettier-ignore -->
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+
+          <div class="income-controls-top">
+            <form
+              method="GET"
+              action="{% url 'biendong_list' %}"
+              class="filter-group"
+            >
+            <div style="display: flex; align-items: flex-end; gap: 12px; width: 100%;">
+              <div class="search-box-container">
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Tìm kiếm theo họ tên, CCCD, Căn hộ..."
+                  value="{{ query|default:'' }}"
+                />
+                <i class="fa-solid fa-search"></i>
+              </div>
+
+              <div style="display: flex; flex-direction: column">
+                <label for="date_from" style="font-size: 0.8em; color: #888; margin-bottom: 4px;">Từ ngày</label>
+                <input
+                  type="date"
+                  id="date_from"
+                  name="date_from"
+                  value="{{ date_from|default:'' }}"
+                  class="filter-select"
+                  style="width: 140px; min-height: 38px; text-align: center;"
+                  placeholder="Ngày bắt đầu"
+                />
+              </div>
+              <div style="display: flex; flex-direction: column;">
+                <label for="date_to" style="font-size: 0.8em; color: #888; margin-bottom: 4px;">Đến ngày</label>
+                <input
+                  type="date"
+                  id="date_to"
+                  name="date_to"
+                  value="{{ date_to|default:'' }}"
+                  class="filter-select"
+                  style="width: 140px; min-height: 38px; text-align: center;"
+                  placeholder="Đến ngày"
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary"
+              >
+                <i class="fa-solid fa-filter"></i> Tìm kiếm
+              </button>
+
+              <select
+                name="loai_biendong"
+                class="filter-select"
+                onchange="this.form.submit()"
+              >
+              <!-- prettier-ignore -->
+                <option value="">-- Trạng thái --</option>
+                <option
+                  value="thuong_tru"
+                  {% if status == 'thuong_tru' %}
+                  selected{% endif %}
+                >
+                  Thường trú
+                </option>
+                <option
+                  value="tam_tru"
+                  {% if status == 'tam_tru' %}
+                  selected{% endif %}
+                >
+                  Tạm trú
+                </option>
+                <option
+                  value="tam_vang"
+                  {% if status == 'tam_vang' %}
+                  selected{% endif %}
+                >
+                  Tạm vắng
+                </option>
+                <option
+                  value="cham_dut"
+                  {% if status == 'cham_dut' %}
+                  selected{% endif %}
+                >
+                  Chấm dứt cư trú
+                </option>
+              </select>
+              
+
+              {% if query or loai_biendong or date_from or date_to %}
+              <a
+                href="{% url 'biendong_list' %}"
+                class="action-btn"
+                title="Xóa lọc"
+                style="background: #f5f5f5; color: #333"
+              >
+                <i class="fa-solid fa-rotate-right"></i>
+              </a>
+              {% endif %}
+            </form>
+          </div></div>
+
           <div style="display: flex; justify-content: flex-end; width: 100%">
             <a href="{% url 'export_biendong_excel' %}" class="btn-excel">
               <i class="fa-solid fa-file-excel"></i> Xuất Excel
@@ -36,9 +169,12 @@
                 <tr>
                   <th>Mã BD</th>
                   <th>Nhân khẩu</th>
+                  <th>CCCD</th>
+                  <th>Số căn hộ</th>
                   <th>Loại biến động</th>
                   <th>Thời gian</th>
                   <th>Lý do</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -46,6 +182,13 @@
                 <tr>
                   <td data-label="Mã BD">#{{ bd.id_biendong }}</td>
                   <td data-label="Nhân khẩu">{{ bd.id_nhankhau.ho_ten }}</td>
+                  <td data-label="CCCD">{{ bd.id_nhankhau.cccd }}</td>
+                  <td data-label="Số căn hộ">
+                  {% if bd.id_nhankhau.id_hokhau and bd.id_nhankhau.id_hokhau.id_canho %}
+                  {{ bd.id_nhankhau.id_hokhau.id_canho.so_can_ho }}
+                  {% endif %}
+                  </td>
+                  
                   <td data-label="Loại biến động">
                     {% if bd.loai_biendong == "tam_tru" %}
                     <span class="status status-normal">Tạm trú</span>
@@ -53,6 +196,8 @@
                     <span class="status status-active">Thường trú</span>
                     {% elif bd.loai_biendong == "tam_vang" %}
                     <span class="status status-inactive">Tạm vắng</span>
+                    {% elif bd.loai_biendong == "cham_dut" %}
+                    <span class="status status-disable">Chấm dứt cư trú</span>
                     {% else %}
                     <span class="status status-normal"
                       >{{ bd.loai_label }}</span
@@ -74,6 +219,16 @@
                       >{{ bd.ly_do|default:"—" }}</small
                     >
                   </td>
+                  <td>
+                    <button
+                      data-url="{% url 'biendong_delete' bd.id_biendong %}"
+                      class="action-btn modal-trigger"
+                      title="Xóa"
+                      style="color: #e74c3c"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -88,5 +243,9 @@
         </div>
       </section>
     </main>
+    <div id="mainModal" class="modal">
+      <div class="modal-content"></div>
+    </div>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
   </body>
 </html>
