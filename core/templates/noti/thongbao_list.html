@@ -79,7 +79,7 @@
               {% endif %}
             </form>
           </div>
-            {% if user.is_superuser or request.user.vaitro.id_vaitro == 1 or request.user.vaitro.id_vaitro == 3 %}
+          {% if user.is_superuser or request.user.vaitro.id_vaitro == 1 or request.user.vaitro.id_vaitro == 3 %}
           <div class="income-actions-bottom income-actions-top-left" >
             <button
               data-url="{% url 'thongbao_create' %}"
@@ -130,7 +130,7 @@
                     >
                       <i class="fa-solid fa-eye"></i>
                     </button>
-                    {% if user.is_superuser or request.user.vaitro.id_vaitro == 1 or request.user.vaitro.id_vaitro == 3 %}
+                    {% if user.is_superuser or user.vaitro.id_vaitro == tb.sender.vaitro.id_vaitro %}
                     <button
                       data-url="{% url 'thongbao_update' tb.pk %}"
                       class="action-btn modal-trigger"

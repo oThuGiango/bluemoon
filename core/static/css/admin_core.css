@@ -63,13 +63,13 @@ body {
 
 .sidebar nav ul {
   list-style: none;
-  margin-top: 18px;
+  margin-top: 8px;
 }
 .sidebar nav ul li {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 15px 26px;
+  padding: 12.5px 26px;
   color: #cfd8dc;
   font-size: 1.08em;
   cursor: pointer;

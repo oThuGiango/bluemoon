@@ -6,38 +6,38 @@
   </h2>
   <div class="detail-grid" style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px;">
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-      <span style="font-weight: bold; color: #666">Căn hộ:</span>
+      <span style="font-weight: 500; color: #666">Căn hộ:</span>
       <span style="font-weight: 500; color: var(--primary)">{% if hokhau.id_canho %}{{ hokhau.id_canho.so_can_ho }}{% endif %}</span>
     </div>
     {% if hokhau.id_canho %}
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-      <span style="font-weight: bold; color: #666">Diện tích:</span>
+      <span style="font-weight: 500; color: #666">Diện tích:</span>
       <span style="font-weight: 500; color: #333">{{ hokhau.id_canho.dien_tich }} m²</span>
     </div>
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-      <span style="font-weight: bold; color: #666">Loại căn hộ:</span>
+      <span style="font-weight: 500; color: #666">Loại căn hộ:</span>
       <span style="font-weight: 500; color: #333">{{ hokhau.id_canho.get_apartment_type_display }}</span>
     </div>
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-      <span style="font-weight: bold; color: #666">Vị trí:</span>
+      <span style="font-weight: 500; color: #666">Vị trí:</span>
       <span style="font-weight: 500; color: #333">Tầng {{ hokhau.id_canho.floor }}, Tòa {{ hokhau.id_canho.building.name }} </span>
     </div>
     {% endif %}
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-      <span style="font-weight: bold; color: #666">Chủ hộ:</span>
+      <span style="font-weight: 500; color: #666">Chủ hộ:</span>
       <span style="font-weight: 500; color: #333">{% if hokhau.id_chuho %}{{ hokhau.id_chuho.username }}{% endif %}</span>
     </div>
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-      <span style="font-weight: bold; color: #666">Tình trạng cư trú:</span>
+      <span style="font-weight: 500; color: #666">Tình trạng cư trú:</span>
       <span style="font-weight: 500; color: #333">{{ hokhau.get_resident_status_display }}</span>
     </div>
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-      <span style="font-weight: bold; color: #666">Đang hoạt động:</span>
+      <span style="font-weight: 500; color: #666">Đang hoạt động:</span>
       <span style="font-weight: 500; color: #333">{% if hokhau.is_active %}Đang hoạt động
       {% else %}Không hoạt động{% endif %}</span>
     </div>
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-      <span style="font-weight: bold; color: #666">Cập nhật lần cuối:</span>
+      <span style="font-weight: 500; color: #666">Cập nhật lần cuối:</span>
       <span style="font-weight: 500; color: #333">{{ hokhau.updated_at|date:'d/m/Y H:i' }} bởi {{ hokhau.updated_by }}</span>
     </div>
   </div>

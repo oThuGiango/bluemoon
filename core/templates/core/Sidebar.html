@@ -1,5 +1,17 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'styles/main.css' %}" />
+<style>
+  .sidebar nav a.active {
+    background-color: rgba(25, 118, 210, 0.15);
+    color: var(--primary);
+    border-left: 4px solid var(--primary);
+    padding-left: calc(18px - 4px);
+    font-weight: 600;
+  }
+  .sidebar nav a {
+    transition: all 0.2s ease;
+  }
+</style>
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <i class="fa-regular fa-building"></i>
@@ -109,4 +121,21 @@
     value="{{ user.vaitro.id_vaitro|default:0 }}"
   />
 </aside>
-<script src="{% static 'js/Sidebar1.js' %}"></script>
+<script>
+  $(function() {
+    const currentPath = window.location.pathname;
+    const sidebar = $('#sidebar');
+    
+    // Loại bỏ class active từ tất cả links
+    sidebar.find('a').removeClass('active');
+    
+    // Thêm class active cho link hiện tại
+    sidebar.find('a').each(function() {
+      const href = $(this).attr('href');
+      // So sánh theo href tương đối
+      if (href && (currentPath === href || currentPath.startsWith(href + '/'))) {
+        $(this).addClass('active');
+      }
+    });
+  });
+</script>

@@ -1,0 +1,83 @@
+{% load static %}
+<form method="post" action="{% url 'ticket_delete' ticket.pk %}">
+  {% csrf_token %}
+  <div
+    class="form-container"
+    style="margin: 0 auto; max-width: 600px; width: 95%"
+  >
+    <h2
+      class="form-title"
+      style="
+        border-bottom: 2px solid #fce8e6;
+        padding-bottom: 10px;
+        color: #d93025;
+      "
+    >
+      <i
+        class="fa-solid fa-triangle-exclamation"
+        style="color: #d93025; font-size: 1.2rem; margin-right: 8px"
+      ></i>
+      Xác nhận xóa ticket
+    </h2>
+    <div style="text-align: center">
+      <p style="font-size: 1.1rem; color: #3c4043; margin-bottom: 12px">
+        Bạn có chắc chắn muốn xóa ticket:
+      </p>
+      <p style="color: #d93025; font-size: 1rem; font-weight: 600">
+        {{ ticket.title }}
+      </p>
+      <div
+        style="
+          background-color: #fef7f7;
+          border-radius: 8px;
+          padding: 12px 10px;
+          margin-top: 12px;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+        "
+      >
+        <i
+          class="fa-solid fa-circle-info"
+          style="color: #d93025; font-size: 1rem; margin-right: 8px"
+        ></i>
+        <span
+          style="
+            font-size: 0.8rem;
+            text-align: left;
+            display: block;
+            width: 100%;
+          "
+        >
+          Hành động này không thể hoàn tác và có thể ảnh hưởng đến các dữ liệu
+          liên quan.
+        </span>
+      </div>
+    </div>
+    <div class="form-actions" style="text-align: center; margin-top: 18px">
+      <button
+        type="button"
+        class="btn btn-secondary-outline modal-close-btn"
+        style="min-width: 150px"
+      >
+        <i class="fa-solid fa-xmark"></i> Hủy
+      </button>
+      <button
+        type="submit"
+        class="btn btn-danger-filled"
+        style="
+          background-color: #d93025;
+          color: white;
+          border: none;
+          padding: 10px 26px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: background 0.3s;
+        "
+      >
+        <i class="fa-solid fa-trash-can"></i> Xác nhận xóa
+      </button>
+    </div>
+  </div>
+</form>

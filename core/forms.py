@@ -1,5 +1,5 @@
 
-from core.modules.noti.models import ThongBao
+from core.modules.noti.models import ThongBao, Ticket, TicketResponse
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -371,8 +371,52 @@ class ChangePasswordForm(forms.Form):
         widget=forms.PasswordInput, label="Xác nhận mật khẩu mới", required=True)
 
 
+class TicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['title', 'content']
 
-"""
-swagger
-ticket
-"""
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+
+class TicketAssignForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['assignee']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        # Chỉ BQL được thay đổi assignee
+        vaitro = getattr(
+            getattr(user, 'vaitro', None), 'id_vaitro', None)
+        if user and not (getattr(user, 'is_superuser', False) or vaitro == 1):
+            raise forms.ValidationError(
+                'Chỉ Ban Quản Lý mới được phép thay đổi assignee.')
+        # Chỉ cho chọn assignee là BQL
+        self.fields['assignee'].queryset = TaiKhoan.objects.filter(
+            vaitro__id_vaitro=1)
+
+
+class TicketStatusForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields = ['status']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        # Chỉ BQL được thay đổi status
+        vaitro = getattr(
+            getattr(user, 'vaitro', None), 'id_vaitro', None)
+        if user and not (getattr(user, 'is_superuser', False) or vaitro == 1):
+            raise forms.ValidationError(
+                'Chỉ Ban Quản Lý mới được phép thay đổi trạng thái.')
+
+
+class TicketResponseForm(forms.ModelForm):
+    class Meta:
+        model = TicketResponse
+        fields = ['content']

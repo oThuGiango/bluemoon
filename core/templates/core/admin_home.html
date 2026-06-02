@@ -1,4 +1,4 @@
-{% load static %}
+{% load static humanize %}
 <!doctype html>
 <html lang="vi">
   <head>
@@ -26,7 +26,7 @@
             <i class="fa-solid fa-users-gear"></i>
           </div>
           <div class="dash-info">
-            <div class="dash-number">12</div>
+            <div class="dash-number">{{ total_accounts|intcomma }}</div>
             <div class="dash-label">Tài khoản hệ thống</div>
           </div>
         </div>
@@ -35,8 +35,8 @@
             <i class="fa-solid fa-house-chimney"></i>
           </div>
           <div class="dash-info">
-            <div class="dash-number">450</div>
-            <div class="dash-label">Căn hộ/Hộ khẩu</div>
+            <div class="dash-number">{{ total_apartments|intcomma }}</div>
+            <div class="dash-label">Căn hộ</div>
           </div>
         </div>
         <div class="dash-card">
@@ -44,7 +44,7 @@
             <i class="fa-solid fa-user-group"></i>
           </div>
           <div class="dash-info">
-            <div class="dash-number">1,210</div>
+            <div class="dash-number">{{ total_residents|intcomma }}</div>
             <div class="dash-label">Nhân khẩu cư trú</div>
           </div>
         </div>
@@ -165,7 +165,6 @@
                 </div>
               </div>
             </a>
-
           </div>
         </div>
       </section>

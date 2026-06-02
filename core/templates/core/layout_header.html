@@ -12,6 +12,30 @@
   </div>
   <div class="header-right">
     <div style="display: flex; align-items: center; gap: 16px">
+      {% if user.is_superuser or user.vaitro.id_vaitro == 1 or user.vaitro.id_vaitro == 2 %}      
+      <a
+        href="{% url 'ticket_list' %}"
+        title="Ticket"
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: #f5f5f5;
+          color: #333;
+          box-shadow: 0 1px 2px #0001;
+          font-size: 1.25rem;
+          transition: background 0.2s;
+          border: none;
+          text-decoration: none;
+          margin-right: 4px;
+        "
+      >
+        <i class="fa-solid fa-ticket"></i>
+      </a>
+      {% endif %}
       <a
         href="{% url 'thongbao_list' %}"
         title="Thông báo"

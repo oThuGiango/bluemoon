@@ -53,6 +53,7 @@ class DotThuPhi(models.Model):
         blank=True,
     )
     is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     updated_by = models.CharField(max_length=100, null=True, blank=True)
 
@@ -94,6 +95,7 @@ class HoaDon(models.Model):
         max_length=20, choices=CHANNEL_CHOICES, default="tien_mat")
 
     is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     updated_by = models.CharField(max_length=100, null=True, blank=True)
 

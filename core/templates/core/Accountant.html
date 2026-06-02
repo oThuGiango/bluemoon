@@ -1,7 +1,7 @@
+{% load static humanize %}
 <!doctype html>
 <html lang="vi">
   <head>
-    {% load static %}
     <meta charset="UTF-8" />
     <title>Chung cư BlueMoon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,7 +25,7 @@
             <i class="fa-solid fa-money-bill-trend-up"></i>
           </div>
           <div class="dash-info">
-            <div class="dash-number">358</div>
+            <div class="dash-number">{{ total_khoanthu|intcomma }}</div>
             <div class="dash-label">Khoản thu</div>
           </div>
         </div>
@@ -34,7 +34,7 @@
             <i class="fa-solid fa-users"></i>
           </div>
           <div class="dash-info">
-            <div class="dash-number">1,210</div>
+            <div class="dash-number">{{ total_nhankhau|intcomma }}</div>
             <div class="dash-label">Nhân khẩu</div>
           </div>
         </div>
@@ -43,7 +43,7 @@
             <i class="fa-solid fa-file-invoice-dollar"></i>
           </div>
           <div class="dash-info">
-            <div class="dash-number">6,120</div>
+            <div class="dash-number">{{ total_hoadon|intcomma }}</div>
             <div class="dash-label">Phiếu thu dịch vụ</div>
           </div>
         </div>
@@ -52,8 +52,8 @@
             <i class="fa-solid fa-chart-simple"></i>
           </div>
           <div class="dash-info">
-            <div class="dash-number">40+</div>
-            <div class="dash-label">Báo cáo thống kê</div>
+            <div class="dash-number">{{ total_dotthu|intcomma }}</div>
+            <div class="dash-label">Kỳ thu trong năm</div>
           </div>
         </div>
       </section>
@@ -63,17 +63,13 @@
           <h2>Tổng quan & Thống kê Tài chính</h2>
           <p>
             Chào mừng đến với Hệ thống Quản lý Chung cư BlueMoon.<br />
-            Bảng điều khiển này cung cấp cái nhìn tổng quan nhanh về các chỉ số
-            tài chính và hoạt động chính.<br />
-            Hãy sử dụng các liên kết nhanh để truy cập các chức năng thường dùng
-            hoặc xem báo cáo chi tiết.
+            Giao diện này cung cấp cái nhìn tổng quan nhanh về các chỉ số tài
+            chính và hoạt động chính.<br />
           </p>
         </div>
       </section>
 
-      <footer>
-        &copy; BlueMoon Apartment 2026.
-      </footer>
+      <footer>&copy; BlueMoon Apartment 2026.</footer>
     </main>
     <script></script>
   </body>

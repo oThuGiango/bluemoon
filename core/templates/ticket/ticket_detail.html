@@ -1,0 +1,342 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chi Tiết Ticket - BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/ticket_detail_custom.css' %}" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+      {% include 'core/layout_header.html' %}
+      <section class="main-content fee-collection-page" style="gap: 0px">
+        {% if messages %} {% for message in messages %}
+        <div class="message-container {{ message.tags }}">{{ message }}</div>
+        {% endfor %} {% endif %}
+
+        <div class="td-page-header">
+          <a href="{% url 'ticket_list' %}" class="td-back-link">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
+          </a>
+
+          <!-- Title -->
+          <h2 class="td-title">{{ ticket.title }}</h2>
+          <div class="td-title-underline"></div>
+        </div>
+
+        <div class="td-page-layout">
+          <!-- ══ LEFT CARD: content + responses ══ -->
+          <div class="td-card-left" style="padding: 0 8px">
+
+            <!-- Content -->
+            <div class="td-content-card" style="margin-bottom: 32px"
+            >{{ ticket.content|default:"(Không có nội dung mô tả)" }}
+            </div>
+
+            <!-- Responses -->
+            <h3 class="td-section-title">Phản hồi</h3>
+            <div id="ticket-responses" class="td-responses-wrap">
+              {% for response in ticket.responses.all %} 
+              {% if response.responder and response.responder.pk == user.pk %}
+              <div class="td-response-item td-mine">
+                <div class="td-response-meta">
+                  <strong>Bạn</strong> &nbsp;
+                  {{ response.created_at|date:"d/m/Y H:i" }}
+                </div>
+                <div class="td-response-bubble">{{ response.content }}</div>
+              </div>
+              {% else %}
+              <div class="td-response-item">
+                <div class="td-response-meta">
+                  <strong>{{ response.responder }}</strong> &nbsp;
+                  {{ response.created_at|date:"d/m/Y H:i" }}
+                </div>
+                <div class="td-response-bubble">{{ response.content }}</div>
+              </div>
+              {% endif %} {% empty %}
+              <div style="color: #9ba8b5; font-size: 0.95rem">
+                Chưa có phản hồi nào.
+              </div>
+              {% endfor %}
+            </div>
+            {% if ticket.status != "done" %}
+            <form id="ticket-response-form" class="td-response-form">
+              {% csrf_token %}
+              <textarea
+                name="content"
+                rows="2"
+                class="form-control"
+                placeholder="Nhập phản hồi..."
+                required
+              ></textarea>
+
+              <div
+                style="
+                  display: flex;
+                  justify-content: flex-end;
+                  margin-top: 8px;
+                "
+              >
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  style="min-width: 130px"
+                >
+                  <i class="fa-solid fa-paper-plane"></i> Gửi phản hồi
+                </button>
+              </div>
+              <div id="response-msg" style="margin-top: 10px"></div>
+            </form>
+            {% endif %}
+          </div>
+          <!-- /td-card-left -->
+
+          <!-- ══ RIGHT COLUMN ══ -->
+          <div class="td-right-col">
+            <!-- Info card -->
+            <div class="td-card" style="padding: 20px">
+              <form id="ticket-assign-status-form">
+                {% csrf_token %}
+                <div class="td-info-panel">
+                  <!-- Người được giao -->
+                  <div class="td-info-row">
+                    <div class="td-info-icon icon-assignee">
+                      <i class="fa-regular fa-user"></i>
+                    </div>
+                    <div class="td-info-text">
+                      <span class="td-info-label">Người được giao</span>
+                      <span class="td-info-value">
+                        {% if can_assign %}
+                        <select
+                          name="assignee"
+                          id="assignee-select"
+                          class="form-control"
+                        >
+                          {% for u in assignee_choices %}
+                          <option
+                            value="{{ u.pk }}"
+                            {% if ticket.assignee and ticket.assignee.pk == u.pk %}
+                            selected{% endif %}
+                          >
+                            {{ u }}
+                          </option>
+                          {% endfor %}
+                        </select>
+                        {% else %} {{ ticket.assignee|default:'Not assignee' }}
+                        {% endif %}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Trạng thái -->
+                  <div class="td-info-row">
+                    <div class="td-info-icon icon-status">
+                      <i class="fa-solid fa-flag"></i>
+                    </div>
+                    <div class="td-info-text">
+                      <span class="td-info-label">Trạng thái</span>
+                      <span class="td-info-value">
+                        {% if can_change_status %}
+                        <select
+                          name="status"
+                          id="status-select"
+                          class="form-control"
+                        >
+                          {% for s in status_choices %}
+                          <option
+                            value="{{ s.0 }}"
+                            {% if ticket.status == s.0 %}
+                            selected{% endif %}
+                          >
+                            {{ s.1 }}
+                          </option>
+                          {% endfor %}
+                        </select>
+                        {% else %} {% if ticket.status == "open" %}
+                        <span class="status status-open"
+                          >{{ ticket.get_status_display }}</span
+                        >
+                        {% elif ticket.status == "is_progress" %}
+                        <span class="status status-primary"
+                          >{{ ticket.get_status_display }}</span
+                        >
+                        {% elif ticket.status == "resolved" %}
+                        <span class="status status-disable"
+                          >{{ ticket.get_status_display }}</span
+                        >
+                        {% elif ticket.status == "done" %}
+                        <span class="status status-active"
+                          >{{ ticket.get_status_display }}</span
+                        >
+                        {% else %}
+                        <span class="status status-normal"
+                          >{{ ticket.get_status_display }}</span
+                        >
+                        {% endif %} {% endif %}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Tạo bởi -->
+                  <div class="td-info-row">
+                    <div class="td-info-icon icon-creator">
+                      <i class="fa-regular fa-circle-user"></i>
+                    </div>
+                    <div class="td-info-text">
+                      <span class="td-info-label">Tạo bởi</span>
+                      <span class="td-info-value"
+                        >{{ ticket.creator.username|default:'-' }}</span
+                      >
+                    </div>
+                  </div>
+
+                  <!-- Ngày tạo -->
+                  <div class="td-info-row">
+                    <div class="td-info-icon icon-date">
+                      <i class="fa-regular fa-calendar"></i>
+                    </div>
+                    <div class="td-info-text">
+                      <span class="td-info-label">Ngày tạo</span>
+                      <span class="td-info-value"
+                        >{{ ticket.created_at|date:"d/m/Y H:i" }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div id="assign-status-msg" style="margin-top: 10px"></div>
+              </form>
+            </div>
+            <!-- /info card -->
+
+            <!-- Review card -->
+            {% if can_review and ticket.status == 'done' %}
+            <div class="td-card" style="padding: 22px 24px">
+              <h3 class="td-section-title" style="margin-bottom: 16px">
+                Đánh giá
+              </h3>
+              <form
+                id="ticket-review-form"
+                data-reviewed="{% if ticket.rating %}1{% else %}0{% endif %}"
+              >
+                {% csrf_token %}
+                <div class="td-rating-wrap">
+                  <label class="td-review-label">Chấm điểm:</label>
+                  <input
+                    type="hidden"
+                    id="rating-value"
+                    name="rating"
+                    value="{{ ticket.rating|default:'' }}"
+                  />
+                  <div
+                    class="td-stars"
+                    role="group"
+                    aria-label="Chấm điểm ticket"
+                  >
+                    <button
+                      type="button"
+                      class="td-star {% if ticket.rating and ticket.rating >= 1 %}active{% endif %}"
+                      data-value="1"
+                      aria-label="1 sao"
+                      {% if ticket.rating %}disabled{% endif %}
+                    >
+                      ★
+                    </button>
+                    <button
+                      type="button"
+                      class="td-star {% if ticket.rating and ticket.rating >= 2 %}active{% endif %}"
+                      data-value="2"
+                      aria-label="2 sao"
+                      {% if ticket.rating %}disabled{% endif %}
+                    >
+                      ★
+                    </button>
+                    <button
+                      type="button"
+                      class="td-star {% if ticket.rating and ticket.rating >= 3 %}active{% endif %}"
+                      data-value="3"
+                      aria-label="3 sao"
+                      {% if ticket.rating %}disabled{% endif %}
+                    >
+                      ★
+                    </button>
+                    <button
+                      type="button"
+                      class="td-star {% if ticket.rating and ticket.rating >= 4 %}active{% endif %}"
+                      data-value="4"
+                      aria-label="4 sao"                      
+                      {% if ticket.rating %}disabled{% endif %}
+                    >
+                      ★
+                    </button>
+                    <button
+                      type="button"
+                      class="td-star {% if ticket.rating and ticket.rating >= 5 %}active{% endif %}"
+                      data-value="5"
+                      aria-label="5 sao"
+                      {% if ticket.rating %}disabled{% endif %}
+
+                    >
+                      ★
+                    </button>
+                  </div>
+                </div>
+                <div style="margin-top: 12px">
+                  <label class="td-review-label" for="review-text"
+                    >Nội dung đánh giá:</label
+                  >
+                  <textarea
+                    id="review-text"
+                    name="review"
+                    rows="3"
+                    class="form-control td-review-textarea"
+                    placeholder="Nhập cảm nhận của bạn..."
+                    {% if ticket.rating %}readonly{% endif %}
+                  >{{ ticket.review|default:'' }}</textarea>
+                </div>
+                {% if not ticket.rating %}
+                <div
+                  id="review-submit-wrap"
+                  style="
+                    margin-top: 12px;
+                    display: flex;
+                    justify-content: flex-end;
+                  "
+                >
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="min-width: 110px"
+                  >
+                    <i class="fa-solid fa-star"></i> Gửi
+                  </button>
+                </div>
+                {% else %}
+                <div id="review-submit-wrap" style="display: none"></div>
+                {% endif %}
+                <div id="review-msg" style="margin-top: 10px"></div>
+              </form>
+            </div>
+            <!-- /review card -->
+            {% endif %}
+          </div>
+          <!-- /td-right-col -->
+        </div>
+        <!-- /td-page-layout -->
+      </section>
+      <footer>&copy; BlueMoon Apartment 2026.</footer>
+    </main>
+    <script src="{% static 'js/ticket_detail.js' %}"></script>
+  </body>
+</html>

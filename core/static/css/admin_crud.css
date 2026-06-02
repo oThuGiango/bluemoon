@@ -236,6 +236,13 @@
   border: 1px solid #fedf89;
 }
 
+/* OPEN */
+.status-open {
+  background: #eff8ff;
+  color: #175cd3;
+  border: 1px solid #b2ddff;
+}
+
 /* Action Button */
 .action-btn {
   background: #e1f5fe;

@@ -1,0 +1,269 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Danh Sách Ticket - BlueMoon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:600,400,700|Roboto:400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/fee_management_modal.css' %}" />
+  </head>
+  <body>
+    {% include 'core/Sidebar.html' %}
+    <main>
+      {% include 'core/layout_header.html' %}
+
+      <section class="main-content fee-collection-page">
+        <div class="main-panel data-table-panel" id="ticket-container">
+          <!-- prettier-ignore -->
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'success' %}
+          <div
+            class="message-container success"
+            style="
+              background-color: #e6f7d9;
+              color: #52c41a;
+              border: 1px solid #b7eb8f;
+              margin: auto;
+            "
+          >
+            {{ message }}
+          </div>
+          {% elif message.tags == 'error' %}
+          <div
+            class="message-container error-alert"
+            style="
+              background-color: #fff1f0;
+              color: #ff4d4f;
+              border: 1px solid #ffa39e;
+              margin: auto;
+            "
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i> {{ message }}
+          </div>
+          <!-- prettier-ignore -->
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+
+          <div class="income-controls-top">
+            <form
+              method="GET"
+              action="{% url 'ticket_list' %}"
+              id="ticketSearchForm"
+              class="filter-group"            
+            >
+              <div style="display: flex; align-items: flex-end; gap: 12px; width: 100%;">
+                <div class="search-box-container">
+                  <input
+                    type="text"
+                    name="search"
+                    placeholder="Tìm kiếm theo họ tên, Căn hộ..."
+                    value="{{ query|default:'' }}"
+                  />
+                  <i class="fa-solid fa-search"></i>
+                </div>
+
+              <div style="display: flex; flex-direction: column">
+                <label for="created_at" style="font-size: 0.8em; color: #888; margin-bottom: 4px;">Từ ngày</label>
+                <input
+                  type="date"
+                  id="created_at"
+                  name="created_at"
+                  value="{{ created_at|default:'' }}"
+                  class="filter-select"
+                  style="width: 140px; min-height: 38px; text-align: center;"
+                  placeholder="Ngày tạo"
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary"
+              >
+                <i class="fa-solid fa-filter"></i> Tìm kiếm
+              </button>
+
+              <select name="status" class="filter-select"
+                onchange="this.form.submit()"
+              >
+                <option value="">-- Trạng thái --</option>
+                {% for s in status_choices %}
+                <!-- prettier-ignore -->
+                <option
+                  value="{{ s.0 }}"
+                  {% if request.GET.status == s.0|stringformat:'s' %}
+                  selected
+                  {% endif %}
+                >
+                  {{ s.1 }}
+                </option>
+                {% endfor %}
+              </select>
+
+              <select name="rating" class="filter-select" onchange="this.form.submit()">
+                <option value="">-- Đánh giá --</option>
+                {% for r in "12345" %}
+                  <option value="{{ forloop.counter }}" 
+                  {% if request.GET.rating == forloop.counter|stringformat:'s' %}
+                  selected{% endif %}
+                  >
+                  {{ forloop.counter }}</option>
+                {% endfor %}
+              </select>
+              
+              {% if query or created_at or status or rating %}
+              <a
+                href="{% url 'ticket_list' %}"
+                class="action-btn"
+                title="Xóa lọc"
+                style="background: #f5f5f5; color: #333"
+              >
+                <i class="fa-solid fa-rotate-right"></i>
+              </a>
+              {% endif %}
+
+            </form>
+          </div>
+
+          <div class="income-actions-bottom income-actions-top-left" >
+            <button
+              data-url="{% url 'ticket_create' %}"
+              class="btn btn-create-new btn-create-compact modal-trigger"
+            >
+              <i class="fa-solid fa-plus"></i> Tạo ticket mới
+            </button>
+          </div>
+
+          <h2
+            class="table-title"
+            style="border-bottom: none; margin: 0px"
+          >
+            DANH SÁCH TICKET
+          </h2>
+          <div
+            style="
+              width: 100%;
+              border-bottom: 2px solid #f0f0f0;
+              margin: 0 0 10px;
+            "
+          >
+            <p
+              style="
+                margin: 0;
+                width: 100%;
+                text-align: right;
+                color: #555;
+                font-size: 1rem;
+              "
+            >
+              Tổng số ticket: {{ tickets.count }}
+            </p>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tiêu đề</th>
+                  <th>Người tạo</th>
+                  <th>Ngày tạo</th>
+                  <th>Trạng thái</th>
+                  <th>Rating</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                  <td data-label="Mã Ticket">#{{ ticket.id }}</td>
+                  <td data-label="Tiêu đề" style="  max-width: 260px;
+                    white-space: normal;
+                    word-break: break-word;
+                    overflow-wrap: anywhere;"
+                  >
+                    {{ ticket.title|truncatechars:150 }}</td>
+                  <td data-label="Người tạo">{{ ticket.creator.username|default:"-" }}</td>
+                  <td data-label="Ngày tạo">
+                    {{ ticket.created_at|date:"d/m/Y" }}
+                  </td>
+                  <td data-label="Trạng thái">
+                    {% if ticket.status == "open" %}
+                      <span class="status status-open">{{ ticket.get_status_display }}</span>
+                    {% elif ticket.status == "is_progress" %}
+                      <span class="status status-primary">{{ ticket.get_status_display }}</span>
+                    {% elif ticket.status == "resolved" %}
+                      <span class="status status-disable">{{ ticket.get_status_display }}</span>
+                    {% elif ticket.status == "done" %}
+                      <span class="status status-active">{{ ticket.get_status_display }}</span>
+                    {% else %}
+                      <span class="status status-normal">{{ ticket.get_status_display }}</span>
+                    {% endif %}
+                  </td>
+                  <td data-label="Rating">
+                    {% if ticket.rating %}
+                      <span style="display: inline-flex; gap: 2px; font-size: 1.1em; vertical-align: middle;">
+                        {% for i in "12345" %}
+                          {% if forloop.counter <= ticket.rating %}
+                            <i class="fa-solid fa-star" style="color: #ffc107;"></i>
+                          {% else %}
+                            <i class="fa-regular fa-star" style="color: #e0e0e0;"></i>
+                          {% endif %}
+                        {% endfor %}
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td data-label="Thao tác">
+                    <a
+                      class="action-btn view-detail"
+                      title="Chi tiết"
+                      href="{% url 'ticket_detail' ticket.id %}"
+                      style="display: inline-block; text-decoration: none"
+                    >
+                      <i
+                        class="fa-solid fa-eye"
+                        style="margin: 8px; margin-top: 9px"
+                      ></i>
+                    </a>
+                    {% if user.is_superuser or ticket.creator == user %}
+                    <button
+                      data-url="{% url 'ticket_delete' ticket.id %}"
+                      class="action-btn modal-trigger"
+                      title="Xóa"
+                      style="color: #e74c3c"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" style="text-align: center">
+                    Chưa có ticket nào.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <footer>&copy; BlueMoon Apartment 2026.</footer>
+    </main>
+    <div id="mainModal" class="modal">
+      <div class="modal-content"></div>
+    </div>
+    <script src="{% static 'js/Management_modal_logic.js' %}"></script>
+  
+  </body>
+</html>

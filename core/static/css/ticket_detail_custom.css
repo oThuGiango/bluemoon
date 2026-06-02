@@ -1,0 +1,278 @@
+/* TICKET DETAIL PAGE CUSTOM STYLES */
+
+/* ── Back link ── */
+.td-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #7a8fa6;
+  font-size: 0.93rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 22px;
+  transition: color 0.15s;
+}
+.td-back-link:hover {
+  color: #1976d2;
+}
+
+/* ── Title ── */
+.td-title {
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #272744;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.2px;
+  /* color: var(--primary); */
+}
+.td-title-underline {
+  width: 48px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 2px;
+  margin-bottom: 28px;
+}
+
+/* ── Page-level layout (grey bg → 2 columns) ── */
+.td-page-header {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 4px;
+  padding: 0 12px;
+}
+
+.td-page-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 4px;
+}
+.td-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 10px rgba(17, 51, 83, 0.05);
+  padding: 32px 28px;
+}
+.td-card-left {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.td-right-col {
+  flex: 0 0 300px;
+  min-width: 260px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Content card ── */
+.td-content-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border-radius: 12px;
+  border: 1px solid #dce7f3;
+  box-shadow: 0 1px 10px rgba(17, 51, 83, 0.05);
+  padding: 18px;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1rem;
+  color: #374151;
+  min-height: 60px;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+/* ── Info panel ── */
+.td-info-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  /* border-bottom: 1px solid #f0f2f5; */
+}
+.td-info-row:last-child {
+  border-bottom: none;
+}
+.td-info-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f0f4f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+.td-info-icon.icon-assignee {
+  background: #e8f0fe;
+  color: #3b7dea;
+}
+.td-info-icon.icon-status {
+  background: #fff3e0;
+  color: #f57c00;
+}
+.td-info-icon.icon-creator {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.td-info-icon.icon-date {
+  background: #fce4ec;
+  color: #c2185b;
+}
+.td-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.td-info-label {
+  font-size: 0.78rem;
+  color: #9ba8b5;
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 500;
+  line-height: 1;
+}
+.td-info-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  font-family: "Roboto", Arial, sans-serif;
+  line-height: 1.35;
+}
+.td-info-value .status {
+  font-size: 0.82rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.td-info-panel .form-control {
+  font-size: 0.88rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #d0d7de;
+  min-width: 130px;
+}
+
+/* ── Section heading ── */
+.td-section-title {
+  font-size: 1.03rem;
+  font-family: "Montserrat", Arial, sans-serif;
+  font-weight: 700;
+  border-left: 4px solid #1976d2;
+  padding-left: 12px;
+  margin: 0 0 14px 0;
+  color: #1a1a2e;
+}
+
+/* ── Response list ── */
+.td-responses-wrap {
+  background: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #dce7f3;
+  box-shadow: 0 1px 10px rgba(17, 51, 83, 0.05);
+  padding: 16px 20px 8px;
+  min-height: 54px;
+  margin-bottom: 12px;
+}
+.td-response-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+.td-response-item.td-mine {
+  align-items: flex-end;
+}
+.td-response-meta {
+  font-size: 0.8rem;
+  color: #9ba8b5;
+  margin-bottom: 4px;
+  font-family: "Roboto", Arial, sans-serif;
+}
+.td-response-meta strong {
+  color: #1976d2;
+  font-weight: 600;
+}
+.td-response-bubble {
+  display: inline-block;
+  background: #f0f4f8;
+  color: #333;
+  border-radius: 0 14px 14px 14px;
+  padding: 9px 16px;
+  max-width: 75%;
+  word-break: break-word;
+  font-size: 0.96rem;
+  font-family: "Roboto", Arial, sans-serif;
+  line-height: 1.5;
+}
+.td-mine .td-response-bubble {
+  background: #dbeafe;
+  color: #1565c0;
+  border-radius: 14px 0 14px 14px;
+}
+
+/* ── Response form ── */
+.td-response-form textarea.form-control {
+  border-radius: 6px;
+  border: 1px solid #d0d7de;
+  font-size: 0.97rem;
+  padding: 10px 14px;
+  font-family: "Roboto", Arial, sans-serif;
+  resize: vertical;
+  width: 100%;
+}
+
+/* ── Review card ── */
+.td-rating-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.td-review-label {
+  font-size: 0.93rem;
+  color: #555;
+  font-weight: 600;
+}
+.td-stars {
+  display: inline-flex;
+  gap: 4px;
+}
+.td-star {
+  border: none;
+  background: transparent;
+  color: #cfd8e3;
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: color 0.15s ease;
+}
+.td-star:hover,
+.td-star.active {
+  color: #ffb400;
+}
+.td-star:disabled {
+  cursor: default;
+}
+.td-star:disabled:not(.active) {
+  color: #cfd8e3;
+}
+.td-review-textarea[readonly] {
+  background: #f7f9fc;
+  cursor: default;
+}
+.td-review-textarea {
+  margin-top: 6px;
+  border-radius: 6px;
+  border: 1px solid #d0d7de;
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  resize: vertical;
+  width: 100%;
+  font-family: "Roboto", Arial, sans-serif;
+  text-align: left;
+}

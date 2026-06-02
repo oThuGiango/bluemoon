@@ -1,9 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.utils import timezone
 
 from core.decorators import role_required
-from core.modules.resident.models import HoKhau
+from core.modules.account.models import TaiKhoan
+from core.modules.apartment.models import CanHo
+from core.modules.resident.models import HoKhau, NhanKhau
+from core.modules.fee.models import KhoanThu, HoaDon, DotThuPhi
 
 
 @login_required(login_url="login")
@@ -81,14 +85,42 @@ def login_view(request):
 @login_required(login_url="login")
 @role_required([1])
 def admin_home(request):
-    ho_khaus = HoKhau.objects.all()
-    return render(request, "core/admin_home.html", {"admin_home": ho_khaus})
+    total_accounts = TaiKhoan.objects.filter(is_deleted=False, is_active=True).count()
+    total_apartments = CanHo.objects.filter(is_deleted=False).count()
+    total_residents = NhanKhau.objects.filter(
+        is_deleted=False,
+        is_active=True,
+    ).count()
+
+    context = {
+        "total_accounts": total_accounts,
+        "total_apartments": total_apartments,
+        "total_residents": total_residents,
+    }
+    return render(request, "core/admin_home.html", context)
 
 
 @login_required(login_url="login")
 @role_required([3])
 def accountant_home(request):
-    return render(request, "core/Accountant.html")
+    current_year = timezone.now().year
+
+    context = {
+        "total_khoanthu": KhoanThu.objects.filter(is_deleted=False).count(),
+        "total_nhankhau": NhanKhau.objects.filter(
+            is_deleted=False,
+            is_active=True,
+        ).count(),
+        "total_hoadon": HoaDon.objects.filter(
+            is_deleted=False,
+            created_at__year=current_year,
+        ).count(),
+        "total_dotthu": DotThuPhi.objects.filter(
+            is_deleted=False,
+            created_at__year=current_year,
+        ).count(),
+    }
+    return render(request, "core/Accountant.html", context)
 
 
 def test(request):

@@ -5,15 +5,15 @@
     </h2>
     <div class="detail-grid" style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px;">
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-        <span style="font-weight: bold; color: #666">Tiêu đề:</span>
+        <span style="font-weight: 500; color: #666">Tiêu đề:</span>
         <span style="font-weight: 500; color: #333">{{ thongbao.title }}</span>
     </div>
     <div style="display: flex; flex-direction: column; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; align-items: flex-start;">
-        <p style="font-weight: bold; color: #666; min-width: 120px;">Nội dung:</p>
+        <p style="font-weight: 500; color: #666; min-width: 120px;">Nội dung:</p>
         <p style="font-weight: 500; color: #333; white-space: pre-line; margin-top: 14px;;">{{ thongbao.content }}</p>
     </div>
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-        <span style="font-weight: bold; color: #666">Đối tượng nhận:</span>
+        <span style="font-weight: 500; color: #666">Đối tượng nhận:</span>
         <span style="font-weight: 500; color: #333">
         {% if thongbao.doi_tuong == 'all' %}Tất cả
         {% elif thongbao.doi_tuong == 'ketoan' %}Kế toán
@@ -22,22 +22,22 @@
         </span>
     </div>
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-        <span style="font-weight: bold; color: #666">Người gửi:</span>
+        <span style="font-weight: 500; color: #666">Người gửi:</span>
         <span style="font-weight: 500; color: #333">{{ thongbao.sender }}</span>
     </div>
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-        <span style="font-weight: bold; color: #666">Thời gian gửi:</span>
+        <span style="font-weight: 500; color: #666">Thời gian gửi:</span>
         <span style="font-weight: 500; color: #333">{{ thongbao.created_at|date:'d/m/Y H:i' }}</span>
     </div>
     {% if thongbao.updated_by %}
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-        <span style="font-weight: bold; color: #666">Cập nhật bởi:</span>
+        <span style="font-weight: 500; color: #666">Cập nhật bởi:</span>
         <span style="font-weight: 500; color: #333">{{ thongbao.updated_by }}</span>
     </div>
     {% endif %}
     {% if thongbao.updated_at %}
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-        <span style="font-weight: bold; color: #666">Thời gian cập nhật:</span>
+        <span style="font-weight: 500; color: #666">Thời gian cập nhật:</span>
         <span style="font-weight: 500; color: #333">{{ thongbao.updated_at|date:'d/m/Y H:i' }}</span>
     </div>
     {% endif %}
